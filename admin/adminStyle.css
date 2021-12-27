@@ -173,7 +173,7 @@ body {
   # Header
   --------------------------------------------------------------*/
   #header {
-    background: #DB5A42;
+    background: #A57F60;
     transition: all 0.5s;
     z-index: 997;
     padding: 15px 0;
@@ -208,7 +208,7 @@ body {
   */
   .appointment-btn {
     margin-left: 25px;
-    background: #1977cc;
+    background: #E3A587;
     color: #fff;
     border-radius: 50px;
     padding: 8px 25px;
@@ -219,7 +219,7 @@ body {
   }
   
   .appointment-btn:hover {
-    background: #166ab5;
+    background: #ec9062;
     color: #fff;
   }
   
@@ -281,7 +281,8 @@ body {
   .navbar .active,
   .navbar .active:focus,
   .navbar li:hover>a {
-    border-bottom: 2px solid white;
+    color: #E3A587;
+    border-bottom: 2px solid #E3A587;
   }
   
   .navbar .dropdown ul {
@@ -294,7 +295,7 @@ body {
     z-index: 99;
     opacity: 0;
     visibility: hidden;
-    background: #fff;
+    background: #A57F60;
     box-shadow: 0px 0px 30px rgba(127, 137, 161, 0.25);
     transition: 0.3s;
   }
@@ -308,7 +309,7 @@ body {
     font-size: 14px;
     font-weight: 500;
     text-transform: none;
-    color: #082744;
+    color: #ffffff;
     border: none;
   }
   
@@ -319,7 +320,7 @@ body {
   .navbar .dropdown ul a:hover,
   .navbar .dropdown ul .active:hover,
   .navbar .dropdown ul li:hover>a {
-    color: #1977cc;
+    color: #E3A587;
   }
   
   .navbar .dropdown:hover>ul {
