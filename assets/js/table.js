@@ -1,6 +1,11 @@
 $(document).ready(function() {
     $('#example').DataTable( {
-        responsive: true,
+        // ajax: '/api/data',
+        // responsive: true,
         fixedHeader: true,
+        // "scrollX": true,
+        // scrollY: 200,
+        // deferRender: true,
+        // scroller: true, 
     });
 } );    
