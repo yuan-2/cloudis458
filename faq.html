@@ -72,7 +72,7 @@
                     <li><a class="nav-link scrollto" href="index.html">Home</a></li>
                     <li><a class="nav-link scrollto" href="donateGeneral.html">Donate</a></li>
                     <li><a class="nav-link scrollto" href="requestWishList.html">Request</a></li>
-                    <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
+                    <li><a class="nav-link scrollto active" href="faq.html">Help</a></li>
                     <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="#">Drop Down 1</a></li>
@@ -94,7 +94,7 @@
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
 
-            <a href="login.html" class="appointment-btn scrollto">Login</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
@@ -116,45 +116,56 @@
             </div>
         </section><!-- End Breadcrumbs Section -->
 
-        <!-- <section class="inner-page">
-          <div class="container">
-            <p>
-              Example inner page template
-            </p>
-          </div>
-        </section> -->
 
-
-        <section>
+        <section id="pageTitle">
             <div class="container">
-                <div class="section-title">
-                    <h2>Login</h2>
-                    <h4 style="font-style: italic;">As an admin, driver or migrant worker</h4>
+                <div class="row">
+                    <div class="col-lg-6 col-sm-12">
+                        <h2>FAQ</h2>
+                        <p style="font-style: italic;">Frequently Asked Questions: </p>
+                        <div class="d-flex flex-row" style="font-style: italic;">
+                            <p>Quick navigation: &nbsp;</p>
+                            <a href="#worker">Migrant Worker</a> |
+                            <a href="#donor">Donor</a> |
+                            <a href="#driver">Driver</a>
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </section>
 
-        <div style="max-width: 1000px; margin: auto;">
-            <form id="loginInfo" onsubmit="event.preventDefault()" class="row g-3">
-                <div class="col-12">
-                    <label for="username" class="form-label w-50">Username</label>
-                    <input type="text" class="form-control w-50" name="username"
-                        placeholder="Enter Username or Phone number (Worker)" required>
-                </div>
-                <div class="col-12 pt-3">
-                    <label for="password" class="form-label w-50">Password</label>
-                    <input type="password" class="form-control w-50" name="password" required>
-                </div>
+        <section id="faqBody" class="pt-0">
+            <div class="container">
 
-                <br>
-
-                <div class="col-12 pt-5" style='text-align: center; color: #E3A587;'>
-                    <button type="submit" class="btn btn-outline-light" onclick="login()"
-                        style="color:white; background-color: #E3A587;">Login</button>
+            <div id="worker" class="pt-4">
+                <!-- Autopopulate FAQ -->
+                <h4>Migrant Worker</h4>
+                <div id="workerFaqList">
+                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Tempora voluptates consequuntur quam dolorem autem deleniti. Minus dolor ad animi eius assumenda error natus excepturi distinctio reiciendis, impedit dolores voluptatum blanditiis?
                 </div>
-            </form>
-            <br>
+            </div>
+    
+            <div id="donor" class="pt-4">
+                <!-- Autopopulate FAQ -->
+                <h4>Donors</h4>
+                <div id="donorFaqList">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto aperiam, perferendis incidunt quae minima vitae placeat repellat similique obcaecati molestias molestiae quos facere eveniet magnam. Adipisci, facilis! Ipsum, esse tempora?
+                </div>
+            </div>
+    
+            <div id="driver" class="pt-4">
+                <!-- Autopopulate FAQ -->
+                <h4>Drivers</h4>
+                <div id="driverFaqList">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum dolore voluptatum tempore iure quae perferendis ea harum animi corrupti tempora nobis, eveniet nulla nemo, reiciendis distinctio vel eos quidem. Rem?
+                </div>
+            </div>
         </div>
+        </section>
+        
+
 
     </main><!-- End #main -->
 
@@ -249,56 +260,24 @@
     <script src="assets/js/main.js"></script>
 
     <script>
+        var userType = ""
 
         function checkLogin() {
             if (window.sessionStorage.getItem("userType") != null) {
-                var userType = window.sessionStorage.getItem("userType")
+                userType = window.sessionStorage.getItem("userType")
+
+                document.getElementById("loginLogoutButton").innerText = "Logout"
+
             }
         }
 
-        function login() {
-            let alertMsgFieldCount = 0
-
-            const formData = document.forms["loginInfo"]
-
-            if (formData.username.value === "") {
-                alertMsgFieldCount += 1
+        function loginLogout() {
+            if (document.getElementById("loginLogoutButton").innerText === "Login") {
+                window.location.href = "login.html"
+            } else {
+                window.sessionStorage.removeItem("userType")
+                window.location.reload()
             }
-            if (formData.password.value === "") {
-                alertMsgFieldCount += 1
-            }
-
-            if (alertMsgFieldCount == 0) {
-                if (formData.username.value === "Migrant Worker") {
-                    window.sessionStorage.setItem("userType", "MW")
-                    let confirmMsg = confirm("Logging in as a Migrant Worker")
-                    if (confirmMsg == true) {
-                        window.location.href = "index.html"
-                    }
-                }
-                else if (formData.username.value === "Admin") {
-                    window.sessionStorage.setItem("userType", "A")
-                    let confirmMsg = confirm("Logging in as Admin")
-                    if (confirmMsg == true) {
-                        // window.location.href = "index.html"
-                    }
-                }
-                else if (formData.username.value === "Driver") {
-                    window.sessionStorage.setItem("userType", "D")
-                    let confirmMsg = confirm("Logging in as a Driver")
-                    if (confirmMsg == true) {
-                        // window.location.href = "index.html"
-                    }
-                }
-
-                else {
-                    alert("Please check if you have a registered account with the organization before logging in again")
-                }
-            }
-            else {
-                alert("Please check the " + alertMsgFieldCount + " field(s) that you have left empty and try to log in again")
-            }
-            
         }
     </script>
 
