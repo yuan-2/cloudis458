@@ -133,4 +133,10 @@ INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemS
 ('drawers', 'drawers to store things', 'home furniture', now(), 1);
 
 
-
+-- for category table 
+INSERT INTO category(`categoryName`) VALUES ('Food');
+INSERT INTO category(`categoryName`) VALUES ('Home Appliances');
+INSERT INTO category(`categoryName`) VALUES ('Clothes');
+INSERT INTO category(`categoryName`) VALUES ('Furniture');
+INSERT INTO category(`categoryName`) VALUES ('Toiletries');
+INSERT INTO category(`categoryName`) VALUES ('Kitchenware');
