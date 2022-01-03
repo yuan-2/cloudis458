@@ -30,9 +30,12 @@
         <link href="adminStyle.css" rel="stylesheet">
 
         <!-- datatables.net -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-        <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap5.min.css" rel="stylesheet">
+
+        <!-- jQuery & Popper.js -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
         <!-- =======================================================
         * Template Name: Medilab - v4.7.0
@@ -69,7 +72,7 @@
             <nav id="navbar" class="navbar order-last order-lg-0">
                 <ul>
                     <li><a class="nav-link" href="#hero">Home</a></li>
-                    <li><a class="nav-link" href="adminViewForms.html">Forms</a></li>
+                    <li><a class="nav-link" href="adminViewForms.html">Requests</a></li>
                     <li><a class="nav-link" href="adminViewSuccessfulMatches.html">Matches</a></li>
                     <li><a class="nav-link" href="adminEditInventory.html">Inventory</a></li>
                     <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
@@ -86,13 +89,13 @@
     <section style="padding-bottom: 0px;">
         <div class="section-title">
             <h2>Add, Remove or Update Inventory</h2>
-            <p>Edit items stored in the database</p>
+            <p>View and Edit items donated by donors and stored in the database</p>
         </div>
     </section>
     <section class="inner-page">
         <div class="container">
             <div class="table-responsive">
-                <table id="example" class="table table-striped table-hover" style="width:100%">
+                <table id="inventory" class="table table-striped table-hover" style="width:100%">
                     <thead>
                         <tr>
                             <th>Item ID</th>
@@ -110,90 +113,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Toothbrush</td>
-                            <td>basic toiletries</td>
-                            <td>yew wei</td>
-                            <td>pasir ris grove</td>
-                            <td>92251521</td>
-                            <td>toiletries</td>
-                            <td>1</td>
-                            <td>Yes</td>
-                            <td>east</td>
-                            <td>2021-12-29 23:48:20</td>
-                            <td>Not delivered</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>hair dryer</td>
-                            <td>for hair</td>
-                            <td>yuanyuan</td>
-                            <td>510121</td>
-                            <td>12345678</td>
-                            <td>home appliances</td>
-                            <td>1</td>
-                            <td>Yes</td>
-                            <td>west</td>
-                            <td>2021-12-29 23:48:20</td>
-                            <td>Not delivered</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>t-shirts</td>
-                            <td>free size t-shirts</td>
-                            <td>amanda</td>
-                            <td>510425</td>
-                            <td>12345678</td>
-                            <td>clothing</td>
-                            <td>1</td>
-                            <td>Yes</td>
-                            <td>north</td>
-                            <td>2021-12-29 23:48:20</td>
-                            <td>Not delivered</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>rice cooker</td>
-                            <td>to cook rice</td>
-                            <td>nicole</td>
-                            <td>510180</td>
-                            <td>12345678</td>
-                            <td>home appliances</td>
-                            <td>1</td>
-                            <td>Yes</td>
-                            <td>south</td>
-                            <td>2021-12-29 23:48:20</td>
-                            <td>Not delivered</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>fan</td>
-                            <td>for sg hot weather</td>
-                            <td>vanessa</td>
-                            <td>pasir ris</td>
-                            <td>12345678</td>
-                            <td>home appliances</td>
-                            <td>1</td>
-                            <td>Yes</td>
-                            <td>east</td>
-                            <td>2021-12-29 23:48:20</td>
-                            <td>Not delivered</td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>jeans</td>
-                            <td>jeans in size 40</td>
-                            <td>mei fang</td>
-                            <td>psair ris</td>
-                            <td>12345678</td>
-                            <td>clothing</td>
-                            <td>1</td>
-                            <td>Yes</td>
-                            <td>east</td>
-                            <td>2021-12-29 23:48:20</td>
-                            <td>Not delivered</td>
-                        </tr>
                     </tbody>
                     <!-- <tfoot>
                         <tr>
