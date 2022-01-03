@@ -83,4 +83,35 @@ CREATE TABLE IF NOT EXISTS `delivery` (
 -- for carousel table
 INSERT INTO carousel (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`) VALUES
 ('toothbrush', 'basic toiletries', 'yew wei', 'pasir ris grove', '92251521', 'toiletries', 1, 1, 'east', now(), 1);
+INSERT INTO carousel (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`) VALUES
+('hair dryer', 'for hair', 'yuanyuan', '510121', '12345678', 'home appliances', 1, 1, 'west', now(), 1);
+INSERT INTO carousel (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`) VALUES
+('t-shirts', 'free size t-shirts', 'amanda', '510425', '87654321', 'clothing', 1, 1, 'north', now(), 1);
+INSERT INTO carousel (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`) VALUES
+('rice cooker', 'to cook rice', 'nicole', '510180', '92251521', 'home appliances', 1, 1, 'south', now(), 1);
+INSERT INTO carousel (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`) VALUES
+('fan', 'for sg hot weather', 'vanessa', 'pasir ris', '92251521', 'home appliances', 1, 1, 'east', now(), 1);
+INSERT INTO carousel (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`) VALUES
+('jeans', 'jeans in size 40', 'mei fang', 'pasir ris', '92251521', 'clothing', 1, 1, 'east', now(), 1);
+
+SELECT * FROM carousel;
+
+-- for wishlist table
+INSERT INTO wishlist (`itemname`, `remarks`, `category`, `timesubmitted`, `itemstatus`) VALUES
+('backpack', 'my backpack broke, need a new one', 'others', now(), 1);
+INSERT INTO wishlist (`itemname`, `remarks`, `category`, `timesubmitted`, `itemstatus`) VALUES
+('stool', 'need a small chair to sit on', 'home furniture', now(), 1);
+INSERT INTO wishlist (`itemname`, `remarks`, `category`, `timesubmitted`, `itemstatus`) VALUES
+('chair', 'chair broke, need a new one', 'home furniture', now(), 1);
+INSERT INTO wishlist (`itemname`, `remarks`, `category`, `timesubmitted`, `itemstatus`) VALUES
+('table', 'a small table for dining and other purposes', 'home furniture', now(), 1);
+INSERT INTO wishlist (`itemname`, `remarks`, `category`, `timesubmitted`, `itemstatus`) VALUES
+('shoes', 'shoes for work', 'clothing', now(), 1);
+INSERT INTO wishlist (`itemname`, `remarks`, `category`, `timesubmitted`, `itemstatus`) VALUES
+('wardrobe', 'wardrobe to store my clothes', 'home furniture', now(), 1);
+INSERT INTO wishlist (`itemname`, `remarks`, `category`, `timesubmitted`, `itemstatus`) VALUES
+('drawers', 'drawers to store things', 'home furniture', now(), 1);
+
+SELECT * FROM wishlist
+
 
