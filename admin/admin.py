@@ -47,7 +47,7 @@ class CarouselItem(db.Model):
         self.itemStatus = itemStatus
 
     def json(self):
-        return {"id": self.id, "name": self.name, "description": self.description, "donorName": self.donorName, "donoradd": self.donorAddr, 
+        return {"id": self.id, "name": self.name, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, 
                 "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, 
                 "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
 

@@ -13,15 +13,15 @@ $(document).ready(function() {
             { data: 'id' },
             { data: 'name' },
             { data: 'description' },
-            { data: 'donorname' },
-            { data: 'donoradd' },
-            { data: 'contactno' },
+            { data: 'donorName' },
+            { data: 'donorAddr' },
+            { data: 'contactNo' },
             { data: 'category' },
             { data: 'quantity' },
-            { data: 'requiredelivery' },
+            { data: 'requireDelivery' },
             { data: 'region' },
-            { data: 'timesubmitted' }, 
-            { data: 'itemstatus' }
+            { data: 'timeSubmitted' }, 
+            { data: 'itemStatus' }
         ],
         // responsive: true,
         fixedHeader: true,
@@ -44,10 +44,10 @@ $(document).ready(function() {
         columns: [
             { data: 'reqid' },
             { data: 'requestor' },
-            { data: 'deliverylocation' },
-            { data: 'itemcategory' },
-            { data: 'requestqty' },
-            { data: 'timesubmitted' }
+            { data: 'deliveryLocation' },
+            { data: 'itemCategory' },
+            { data: 'requestQty' },
+            { data: 'timeSubmitted' }
         ],
         // responsive: true,
         fixedHeader: true,
