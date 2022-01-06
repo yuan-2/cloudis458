@@ -94,3 +94,7 @@ $(document).ready(function() {
     });
 
 } );    
+
+function editSpecificRow() {
+    document.getElementById("edit-section").style.display = "block";
+}
