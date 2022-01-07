@@ -99,6 +99,14 @@ CREATE TABLE IF NOT EXISTS `matches` (
 ) ;
 
 
+DROP TABLE IF EXISTS `fixedItem`;
+CREATE TABLE IF NOT EXISTS `fixedItem` (
+  `itemID` int(11) NOT NULL AUTO_INCREMENT,
+  `itemName` varchar(50) NOT NULL,
+  PRIMARY KEY (`itemID`)
+) ;
+
+
 -- INSERT values
 
 -- for carousel table
@@ -140,3 +148,11 @@ INSERT INTO category(`categoryName`) VALUES ('Clothes');
 INSERT INTO category(`categoryName`) VALUES ('Furniture');
 INSERT INTO category(`categoryName`) VALUES ('Toiletries');
 INSERT INTO category(`categoryName`) VALUES ('Kitchenware');
+
+
+-- fixed Item table
+INSERT INTO fixedItem(`itemName`) VALUES ('Clothes');
+INSERT INTO fixedItem(`itemName`) VALUES ('microwave');
+INSERT INTO fixedItem(`itemName`) VALUES ('toothbrush');
+INSERT INTO fixedItem(`itemName`) VALUES ('water bottle');
+INSERT INTO fixedItem(`itemName`) VALUES ('handphone');
