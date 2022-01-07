@@ -134,53 +134,53 @@
         </section>
 
         <div style="max-width: 1000px; margin: auto;">
-            <form class="row g-3">
+            <form id="donateForm" class="row g-3">
                 <div class="col-md-6">
-                    <label for="inputName" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="inputName" placeholder="Enter Name" required>
+                    <label for="donorFullName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="donorFullName" placeholder="Your name or the Organization you are representing" required>
                 </div>
                 <div class="col-md-6">
-                    <label for="inputContactNumber" class="form-label">Contact Number</label>
-                    <input type="text" class="form-control" id="inputContactNumber" placeholder="Enter Contact Number"
-                        required>
+                    <label for="donorContact" class="form-label">Contact Number</label>
+                    <input type="text" class="form-control" id="donorContact" placeholder="Enter a valid contact number" required>
                 </div>
                 <div class="col-6">
-                    <label for="inputAddress" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="inputAddress" placeholder="Enter Address" required>
+                    <label for="donorAddress" class="form-label">Address</label>
+                    <input type="text" class="form-control" id="donorAddress" placeholder="Enter a valid address" required>
                 </div>
 
                 <div class="col-6">
-                    <label for="inputAddress" class="form-label">Area</label>
+                    <label for="donorAddress" class="form-label">Area</label>
                     <br>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                            value="option1">
+                            value="North">
                         <label class="form-check-label" for="inlineRadio1">North</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
-                            value="option2">
+                            value="South">
                         <label class="form-check-label" for="inlineRadio2">South</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
-                            value="option3">
+                            value="East">
                         <label class="form-check-label" for="inlineRadio3">East</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
-                            value="option3">
-                        <label class="form-check-label" for="inlineRadio3">West</label>
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio4"
+                            value="West">
+                        <label class="form-check-label" for="inlineRadio4">West</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
-                            value="option3">
-                        <label class="form-check-label" for="inlineRadio3">Central</label>
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio5"
+                            value="Central">
+                        <label class="form-check-label" for="inlineRadio5">Central</label>
                     </div>
                 </div>
 
+                <!--On change of this dropdown, auto get item names listed under this category-->
                 <div class="col-6">
-                    <label for="autoSizingSelect" class="form-label">Item Category</label>
+                    <label for="itemCategory" class="form-label">Item Category</label>
                     <select class="form-select" id="itemCategory" required>
                         <option value="Clothes" selected>Clothes</option>
                         <option value="Home Appliances">Home Appliances</option>
@@ -197,17 +197,18 @@
                     </div>
                 </div>
 
+                <!--Option value for item name needs to be dynamic, based on category-->
                 <div class="col-6">
-                    <label for="autoSizingSelect" class="form-label">Item Name</label>
-                    <select class="form-select" id="autoSizingSelect" required>
+                    <label for="itemNameInCat" class="form-label">Item Name</label>
+                    <select class="form-select" id="itemNameInCat" required>
                         <option selected value="T-shirts">T-shirts</option>
                         <option value="1">Pants</option>
                         <option value="2">Hat</option>
                     </select>
                 </div>
                 <div class="col-6">
-                    <label for="autoSizingSelect" class="form-label">Quantity</label>
-                    <select class="form-select" id="autoSizingSelect" required>
+                    <label for="itemQty" class="form-label">Quantity</label>
+                    <select class="form-select" id="itemQty" required>
                         <option selected value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -216,8 +217,8 @@
                 </div>
 
                 <div class="col-6">
-                    <label for="homeDelivery" class="form-label">Require delivery from home?</label>
-                    <select class="form-select" id="homeDelivery" required>
+                    <label for="pickUpOption" class="form-label">Require drivers to pick it up?</label>
+                    <select class="form-select" id="pickUpOption" required>
                         <option selected value="yes">Yes</option>
                         <option value="no">No</option>
                     </select>

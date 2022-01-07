@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `spmproject`
+-- Database: `fyptest`
 --
 DROP Database IF EXISTS `fyptest`;
 Create DATABASE `fyptest`;
@@ -45,11 +45,13 @@ CREATE TABLE IF NOT EXISTS `carousel` (
   `Region` varchar(20) NOT NULL,
   `TimeSubmitted` DATETIME NOT NULL,
   `ItemStatus` TINYINT(1) NOT NULL,
+  `FileName` varchar(200) NOT NULL,
   PRIMARY KEY (`ID`)
 ) ;
 
-INSERT INTO `carousel` (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`) VALUES
-('toothbrush', 'basic toiletries', 'yew wei', 'pasir ris grove', '92251521', 'toiletries', 1, 1, 'east', 1);
+INSERT INTO `carousel` (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`, `filename`) VALUES
+('toothbrush', 'teeth brushing essential', 'yew wei', 'pasir ris grove', '92251521', 'toiletries', 1, 1, 'east', '2022-01-03 17:10:00', 1, 'toothbrush.png'),
+('blender', 'makes great shakes', 'yew wei', 'pasir ris grove', '92251521', 'electronics', 1, 1, 'east', '2022-01-03 17:15:00', 1, 'blender.jpg');
 
 DROP TABLE IF EXISTS `wishlist`;
 CREATE TABLE IF NOT EXISTS `wishlist` (
@@ -61,5 +63,7 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
   `itemstatus` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ;
+
+select * from carousel;
 
 
