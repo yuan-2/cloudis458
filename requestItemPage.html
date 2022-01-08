@@ -99,49 +99,25 @@
         </div>
     </header><!-- End Header -->
 
+    <!-- ======= Image Banner Section ======= -->
+    <section id="hero" class="d-flex align-items-center"></section>
+
     <main id="main">
-
-        <!-- ======= Breadcrumbs Section ======= -->
-        <section class="breadcrumbs">
-            <div class="container">
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>Inner Page</h2>
-                    <ol>
-                        <li><a href="index.html">Home</a></li>
-                        <li>Inner Page</li>
-                    </ol>
-                </div>
-
-            </div>
-        </section><!-- End Breadcrumbs Section -->
 
         <!-- Adaptive section to auto populate data carried over from carousel page click -->
         <section id="pageTitle">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-12 col-lg-6">
-                        <div class="pt-3">
-                            <h2 id="itemName">Blender</h2>
-                            <p style="font-style: italic;">Category: <span id="itemCat">Electronics</span></p>
-                        </div>
-                    </div>
-                </div>
+            <div class="container" id="itemReqDisplay">
+
             </div>
         </section>
 
         <div style="max-width: 1000px; margin: auto;">
             <form class="row g-3">
                 <div id="itemImage" class="col-md-6">
-                    <img style="width: 300px; width: 300px;" src="assets/img/donations/blender.jpg" alt="">
+                    
                 </div>
                 <div id="donorInfo" class="col-md-6">
-                    <div class="pt-5">
-                        <p>Donated By: <span id="donorName">Yew Wei</span></p>
-                        <p>Contact No: <span id="donorContact">92365125</span></p>
-                        <p>Item Description: <span id="itemDesc">Typical blender</span></p>
-                        <p>Delivery Method: <span id="itemDelivery">Require Driver</span></p>
-                    </div>
+                    
                 </div>
 
             </form>
@@ -242,12 +218,68 @@
 
     <script>
         var userType = ""
+        var itemId = ""
+        var itemReqDisplay = document.getElementById("itemReqDisplay")
+        var itemImage = document.getElementById("itemImage")
+        var donorInfo = document.getElementById("donorInfo")
 
         function checkLoginForReq() {
             if (window.sessionStorage.getItem("userType") != null) {
                 userType = window.sessionStorage.getItem("userType")
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
+
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                itemId = urlParams.get('id')
+
+                loadItem().then(function retriveInfo(result) {
+                    var itemInfo = result
+                    // console.log(itemInfo)
+
+                    // item info API Works but request is not done up for dynamic work 
+                    for (item of itemInfo) {
+                        itemReqDisplay.innerHTML = `
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-6">
+                                <div class="pt-3">
+                                    <h2 id="itemName">${item.name}</h2>
+                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        `
+
+                        itemImage.innerHTML = `
+                        <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
+                        `
+
+                        if (item.requireDelivery == 1) {
+                            donorInfo.innerHTML = `
+                            <div class="pt-5">
+                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
+                                <p>Contact No: <span id="donorContact">${item.contactNo}</span></p>
+                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
+                                <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
+                                <button class="btn btn-outline-secondary" onclick="reqItem()">Request!</button>
+                            </div>
+                        `
+                        }
+                        else {
+                            donorInfo.innerHTML = `
+                            <div class="pt-5">
+                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
+                                <p>Contact No: <span id="donorContact">${item.contactNo}</span></p>
+                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
+                                <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
+                                <button class="btn btn-outline-secondary" onclick="reqItem()">Request!</button>
+                            </div>
+                        `
+                        }
+                    }
+                    
+                    
+                })
 
             }
             else {
@@ -259,6 +291,23 @@
                     window.location.href = "index.html"
                 }
             }
+        }
+
+        async function loadItem() {
+            let response = await fetch("http://127.0.0.1:5004/getItemById/" + itemId)
+            let responseCode = await response.json()
+            if (responseCode.code == 200) {
+                return responseCode.data.itemDetail
+            }
+            else {
+                alert(responseCode.message)
+            }
+
+        }
+
+        // Request button to POST item request
+        function reqItem() {
+
         }
 
         function loginLogout() {

@@ -176,58 +176,8 @@
       <!-- item carousel starts here (auto populate using db) -->
       <section id="carouselBody">
         <div class="container">
-          <div class="row">
-            <div class="col-lg-4 d-flex align-items-stretch p-3">
-              <div class="card" style="width: 20rem;">
-                <img src="./assets/img/donations/blender.jpg" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">Blender</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Electronics</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-                  <a onclick="checkUserType()" class="btn btn-primary">Request</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 d-flex align-items-stretch p-3">
-              <div class="card" style="width: 20rem;">
-                <img src="./assets/img/donations/toothbrush.png" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">Toothbrush</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Toiletries</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-                  <a href="#" class="btn btn-primary">Request</a>
-                </div>
-              </div>
-
-            </div>
-            <div class="col-lg-4 d-flex align-items-stretch p-3">
-              <div class="card" style="width: 20rem;">
-                <img src="./assets/img/donations/diffuser.jpg" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">Diffuser</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Electronics</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-                  <a href="#" class="btn btn-primary">Request</a>
-                </div>
-              </div>
-
-            </div>
-            <div class="col-lg-4 d-flex align-items-stretch p-3">
-              <div class="card" style="width: 20rem;">
-                <img src="./assets/img/donations/bottle.jpg" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">1 Litre Bottle</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Bottles</h6>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-                  <a href="#" class="btn btn-primary">Request</a>
-                </div>
-              </div>
-
-            </div>
+          <div class="row" id="mainCarouselDisplay">
+            <!-- Div for carousel cards go here -->
           </div>
         </div>
       </section>
@@ -327,12 +277,54 @@
 
   <script>
     var userType = ""
+
+    var mainCarouselDisplay = document.getElementById("mainCarouselDisplay")
+    
     function checkLogin() {
       if (window.sessionStorage.getItem("userType") != null) {
         userType = window.sessionStorage.getItem("userType")
 
         document.getElementById("loginLogoutButton").innerText = "Logout"
         
+      }
+
+      // async to return promise and update carousel page with items 
+      loadCarousel().then(function retrieveItems(result) {
+        var carouselItemList = result
+
+        mainCarouselDisplay.innerHTML = ""
+
+        for (i in carouselItemList) {
+          mainCarouselDisplay.innerHTML += `
+            <div class="col-lg-4 d-flex align-items-stretch p-3">
+              <div class="card" style="width: 20rem;">
+                <img src="./assets/img/donations/${carouselItemList[i].fileName}" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">${carouselItemList[i].name}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">${carouselItemList[i].category}</h6>
+                  <p class="card-text">${carouselItemList[i].description}</p>
+                  <a data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
+                </div>
+              </div>
+            </div>
+          `
+        }
+      })
+      
+    }
+
+    async function loadCarousel() {
+      try {
+        let response = await fetch("http://127.0.0.1:5004/getItems")
+        let responseCode = await response.json()
+        if (responseCode.code == 200) {
+          return responseCode.data.items
+        }
+        else {
+          alert(responseCode.message)
+        }
+      } catch (error) {
+        alert(error)
       }
     }
 
@@ -346,7 +338,9 @@
       }
     }
     
-    function checkUserType() {
+    function checkUserType(x) {
+      var itemData = x.getAttribute("data-tip")
+
       if (userType == "") {
         let confirmMsg = confirm("Only Migrant Workers can request for items. Click on OK to go to the Login Page.")
 
@@ -356,9 +350,13 @@
         
       }
       else if (userType == "MW") {
-        window.location.href = "requestItemPage.html"
+
+        // console.log(itemData)
+        window.location.href = `requestItemPage.html?id=${itemData}` // pass itemId over to request page to retrieve full item info
       }
     }
+
+
   </script>
 
 </body>
