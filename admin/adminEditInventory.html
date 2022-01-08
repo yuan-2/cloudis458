@@ -130,44 +130,55 @@
             <div id="edit-section" style="display: none">
                 <div class="row">
                     <div class="col-2">
-                        <input class="form-control mb-2" type="text" placeholder="Item ID">
+                        <label for="itemID">Item ID</label>
+                        <input class="form-control mb-2" type="number" placeholder="Item ID" id="itemID" onchange="fillInventoryDetails(this.value)">
                     </div>
                     <div class="col-4">
-                        <input class="form-control mb-2" type="text" placeholder="Item Name">
+                        <label for="itemName">Item Name</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Name" id="itemName">
                     </div>
                     <div class="col-6">
-                        <input class="form-control mb-2" type="text" placeholder="Description">
+                        <label for="description">Description</label>
+                        <input class="form-control mb-2" type="text" placeholder="Description" id="description">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-4">
-                        <input class="form-control mb-2" type="text" placeholder="Donor Name">
+                        <label for="donorName">Donor Name</label>
+                        <input class="form-control mb-2" type="text" placeholder="Donor Name" id="donorName">
                     </div>
                     <div class="col-4">
-                        <input class="form-control mb-2" type="text" placeholder="Donor Address">
+                        <label for="donorAddr">Donor Address</label>
+                        <input class="form-control mb-2" type="text" placeholder="Donor Address" id="donorAddr">
                     </div>
                     <div class="col-4">
-                        <input class="form-control mb-2" type="text" placeholder="Contact No.">
+                        <label for="contactNo">Contact No.</label>
+                        <input class="form-control mb-2" type="text" placeholder="Contact No." id="contactNo">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-4">
-                        <input class="form-control mb-2" type="text" placeholder="Item Category">
+                        <label for="itemCat">Item Category</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCat">
                     </div>
                     <div class="col-2">
-                        <input class="form-control mb-2" type="text" placeholder="Quantity">
+                        <label for="quantity">Quantity</label>
+                        <input class="form-control mb-2" type="number" placeholder="Quantity" id="quantity">
                     </div>
                     <div class="col-2">
-                        <input class="form-control mb-2" type="text" placeholder="Need Delivery?">
+                        <label for="needDelivery">Need Delivery?</label>
+                        <input class="form-control mb-2" type="number" placeholder="Need Delivery?" id="needDelivery">
                     </div>
                     <div class="col-2">
-                        <input class="form-control mb-2" type="text" placeholder="Area">
+                        <label for="area">Area</label>
+                        <input class="form-control mb-2" type="text" placeholder="Area" id="area">
                     </div>
                     <div class="col-2">
-                        <input class="form-control mb-2" type="text" placeholder="Status">
+                        <label for="status">Item Status</label>
+                        <input class="form-control mb-2" type="number" placeholder="Status" id="status">
                     </div>
                 </div>
-                <button type="submit" id="save-btn" href="#" class="btn btn-outline-secondary" onclick="">Save Changes</button>
+                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editInventory()">Save Changes</button>
             </div>
         </div>
     </section>

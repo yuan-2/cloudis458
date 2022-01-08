@@ -51,9 +51,6 @@ class CarouselItem(db.Model):
                 "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, 
                 "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
 
-# class WishList(db.Model):
-#     __tablename__ = 'wishlist'
-
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
 @app.route("/getAllItems")
 def getAllItems():
@@ -93,6 +90,56 @@ def getItemsByCategory(Cat):
             "message": "There are no items listed under this category."
         }
     ), 404
+
+# get specific wishlist submitted by migrant workers by wishlist ID
+@app.route("/getItem/<int:id>")
+def getItemByID(id):
+    carouselItem = CarouselItem.query.filter_by(id=id).first()
+    if carouselItem:
+        return jsonify(
+            {
+                "code": 200,
+                "data": carouselItem.json()
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Item cannot be found for this ID."
+        }
+    ), 404
+
+# edit donated (carousel) item in table
+@app.route("/updateItem/<int:itemID>", methods=["PUT"])
+def updateItem(itemID):
+    item = CarouselItem.query.filter_by(id=itemID).first()
+    data = request.get_json()
+    if (item is None):
+        return jsonify( 
+            {
+                "code": 404,
+                "message": "This item ID is not found in the database."
+            }
+        )
+    else:
+        item.name = data['itemName']
+        item.description = data['description']
+        item.donorName = data['donorName']
+        item.donorAddr = data['donorAddr']
+        item.contactNo = data['contactNo']
+        item.category = data['itemCategory']
+        item.quantity = data['quantity']
+        item.requireDelivery = data['requireDelivery']
+        item.region = data['region']
+        item.itemStatus = data['itemStatus']
+        db.session.add(item)
+        db.session.commit()
+        return jsonify(
+            {
+                "code": 200,
+                "message": "Item successfully updated."
+            }
+        )
 
 
 class Request(db.Model):
@@ -180,6 +227,49 @@ def getWishlist():
         }
     ), 404
 
+# get specific wishlist submitted by migrant workers by wishlist ID
+@app.route("/getWishlist/<int:id>")
+def getWishlistByID(id):
+    wishlist = Wishlist.query.filter_by(id=id).first()
+    if wishlist:
+        return jsonify(
+            {
+                "code": 200,
+                "data": wishlist.json()
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Wishlist cannot be found for this ID."
+        }
+    ), 404
+
+# edit wishlist in table
+@app.route("/updateWishlist/<int:id>", methods=["PUT"])
+def updateWishlist(id):
+    wishlistItem = Wishlist.query.filter_by(id=id).first()
+    data = request.get_json()
+    if (wishlistItem is None):
+        return jsonify( 
+            {
+                "code": 404,
+                "message": "This ID is not found in the database."
+            }
+        )
+    else:
+        wishlistItem.itemName = data['itemName']
+        wishlistItem.remarks = data['remarks']
+        wishlistItem.category = data['itemCategory']
+        wishlistItem.itemStatus = data['itemStatus']
+        db.session.add(wishlistItem)
+        db.session.commit()
+        return jsonify(
+            {
+                "code": 200,
+                "message": "Wishlist successfully updated."
+            }
+        )
 
 if __name__ == "__main__":
     app.run(port="5000", debug=True)
