@@ -23,7 +23,7 @@ class CarouselItem(db.Model):
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(300), nullable=False)
     donorName = db.Column(db.String(50), nullable=False)
-    donorAdd = db.Column(db.String(300), nullable=False)
+    donorAddr = db.Column(db.String(300), nullable=False)
     contactNo = db.Column(db.String(20), nullable=False)
     category = db.Column(db.String(20), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
@@ -33,12 +33,12 @@ class CarouselItem(db.Model):
     itemStatus = db.Column(db.Integer, nullable=False)
     fileName = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, id, name, description, donorName, donorAdd, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, filename):
+    def __init__(self, id, name, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, filename):
         self.id = id
         self.name = name
         self.description = description
         self.donorName = donorName
-        self.donorAdd = donorAdd
+        self.donorAddr = donorAddr
         self.contactNo = contactNo
         self.category = category
         self.quantity = quantity
@@ -49,10 +49,35 @@ class CarouselItem(db.Model):
         self.filename = filename
 
     def json(self):
-        return {"id": self.id, "name": self.name, "description": self.description, "donorName": self.donorName, "donorAdd": self.donorAdd, "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
+        return {"id": self.id, "name": self.name, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
 
-# class WishList(db.Model):
-#     __tablename__ = 'wishlist'
+
+# class Category(db.Model):
+#     __tablename__ = 'category'
+    
+#     categoryName = db.Column(db.String, primary_key=True)
+#     description = db.Column(db.String, nullable=True)
+    
+#     def __init__(self, categoryName, description):
+#         self.categoryName = categoryName
+#         self.description = description
+        
+#     def json(self):
+#         return {"categoryName": self.categoryName, "description": self.description}
+
+class CategoryItem(db.Model):
+    __tablename__ = 'categoryitem'
+    
+    itemId = db.Column(db.Integer, nullable=False)
+    itemName = db.Column(db.String, primary_key=True)
+    attachedCategory = db.Column(db.String, primary_key=True)
+    
+    def __init__(self, itemName, attachedCategory):
+        self.itemName = itemName
+        self.attachedCategory = attachedCategory
+        
+    def json(self):
+        return {"itemId": self.itemId, "itemName": self.itemName, "attachedCategory": self.attachedCategory}
 
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
 @app.route("/getItems")
@@ -97,10 +122,10 @@ def getItem(id):
     ), 404
 
 
-@app.route("/addItemToCarousel", methods=['POST'])
-def addCarouselItem():
-    formData = request.form
-    formDict = formData.to_dict()
+# @app.route("/addItemToCarousel", methods=['POST'])
+# def addCarouselItem():
+#     formData = request.form
+#     formDict = formData.to_dict()
     
 
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 and filtered by category (time logic not done)
@@ -123,7 +148,56 @@ def getItemsByCategory(Cat):
         }
     ), 404
 
+# get all exisitng categories to be displayed in drop down fields
+@app.route("/getCat")
+def getAllCat():
+    categoryList = CategoryItem.query.with_entities(CategoryItem.attachedCategory).distinct()
+    # print(categoryList)
+    if (categoryList):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "categories": [category for category in categoryList] # No need for .json() because you are returning just one column's data
+                }
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Please make sure the py file is being run to see category list"
+        }
+    ), 404
 
+# get all exisitng categories to be displayed in drop down fields
+@app.route("/getItemsInCat/<cat>")
+def getItemsInCategory(cat):
+    itemsInCategory = CategoryItem.query.filter_by(attachedCategory=cat)
+    # print(itemsInCategory)
+    
+    if (itemsInCategory):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "itemsInCat": [item.json() for item in itemsInCategory]
+                }
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Please make sure the py file is running to view items in each category."
+        }
+    ), 404
+
+# API to add item into carousel table from donor form
+# @app.route("/addItemToCarousel", methods=['POST'])
+# def addCarouselItem():
+#     formData = request.form
+#     formDict = formData.to_dict()
+    
 
 if __name__ == "__main__":
     app.run(port="5004", debug=True)
+
