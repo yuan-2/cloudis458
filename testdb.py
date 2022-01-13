@@ -33,8 +33,7 @@ class CarouselItem(db.Model):
     itemStatus = db.Column(db.Integer, nullable=False)
     fileName = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, id, name, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, filename):
-        self.id = id
+    def __init__(self, name, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, filename):
         self.name = name
         self.description = description
         self.donorName = donorName
@@ -54,32 +53,34 @@ class CarouselItem(db.Model):
 
 # class Category(db.Model):
 #     __tablename__ = 'category'
-    
+
 #     categoryName = db.Column(db.String, primary_key=True)
 #     description = db.Column(db.String, nullable=True)
-    
+
 #     def __init__(self, categoryName, description):
 #         self.categoryName = categoryName
 #         self.description = description
-        
+
 #     def json(self):
 #         return {"categoryName": self.categoryName, "description": self.description}
 
 class CategoryItem(db.Model):
     __tablename__ = 'categoryitem'
-    
+
     itemId = db.Column(db.Integer, nullable=False)
     itemName = db.Column(db.String, primary_key=True)
     attachedCategory = db.Column(db.String, primary_key=True)
-    
+
     def __init__(self, itemName, attachedCategory):
         self.itemName = itemName
         self.attachedCategory = attachedCategory
-        
+
     def json(self):
         return {"itemId": self.itemId, "itemName": self.itemName, "attachedCategory": self.attachedCategory}
 
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
+
+
 @app.route("/getItems")
 def getAllItems():
     carouselList = CarouselItem.query.all()
@@ -99,8 +100,10 @@ def getAllItems():
             "message": "There are no donations at the moment."
         }
     ), 404
-    
+
 # get item by id where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
+
+
 @app.route("/getItemById/<id>")
 def getItem(id):
     itemInfo = CarouselItem.query.filter_by(id=id)
@@ -126,7 +129,7 @@ def getItem(id):
 # def addCarouselItem():
 #     formData = request.form
 #     formDict = formData.to_dict()
-    
+
 
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 and filtered by category (time logic not done)
 @app.route("/getItem/<Cat>")
@@ -149,16 +152,20 @@ def getItemsByCategory(Cat):
     ), 404
 
 # get all exisitng categories to be displayed in drop down fields
+
+
 @app.route("/getCat")
 def getAllCat():
-    categoryList = CategoryItem.query.with_entities(CategoryItem.attachedCategory).distinct()
+    categoryList = CategoryItem.query.with_entities(
+        CategoryItem.attachedCategory).distinct()
     # print(categoryList)
     if (categoryList):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "categories": [category for category in categoryList] # No need for .json() because you are returning just one column's data
+                    # No need for .json() because you are returning just one column's data
+                    "categories": [category for category in categoryList]
                 }
             }
         )
@@ -170,11 +177,13 @@ def getAllCat():
     ), 404
 
 # get all exisitng categories to be displayed in drop down fields
+
+
 @app.route("/getItemsInCat/<cat>")
 def getItemsInCategory(cat):
     itemsInCategory = CategoryItem.query.filter_by(attachedCategory=cat)
     # print(itemsInCategory)
-    
+
     if (itemsInCategory):
         return jsonify(
             {
@@ -192,12 +201,23 @@ def getItemsInCategory(cat):
     ), 404
 
 # API to add item into carousel table from donor form
-# @app.route("/addItemToCarousel", methods=['POST'])
+
+
+# @app.route("/addDonation", methods=['POST'])
 # def addCarouselItem():
-#     formData = request.form
-#     formDict = formData.to_dict()
-    
+#     self.name = name
+#     self.description = description
+#     self.donorName = donorName
+#     self.donorAddr = donorAddr
+#     self.contactNo = contactNo
+#     self.category = category
+#     self.quantity = quantity
+#     self.requireDelivery = requireDelivery
+#     self.region = region
+#     self.timeSubmitted = timeSubmitted
+#     self.itemStatus = itemStatus
+#     self.filename = filename
+
 
 if __name__ == "__main__":
     app.run(port="5004", debug=True)
-
