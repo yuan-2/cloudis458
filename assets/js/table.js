@@ -33,8 +33,8 @@ $(document).ready(function() {
 
     $('#requests').DataTable( {
         ajax: {
-            url: 'http://127.0.0.1:5000/getAllRequests',
-            dataSrc: 'data.items',
+            url: 'http://127.0.0.1:5000/getRequests',
+            dataSrc: 'data',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -55,7 +55,7 @@ $(document).ready(function() {
     $('#wishlist').DataTable( {
         ajax: {
             url: 'http://127.0.0.1:5000/getWishlist',
-            dataSrc: 'data.items',
+            dataSrc: 'data',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -73,10 +73,10 @@ $(document).ready(function() {
         fixedHeader: true,
     });
 
-    $('#successfulMatches').DataTable( {
+    $('#successMatches').DataTable( {
         ajax: {
-            url: 'http://127.0.0.1:5000/getMatches',
-            dataSrc: 'data.items',
+            url: 'http://127.0.0.1:5000/getSuccessfulMatches',
+            dataSrc: 'data',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -84,16 +84,19 @@ $(document).ready(function() {
             dataType: "json"
         },
         columns: [
-            { data: 'id' },
-            { data: 'itemName' },
-            { data: 'remarks' },
-            { data: 'category' },
-            { data: 'timeSubmitted' },
-            { data: 'itemStatus' }
+            { data: 'matchid' },
+            { data: 'reqid' },
+            { data: 'requestorName' },
+            { data: 'requestorContactNo' },
+            { data: 'donorName' },
+            { data: 'donorContactNo' },
+            { data: 'requestedItem' },
+            { data: 'itemCategory' },
+            { data: 'dateSubmitted' }
         ],
         fixedHeader: true,
+        responsive: true,
     });
-
 
     $('#example').DataTable( {
         fixedHeader: true,
@@ -128,6 +131,9 @@ function fillInventoryDetails(val) {
                 document.getElementById("needDelivery").value = result.data.requireDelivery;
                 document.getElementById("area").value = result.data.region;
                 document.getElementById("status").value = result.data.itemStatus;
+            }
+            if (response.status == 404) {
+                alert('There is no such request ID in the database, please enter a valid ID.')
             }
         }
         catch (error) {
@@ -196,6 +202,9 @@ function fillWishlistDetails(val) {
                 document.getElementById("itemCat").value = result.data.category;
                 document.getElementById("status").value = result.data.itemStatus;
             }
+            if (response.status == 404) {
+                alert('There is no such request ID in the database, please enter a valid ID.')
+            }
         }
         catch (error) {
             // Errors when calling the service; such as network error, 
@@ -237,3 +246,70 @@ function editWishlist() {
         } // error
     });
 }
+
+
+function fillRequestDetails(val) {
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/getRequests/" + val;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json'},
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                document.getElementById("reqID").value = result.data.reqid;
+                document.getElementById("requestorName").value = result.data.requestor;
+                document.getElementById("deliveryLocation").value = result.data.deliveryLocation;
+                document.getElementById("itemCat").value = result.data.itemCategory;
+                document.getElementById("quantity").value = result.data.requestQty;
+            }
+            if (response.status == 404) {
+                alert('There is no such request ID in the database, please enter a valid ID.')
+            }
+        }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem retrieving the data, please try again later.');
+        } // error
+    });
+}
+
+function editRequest() {
+    var data = {};
+    data["reqid"] = document.getElementById("reqID").value;
+    data["requestor"] = document.getElementById("requestorName").value;
+    data["deliveryLocation"] = document.getElementById("deliveryLocation").value;
+    data["itemCategory"] = document.getElementById("itemCat").value;
+    data["requestQty"] = document.getElementById("quantity").value;
+    var jsondata = JSON.stringify(data);
+    console.log(jsondata);
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/updateRequest/" + data.reqid;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json'},
+                body: jsondata,
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                alert('Successfully updated data in database. Please refresh to view changes.')
+                window.location.reload();
+            }
+            }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem updating the data, please try again later.');
+        } // error
+    });
+}
+
