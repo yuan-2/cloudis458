@@ -27,9 +27,30 @@ USE `fyptest`;
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `class`
---
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE IF NOT EXISTS `category` (
+  `categoryname` varchar(50) NOT NULL,
+  `description` varchar(300),
+  PRIMARY KEY (`categoryname`)
+) ;
+
+INSERT INTO `category` (`categoryname`) VALUES
+('Toiletries'), ('Electronics'), ('Clothes'), ('Others')
+;
+
+DROP TABLE IF EXISTS `categoryitem`;
+CREATE TABLE IF NOT EXISTS `categoryitem` (
+  `itemid` int(11) NOT NULL AUTO_INCREMENT,
+  `itemname` varchar(50) NOT NULL,
+  `attachedcategory` varchar(50) NOT NULL,
+  PRIMARY KEY (`itemid`, `attachedCategory`),
+  FOREIGN KEY (`attachedCategory`) REFERENCES `category` (`categoryname`)
+) ;
+
+INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES
+('Toothbrush', 'Toiletries'), ('Blender', 'Electronics'), ('Television', 'Electronics'), ('T-Shirt', 'Clothes')
+;
+
 
 DROP TABLE IF EXISTS `carousel`;
 CREATE TABLE IF NOT EXISTS `carousel` (
@@ -46,24 +67,26 @@ CREATE TABLE IF NOT EXISTS `carousel` (
   `TimeSubmitted` DATETIME NOT NULL,
   `ItemStatus` TINYINT(1) NOT NULL,
   `FileName` varchar(200) NOT NULL,
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  FOREIGN KEY (`Category`) REFERENCES `category` (`categoryname`)
 ) ;
 
 INSERT INTO `carousel` (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`, `filename`) VALUES
-('toothbrush', 'teeth brushing essential', 'yew wei', 'pasir ris grove', '92251521', 'toiletries', 1, 1, 'east', '2022-01-03 17:10:00', 1, 'toothbrush.png'),
-('blender', 'makes great shakes', 'yew wei', 'pasir ris grove', '92251521', 'electronics', 1, 1, 'east', '2022-01-03 17:15:00', 1, 'blender.jpg');
+('Toothbrush', 'Teeth brushing essential', 'Yew wei', 'Pasir ris grove', '92251521', 'Toiletries', 1, 1, 'East', '2022-01-03 17:10:00', 1, 'toothbrush.png'),
+('Blender', 'Makes great shakes', 'Yew wei', 'Pasir ris grove', '92251521', 'Electronics', 1, 1, 'East', '2022-01-03 17:15:00', 1, 'blender.jpg');
 
-DROP TABLE IF EXISTS `wishlist`;
-CREATE TABLE IF NOT EXISTS `wishlist` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `itemname` varchar(50) NOT NULL,
-  `remarks` varchar(300) NOT NULL,
-  `category` varchar(50) NOT NULL,
-  `timesubmitted` datetime NOT NULL,
-  `itemstatus` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ;
+-- DROP TABLE IF EXISTS `wishlist`;
+-- CREATE TABLE IF NOT EXISTS `wishlist` (
+--   `id` int(11) NOT NULL AUTO_INCREMENT,
+--   `itemname` varchar(50) NOT NULL,
+--   `category` varchar(50) NOT NULL,
+--   PRIMARY KEY (`id`)
+-- ) ;
 
-select * from carousel;
+select * from carousel
 
+
+
+-- select * from carousel;
+-- 
 
