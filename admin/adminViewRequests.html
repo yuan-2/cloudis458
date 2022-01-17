@@ -30,9 +30,7 @@
         <link href="adminStyle.css" rel="stylesheet">
 
         <!-- datatables.net -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-        <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap5.min.css" rel="stylesheet">
 
         <!-- jQuery & Popper.js -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -74,7 +72,7 @@
             <nav id="navbar" class="navbar order-last order-lg-0">
             <ul>
                 <li><a class="nav-link" href="#hero">Home</a></li>
-                <li><a class="nav-link" href="adminViewForms.html">Requests</a></li>
+                <li><a class="nav-link" href="adminViewRequests.html">Requests</a></li>
                 <li><a class="nav-link" href="adminViewSuccessfulMatches.html">Matches</a></li>
                 <li><a class="nav-link" href="adminEditInventory.html">Inventory</a></li>
                 <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
@@ -94,7 +92,7 @@
             <p>View all requests submitted by migrant workers</p>
         </div>
         <div class="text-center">
-            <a type="button" href="adminEditDonateForm.html" class="btn appointment-btn">Edit Donate Form</a>
+            <a type="button" href="adminEditDonorForm.html" class="btn appointment-btn">Edit Donate Form</a>
             <a type="button" href="adminEditRequestItemForm.html" class="btn appointment-btn">Edit Request Form</a>
             <a type="button" href="adminViewWishlist.html" class="btn appointment-btn">Edit Wishlist</a>
             <a type="button" href="adminEditFaq.html" class="btn appointment-btn">Edit FAQ Page</a>
@@ -105,48 +103,15 @@
             <table id="requests" class="table table-striped table-hover" style="width:100%">
                 <thead>
                     <tr>
-                        <th>Form ID</th>
+                        <th>Request ID</th>
                         <th>Requestor Name</th>
-                        <th>Contact No.</th>
-                        <th>Requested Item</th>
+                        <th>Delivery Location</th>
                         <th>Item Category</th>
+                        <th>Quantity</th>
                         <th>Date Submitted</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Amanda</td>
-                        <td>12345678</td>
-                        <td>Bed</td>
-                        <td>Home Furniture</td>
-                        <td>29/12/2021</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Yuanyuan</td>
-                        <td>12345678</td>
-                        <td>Fan</td>
-                        <td>Home Furniture</td>
-                        <td>28/12/2021</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Nicole</td>
-                        <td>12345678</td>
-                        <td>Hair Dryer</td>
-                        <td>Lifestyle</td>
-                        <td>25/12/2021</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Yew Wei</td>
-                        <td>12345678</td>
-                        <td>Broom</td>
-                        <td>Lifestyle</td>
-                        <td>29/12/2021</td>
-                    </tr>
-                </tbody>
+                <tbody></tbody>
                 <!-- <tfoot>
                     <tr>
                         <th>Form ID</th>
@@ -158,7 +123,37 @@
                     </tr>
                 </tfoot> -->
             </table>
-            <button type="submit" href="#" class="btn btn-outline-secondary">Save Changes</button>
+            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow()">Edit Specific Row</button>
+            <br><br>
+            <hr>
+            <br>
+            <div id="edit-section" style="display: none">
+                <div class="row">
+                    <div class="col-2">
+                        <label for="reqID">Request ID</label>
+                        <input class="form-control mb-2" type="number" placeholder="Request ID" id="reqID" onchange="fillRequestDetails(this.value)">
+                    </div>
+                    <div class="col-4">
+                        <label for="requestorName">Requestor Name</label>
+                        <input class="form-control mb-2" type="text" placeholder="Requestor Name" id="requestorName">
+                    </div>
+                    <div class="col-6">
+                        <label for="deliveryLocation">Delivery Location</label>
+                        <input class="form-control mb-2" type="text" placeholder="Delivery Location" id="deliveryLocation">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="itemCat">Item Category</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCat">
+                    </div>
+                    <div class="col-4">
+                        <label for="quantity">Quantity</label>
+                        <input class="form-control mb-2" type="number" placeholder="Quantity" id="quantity">
+                    </div>
+                </div>
+                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editRequest()">Save Changes</button>
+            </div>
         </div>
     </section>
 

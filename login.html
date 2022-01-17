@@ -269,21 +269,21 @@
             }
 
             if (alertMsgFieldCount == 0) {
-                if (formData.username.value === "Migrant Worker") {
+                if (formData.username.value === "mw") {
                     window.sessionStorage.setItem("userType", "MW")
                     let confirmMsg = confirm("Logging in as a Migrant Worker")
                     if (confirmMsg == true) {
                         window.location.href = "index.html"
                     }
                 }
-                else if (formData.username.value === "Admin") {
+                else if (formData.username.value === "admin") {
                     window.sessionStorage.setItem("userType", "A")
                     let confirmMsg = confirm("Logging in as Admin")
                     if (confirmMsg == true) {
                         // window.location.href = "index.html"
                     }
                 }
-                else if (formData.username.value === "Driver") {
+                else if (formData.username.value === "driver") {
                     window.sessionStorage.setItem("userType", "D")
                     let confirmMsg = confirm("Logging in as a Driver")
                     if (confirmMsg == true) {

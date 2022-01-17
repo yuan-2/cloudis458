@@ -12,10 +12,11 @@ CREATE TABLE IF NOT EXISTS `carousel` (
   `contactNo` varchar(20) NOT NULL,
   `category` varchar(20) NOT NULL,
   `quantity` INT(4) NOT NULL,
-  `requireDelivery` TINYINT(1) NOT NULL,
+  `requireDelivery` varchar(50) NOT NULL,
   `region` varchar(20) NOT NULL,
   `timeSubmitted` DATETIME NOT NULL,
-  `itemStatus` TINYINT(1) NOT NULL,
+  `itemStatus` varchar(50) NOT NULL,
+  `fileName` varchar(200) NOT NULL,
   PRIMARY KEY (`id`)
 ) ;
 
@@ -26,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
   `remarks` varchar(300) NOT NULL,
   `category` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
-  `itemStatus` tinyint(1) NOT NULL,
+  `itemStatus` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
 ) ;
 
@@ -71,18 +72,18 @@ CREATE TABLE IF NOT EXISTS `request` (
 DROP TABLE IF EXISTS `delivery`;
 CREATE TABLE IF NOT EXISTS `delivery` (
   `dreqid` int(11) NOT NULL AUTO_INCREMENT,
-  `accepted` tinyint(1) NOT NULL,
+  `accepted` varchar(50) NOT NULL,
   `reqid` int(11) NOT NULL,
   PRIMARY KEY (`dreqid`),
   FOREIGN KEY (`reqid`) references request (`reqid`)
 ) ;
 
-DROP TABLE IF EXISTS `category`;
-CREATE TABLE IF NOT EXISTS `category` (
-  `categoryid` int(11) NOT NULL AUTO_INCREMENT,
-  `categoryName` varchar(50) NOT NULL,
-  PRIMARY KEY (`categoryid`)
-) ;
+-- DROP TABLE IF EXISTS `category`;
+-- CREATE TABLE IF NOT EXISTS `category` (
+--   `categoryid` int(11) NOT NULL AUTO_INCREMENT,
+--   `categoryName` varchar(50) NOT NULL,
+--   PRIMARY KEY (`categoryid`)
+-- ) ;
 
 DROP TABLE IF EXISTS `matches`;
 CREATE TABLE IF NOT EXISTS `matches` (
@@ -99,60 +100,76 @@ CREATE TABLE IF NOT EXISTS `matches` (
 ) ;
 
 
-DROP TABLE IF EXISTS `fixedItem`;
-CREATE TABLE IF NOT EXISTS `fixedItem` (
-  `itemID` int(11) NOT NULL AUTO_INCREMENT,
-  `itemName` varchar(50) NOT NULL,
-  PRIMARY KEY (`itemID`)
+-- DROP TABLE IF EXISTS `fixedItem`;
+-- CREATE TABLE IF NOT EXISTS `fixedItem` (
+--   `itemID` int(11) NOT NULL AUTO_INCREMENT,
+--   `itemName` varchar(50) NOT NULL,
+--   PRIMARY KEY (`itemID`)
+-- ) ;
+-- 
+
+DROP TABLE IF EXISTS `categoryitem`;
+CREATE TABLE IF NOT EXISTS `categoryitem` (
+  `itemid` int(11) NOT NULL AUTO_INCREMENT,
+  `itemname` varchar(50) NOT NULL,
+  `attachedcategory` varchar(50) NOT NULL,
+  PRIMARY KEY (`itemid`, `attachedCategory`)
 ) ;
 
 
 -- INSERT values
 
 -- for carousel table
-INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`) VALUES
-('toothbrush', 'basic toiletries', 'yew wei', 'pasir ris grove', '92251521', 'toiletries', 1, 1, 'east', now(), 1);
-INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`) VALUES
-('hair dryer', 'for hair', 'yuanyuan', '510121', '12345678', 'home appliances', 1, 1, 'west', now(), 1);
-INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`) VALUES
-('t-shirts', 'free size t-shirts', 'amanda', '510425', '87654321', 'clothing', 1, 1, 'north', now(), 1);
-INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`) VALUES
-('rice cooker', 'to cook rice', 'nicole', '510180', '92251521', 'home appliances', 1, 1, 'south', now(), 1);
-INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`) VALUES
-('fan', 'for sg hot weather', 'vanessa', 'pasir ris', '92251521', 'home appliances', 1, 1, 'east', now(), 1);
-INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`) VALUES
-('jeans', 'jeans in size 40', 'mei fang', 'pasir ris', '92251521', 'clothing', 1, 1, 'east', now(), 1);
+INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
+('toothbrush', 'basic toiletries', 'yew wei', 'pasir ris grove', '92251521', 'toiletries', 1, 'yes', 'east', now(), 'available', 'toothbrush.png');
+INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
+('hair dryer', 'for hair', 'yuanyuan', '510121', '12345678', 'home appliances', 1, 'yes', 'west', now(), 'available', 'hairdryer.jpg');
+INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
+('t-shirts', 'free size t-shirts', 'amanda', '510425', '87654321', 'clothing', 1, 'yes', 'north', now(), 'available', 't-shirt.jpg');
+INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
+('rice cooker', 'to cook rice', 'nicole', '510180', '92251521', 'home appliances', 1, 'yes', 'south', now(), 'available', 'ricecooker.jpg');
+INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
+('fan', 'for sg hot weather', 'vanessa', 'pasir ris', '92251521', 'home appliances', 1, 'yes', 'east', now(), 'available', 'fan.jpg');
+INSERT INTO carousel (`name`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
+('jeans', 'jeans in size 40', 'mei fang', 'pasir ris', '92251521', 'clothing', 1, 'yes', 'east', now(), 'available', 'jeans.jpg');
 
 
 -- for wishlist table
 INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('backpack', 'my backpack broke, need a new one', 'others', now(), 1);
+('backpack', 'my backpack broke, need a new one', 'others', now(), 'available');
 INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('stool', 'need a small chair to sit on', 'home furniture', now(), 1);
+('stool', 'need a small chair to sit on', 'home furniture', now(), 'available');
 INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('chair', 'chair broke, need a new one', 'home furniture', now(), 1);
+('chair', 'chair broke, need a new one', 'home furniture', now(), 'available');
 INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('table', 'a small table for dining and other purposes', 'home furniture', now(), 1);
+('table', 'a small table for dining and other purposes', 'home furniture', now(), 'available');
 INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('shoes', 'shoes for work', 'clothing', now(), 1);
+('shoes', 'shoes for work', 'clothing', now(), 'available');
 INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('wardrobe', 'wardrobe to store my clothes', 'home furniture', now(), 1);
+('wardrobe', 'wardrobe to store my clothes', 'home furniture', now(), 'available');
 INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('drawers', 'drawers to store things', 'home furniture', now(), 1);
+('drawers', 'drawers to store things', 'home furniture', now(), 'available');
 
 
 -- for category table 
-INSERT INTO category(`categoryName`) VALUES ('Food');
-INSERT INTO category(`categoryName`) VALUES ('Home Appliances');
-INSERT INTO category(`categoryName`) VALUES ('Clothes');
-INSERT INTO category(`categoryName`) VALUES ('Furniture');
-INSERT INTO category(`categoryName`) VALUES ('Toiletries');
-INSERT INTO category(`categoryName`) VALUES ('Kitchenware');
+-- INSERT INTO category(`categoryName`) VALUES ('Food');
+-- INSERT INTO category(`categoryName`) VALUES ('Home Appliances');
+-- INSERT INTO category(`categoryName`) VALUES ('Clothes');
+-- INSERT INTO category(`categoryName`) VALUES ('Furniture');
+-- INSERT INTO category(`categoryName`) VALUES ('Toiletries');
+-- INSERT INTO category(`categoryName`) VALUES ('Kitchenware');
 
 
 -- fixed Item table
-INSERT INTO fixedItem(`itemName`) VALUES ('Clothes');
-INSERT INTO fixedItem(`itemName`) VALUES ('microwave');
-INSERT INTO fixedItem(`itemName`) VALUES ('toothbrush');
-INSERT INTO fixedItem(`itemName`) VALUES ('water bottle');
-INSERT INTO fixedItem(`itemName`) VALUES ('handphone');
+-- INSERT INTO fixedItem(`itemName`) VALUES ('Clothes');
+-- INSERT INTO fixedItem(`itemName`) VALUES ('microwave');
+-- INSERT INTO fixedItem(`itemName`) VALUES ('toothbrush');
+-- INSERT INTO fixedItem(`itemName`) VALUES ('water bottle');
+-- INSERT INTO fixedItem(`itemName`) VALUES ('handphone');
+
+-- categoryitem table
+INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES
+('Toothbrush', 'Toiletries'), ('Blender', 'Electronics'), ('Television', 'Electronics'), ('T-Shirt', 'Clothes')
+;
+
+select * from categoryitem;

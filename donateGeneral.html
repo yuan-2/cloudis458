@@ -94,35 +94,15 @@
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
 
-            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;" class="appointment-btn scrollto">Login</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
 
+    <section id="hero" class="d-flex align-items-center"></section>
+
     <main id="main">
-
-        <!-- ======= Breadcrumbs Section ======= -->
-        <section class="breadcrumbs">
-            <div class="container">
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>Inner Page</h2>
-                    <ol>
-                        <li><a href="index.html">Home</a></li>
-                        <li>Inner Page</li>
-                    </ol>
-                </div>
-
-            </div>
-        </section><!-- End Breadcrumbs Section -->
-
-        <!-- <section class="inner-page">
-          <div class="container">
-            <p>
-              Example inner page template
-            </p>
-          </div>
-        </section> -->
 
 
         <section>
@@ -137,55 +117,50 @@
             <form id="donateForm" class="row g-3">
                 <div class="col-md-6">
                     <label for="donorFullName" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="donorFullName" placeholder="Your name or the Organization you are representing" required>
+                    <input type="text" class="form-control" id="donorFullName"
+                        placeholder="Your name or the Organization you are representing" required>
                 </div>
                 <div class="col-md-6">
                     <label for="donorContact" class="form-label">Contact Number</label>
-                    <input type="text" class="form-control" id="donorContact" placeholder="Enter a valid contact number" required>
+                    <input type="text" class="form-control" id="donorContact" placeholder="Enter a valid contact number"
+                        required>
                 </div>
                 <div class="col-6">
                     <label for="donorAddress" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="donorAddress" placeholder="Enter a valid address" required>
+                    <input type="text" class="form-control" id="donorAddress" placeholder="Enter a valid address"
+                        required>
                 </div>
 
                 <div class="col-6">
                     <label for="donorAddress" class="form-label">Area</label>
                     <br>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                            value="North">
+                        <input class="form-check-input" type="radio" name="region" id="inlineRadio1" value="North">
                         <label class="form-check-label" for="inlineRadio1">North</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
-                            value="South">
+                        <input class="form-check-input" type="radio" name="region" id="inlineRadio2" value="South">
                         <label class="form-check-label" for="inlineRadio2">South</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
-                            value="East">
+                        <input class="form-check-input" type="radio" name="region" id="inlineRadio3" value="East">
                         <label class="form-check-label" for="inlineRadio3">East</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio4"
-                            value="West">
+                        <input class="form-check-input" type="radio" name="region" id="inlineRadio4" value="West">
                         <label class="form-check-label" for="inlineRadio4">West</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio5"
-                            value="Central">
+                        <input class="form-check-input" type="radio" name="region" id="inlineRadio5" value="Central">
                         <label class="form-check-label" for="inlineRadio5">Central</label>
                     </div>
                 </div>
 
                 <!--On change of this dropdown, auto get item names listed under this category-->
                 <div class="col-6">
-                    <label for="itemCategory" class="form-label">Item Category</label>
-                    <select class="form-select" id="itemCategory" required>
-                        <option value="Clothes" selected>Clothes</option>
-                        <option value="Home Appliances">Home Appliances</option>
-                        <option value="Toiletries">Toiletries</option>
-                        <option value="Food">Food</option>
+                    <label for="itemCategoryOptions" class="form-label">Item Category</label>
+                    <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions" required>
+                        <!--Dynamically dropdown categories listed in existing db-->
                     </select>
                 </div>
 
@@ -199,21 +174,14 @@
 
                 <!--Option value for item name needs to be dynamic, based on category-->
                 <div class="col-6">
-                    <label for="itemNameInCat" class="form-label">Item Name</label>
-                    <select class="form-select" id="itemNameInCat" required>
-                        <option selected value="T-shirts">T-shirts</option>
-                        <option value="1">Pants</option>
-                        <option value="2">Hat</option>
+                    <label for="itemNameOptions" class="form-label">Item Name</label>
+                    <select class="form-select" id="itemNameOptions" required>
+                        <!--Dynamically update item names-->
                     </select>
                 </div>
                 <div class="col-6">
                     <label for="itemQty" class="form-label">Quantity</label>
-                    <select class="form-select" id="itemQty" required>
-                        <option selected value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                    </select>
+                    <input type="number" class="form-control" id="itemQty">
                 </div>
 
                 <div class="col-6">
@@ -329,13 +297,95 @@
     <script>
         var userType = ""
 
+        var itemCategoryOptions = document.getElementById('itemCategoryOptions')
+
+        var itemNameOptions = document.getElementById("itemNameOptions")
+
         function checkLogin() {
+
+            getDropDownCat().then(function autoPopCategories(result) {
+                    var catList = result
+
+                    // reset dropdown fields
+                    itemCategoryOptions.innerHTML = ""
+
+                    itemNameOptions.innerHTML = ""
+
+                    // Start off with an empty selected option for category
+                    itemCategoryOptions.innerHTML += `<option selected> </option>`
+
+                    for (cat of catList) {
+                        itemCategoryOptions.innerHTML += `
+                        <option value="${cat}">${cat}</option>
+                    `
+                    }
+
+                }
+
+            )
             if (window.sessionStorage.getItem("userType") != null) {
                 userType = window.sessionStorage.getItem("userType")
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
-
             }
+        }
+
+        async function getDropDownCat() {
+            let response = await fetch("http://127.0.0.1:5004/getCat")
+            let responseCode = await response.json()
+
+            if (responseCode.code == 200) {
+                return responseCode.data.categories
+            } else {
+                alert(responseCode.message)
+            }
+        }
+
+        async function populateItemNames(cat) {
+            itemNameOptions.innerHTML = ""
+            cat = cat.value
+            let response = await fetch("http://127.0.0.1:5004/getItemsInCat/" + cat)
+            let responseCode = await response.json()
+
+            if (responseCode.code == 200) {
+                itemNameOptions.innerHTML += "<option selected> </option>"
+                for (cat of responseCode.data.itemsInCat) {
+                    itemNameOptions.innerHTML += `<option>${cat.itemName}</option>`
+                }
+            }
+        }
+
+        const form = document.getElementById("donateForm")
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            var donateFormElements = document.forms[0].elements
+
+            // console.log(donateFormElements)
+
+            for (i in donateFormElements) {
+                console.log(donateFormElements[i].value)
+            }
+        })
+
+        // Example POST method implementation:
+        async function addDonation(url = 'http://127.0.0.1:5004/addDonation', data = {}) {
+            // Default options are marked with *
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data) // body data type must match "Content-Type" header
+            });
+            return response.json(); // parses JSON response into native JavaScript objects
         }
 
         function loginLogout() {

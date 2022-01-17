@@ -72,7 +72,7 @@
             <nav id="navbar" class="navbar order-last order-lg-0">
                 <ul>
                     <li><a class="nav-link" href="#hero">Home</a></li>
-                    <li><a class="nav-link" href="adminViewForms.html">Requests</a></li>
+                    <li><a class="nav-link" href="adminViewRequests.html">Requests</a></li>
                     <li><a class="nav-link" href="adminViewSuccessfulMatches.html">Matches</a></li>
                     <li><a class="nav-link" href="adminEditInventory.html">Inventory</a></li>
                     <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
@@ -94,15 +94,15 @@
     </section>
     <section class="inner-page">
         <div class="container">
-            <table id="wishlist" class="table table-striped table-hover" style="width:100%">
+            <table id="wishlist" class="table table-striped table-hover" style="width: 100%">
                 <thead>
                     <tr>
-                        <th>Form ID</th>
-                        <th>Requestor Name</th>
-                        <th>Contact No.</th>
-                        <th>Requested Item</th>
-                        <th>Item Category</th>
+                        <th>ID</th>
+                        <th>Item Name</th>
+                        <th>Remarks</th>
+                        <th>Category</th>
                         <th>Date Submitted</th>
+                        <th>Item Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -118,7 +118,37 @@
                     </tr>
                 </tfoot> -->
             </table>
-            <button type="submit" href="#" class="btn btn-outline-secondary">Save Changes</button>
+            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow()">Edit Specific Row</button>
+            <br><br>
+            <hr>
+            <br>
+            <div id="edit-section" style="display: none">
+                <div class="row">
+                    <div class="col-2">
+                        <label for="id">ID</label>
+                        <input class="form-control mb-2" type="number" placeholder="ID" id="id" onchange="fillWishlistDetails(this.value)">
+                    </div>
+                    <div class="col-4">
+                        <label for="itemName">Item Name</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Name" id="itemName">
+                    </div>
+                    <div class="col-6">
+                        <label for="remarks">Remarks</label>
+                        <input class="form-control mb-2" type="text" placeholder="Remarks" id="remarks">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="itemCat">Item Category</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCat">
+                    </div>
+                    <div class="col-2">
+                        <label for="status">Item Status</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Status" id="status">
+                    </div>
+                </div>
+                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editWishlist()">Save Changes</button>
+            </div>
         </div>
     </section>
 
