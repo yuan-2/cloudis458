@@ -13,6 +13,9 @@
     <link href="assets/img/favicon.png" rel="icon">
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
@@ -39,7 +42,7 @@
   ======================================================== -->
 </head>
 
-<body onload="checkLogin()">
+<body>
 
     <!-- ======= Top Bar ======= -->
     <div id="topbar" class="d-flex align-items-center fixed-top">
@@ -116,55 +119,36 @@
             </div>
         </section><!-- End Breadcrumbs Section -->
 
-
-        <section id="pageTitle">
+        <section id="faq" class="faq section-bg">
             <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 col-sm-12">
-                        <h2>FAQ</h2>
-                        <p style="font-style: italic;">Frequently Asked Questions: </p>
-                        <div class="d-flex flex-row" style="font-style: italic;">
-                            <p>Quick navigation: &nbsp;</p>
+      
+                <div class="section-title">
+                    <h2>Frequently Asked Questions</h2>
+                    <div class="d-flex flex-row justify-content-center" style="font-style: italic;">
+                        <p>Got a question?<br>
+                            Here are our non-exhaustive list of answers. You can contact us if you are unable to find the answers here.<br>
+                            Quick navigation: &nbsp;
                             <a href="#worker">Migrant Worker</a> |
                             <a href="#donor">Donor</a> |
                             <a href="#driver">Driver</a>
-                        </div>
+                        </p>
                     </div>
-
-
                 </div>
-            </div>
-        </section>
+      
+                <div id="worker" class="faq-list">
+                    <h4>Migrant Worker</h4>
+                </div>
 
-        <section id="faqBody" class="pt-0">
-            <div class="container">
+                <div id="donor" class="faq-list">
+                    <h4>Donor</h4>
+                </div>
 
-            <div id="worker" class="pt-4">
-                <!-- Autopopulate FAQ -->
-                <h4>Migrant Worker</h4>
-                <div id="workerFaqList">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Tempora voluptates consequuntur quam dolorem autem deleniti. Minus dolor ad animi eius assumenda error natus excepturi distinctio reiciendis, impedit dolores voluptatum blanditiis?
+                <div id="driver" class="faq-list">
+                    <h4>Driver</h4>
                 </div>
-            </div>
-    
-            <div id="donor" class="pt-4">
-                <!-- Autopopulate FAQ -->
-                <h4>Donors</h4>
-                <div id="donorFaqList">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto aperiam, perferendis incidunt quae minima vitae placeat repellat similique obcaecati molestias molestiae quos facere eveniet magnam. Adipisci, facilis! Ipsum, esse tempora?
-                </div>
-            </div>
-    
-            <div id="driver" class="pt-4">
-                <!-- Autopopulate FAQ -->
-                <h4>Drivers</h4>
-                <div id="driverFaqList">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum dolore voluptatum tempore iure quae perferendis ea harum animi corrupti tempora nobis, eveniet nulla nemo, reiciendis distinctio vel eos quidem. Rem?
-                </div>
-            </div>
-        </div>
-        </section>
         
+            </div>
+        </section>
 
 
     </main><!-- End #main -->
@@ -260,25 +244,55 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        var userType = ""
+        
+        $(async() => {            
+            var serviceURL = "http://127.0.0.1:5001/faq";
+    
+            try {
+                // Retrieve list of all students in the class
+                const response =
+                await fetch(
+                   serviceURL, { method: 'GET' }
+                );
+                const result = await response.json();
+                if (response.ok) {
+                    // success case
+                    var allFaq = result.data.items;
+                    var worker = "<ul>";
+                    var donor = "<ul>";
+                    var driver = "<ul>";
+                    for (faq of allFaq) {
+                        item = `<li data-aos="fade-up">
+                                    <i class="bx bx-help-circle icon-help"></i><a data-bs-toggle="collapse" class="collapsed" data-bs-target="#id` + faq.faqID + `">` + faq.question + ` <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+                                    <div id="id` + faq.faqID + `" class="collapse">
+                                    <p>` + faq.answer + `</p>
+                                    </div>
+                                </li>`
+                        if (faq.section == "worker") {
+                            worker += item
+                        } else if (faq.section == "donor") {
+                            donor += item
+                        } else if (faq.section == "driver") {
+                            driver += item
+                        }
+                    }
+                    
+                    worker += "</ul>";
+                    donor += "</ul>";
+                    driver += "</ul>";
+                    
+                    $('#worker').append(worker);
+                    $('#donor').append(donor);
+                    $('#driver').append(driver);
+                }
+            } catch (error) {
+                // Errors when calling the service; such as network error, 
+                // service offline, etc
+                console.log(error)
+                alert('There is a problem retrieving data, please refresh the page or try again later.');
+            } // error
+        });
 
-        function checkLogin() {
-            if (window.sessionStorage.getItem("userType") != null) {
-                userType = window.sessionStorage.getItem("userType")
-
-                document.getElementById("loginLogoutButton").innerText = "Logout"
-
-            }
-        }
-
-        function loginLogout() {
-            if (document.getElementById("loginLogoutButton").innerText === "Login") {
-                window.location.href = "login.html"
-            } else {
-                window.sessionStorage.removeItem("userType")
-                window.location.reload()
-            }
-        }
     </script>
 
 </body>
