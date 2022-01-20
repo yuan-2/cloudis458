@@ -116,6 +116,15 @@ CREATE TABLE IF NOT EXISTS `categoryitem` (
   PRIMARY KEY (`itemid`, `attachedCategory`)
 ) ;
 
+DROP TABLE IF EXISTS `faq`;
+CREATE TABLE IF NOT EXISTS `faq` (
+  `faqID` int(11) NOT NULL AUTO_INCREMENT,
+  `question` varchar(300) NOT NULL,
+  `answer` varchar(300) NOT NULL,
+  `section` varchar(10) NOT NULL,
+  PRIMARY KEY (`faqID`)
+) ;
+
 
 -- INSERT values
 
@@ -166,6 +175,14 @@ INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemS
 -- INSERT INTO fixedItem(`itemName`) VALUES ('toothbrush');
 -- INSERT INTO fixedItem(`itemName`) VALUES ('water bottle');
 -- INSERT INTO fixedItem(`itemName`) VALUES ('handphone');
+
+
+-- for faq
+INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I donate?', 'Just do it!', 'donor');
+INSERT INTO faq (`question`, `answer`, `section`) VALUES ('What do I donate?', 'Check out our wishlist', 'donor');
+INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I request for an item?', 'Just do it!', 'worker');
+INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I drive?', 'Just do it!', 'driver');
+
 
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES

@@ -199,11 +199,10 @@
       <!--Editing portion starts from here-->
       <!--idk if i should just have 1 form so means only the bottom part will be the form-->
       <form action='' method='POST'>
-        <div class="row g-3" id = 'editForm'>
+        <!-- <div class="row g-3" id = 'editForm'>
           <div class="col-md-6">
             <input type="text" class="form-control" id="newLabel" placeholder="Enter Input field Name" required>
           </div>
-
           <div class="col-md-6" style="padding-top: 1%;">
             <label class="radio-inline" style="padding-right: 7px;">
               <input class="form-check-input" type="radio" name="input" id="input" value="text"> Text Input
@@ -223,14 +222,44 @@
               <button type="submit" class="btn btn-outline-light" id= 'add-inputField' style="color:white; background-color: #A57F60;" onclick = "addInputField()">Add Input Field</button>
           </div>
             
-        
-         
-        </div>
-        
-      </form>
-       <div class="col-12" style='text-align: center; color: #A57F60;'>
+        </div> -->
+        <div class="row mt-3 mb-3 inputblock" id="input-block1">
+          <div class="card" style="padding-left: 0; padding-right: 0;">
+              <div class="card-header">
+                <div class="col-md-6">
+                  <input type="text" class="form-control" id="newLabel" placeholder="Enter Input field Name" required>
+                </div>
+              </div>
+              <div class="card-body" id='optiondetalis'>
+                  <select class="custom-select col-5" id="selectInputtype1" onchange="showInputType(this.id)">
+                      <option selected>Select Input Type</option>
+                      <option value='Text'>Text Input</option>
+                      <option value='Checkbox'>Checkbox</option>
+                      <option value='Radio'>Radio Button</option>
+                      <option value='Dropdown'>Dropdown</option>
+                  </select> 
+                  <!--????-->
+                  <div class="row ml-4 mt-2" id="showqnstype1"></div>
+                  <div>
+                      <button class="btn btn-outline-secondary" type='button' id="delete-input" onclick="deleteInput(this.id)">Delete Input Type</button>
+                  </div>
+              </div>
+              
+          </div>
+      </div>
+  </div>
+  
+<!--add another input field-->
+              <div class="row mt-3 mb-3">
+                  <button class="col-sm-3 btn btn-outline-secondary" type='button' id="add-input" onclick="addInput()">Add New input</button>
+              </div>
+
+              <div class="col-12" style='text-align: center; color: #A57F60;'>
             <button type="submit" class="btn btn-outline-light" id='save' style="color:white; background-color: #A57F60;" onclick = "save()">Save</button>
           </div>
+
+      </form>
+       
     </form>
     <br>
   </div>
