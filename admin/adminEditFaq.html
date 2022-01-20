@@ -16,6 +16,9 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
   <!-- Vendor CSS Files -->
   <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
   <link href="../assets/vendor/animate.css/animate.min.css" rel="stylesheet">
@@ -73,138 +76,72 @@
         <i class="bi bi-list mobile-nav-toggle"></i>
         </nav><!-- .navbar -->
         <a href="#appointment" class="appointment-btn"><span class="d-none d-md-inline">Logout</a>
+
     </div>
   </header><!-- End Header -->
-
+  
   <main id="main">
     <section></section>
-    <section>
+    <section id="services" class="services">
       <div class="container">
         <div class="section-title">
-          <h2>Donate to us</h2>
+          <h2>Edit FAQ</h2>
+          <p>Add or Edit questions and answers in the FAQ page</p>
         </div>
       </div>
     </section>
 
     <div style="max-width: 1000px; margin: auto;">
-      <form class="row g-3">
-        <div class="col-md-6">
-          <label for="name" class="form-label">Name</label>
-          <input type="text" class="form-control" id="name" placeholder="Enter Name" required>
-        </div>
-
-        <div class="col-md-6">
-          <label for="contactNumber" class="form-label">Contact Number</label>
-          <input type="text" class="form-control" id="contactNumber" placeholder="Enter Contact Number" required>
-        </div>
-
-        <div class="col-6">
-          <label for="address" class="form-label">Address</label>
-          <input type="text" class="form-control" id="address" placeholder="Enter Address" required>
-        </div>
-
-      <div class="col-6">
-        <label for="area" class="form-label">Area </label>
-        <br>
-        <label class="radio-inline" style="padding-right: 7px;">
-          <input class="form-check-input" type="radio" name="area" id="areaN" value="north"> North 
-        </label>
-        <label class="radio-inline"  style="padding-right: 7px;">
-          <input class="form-check-input" type="radio" name="area" id="areaS" value="south"> South 
-        </label>
-        <label class="radio-inline"  style="padding-right: 7px;">
-          <input class="form-check-input" type="radio" name="area" id="areaE" value="east"> East
-        </label>
-        <label class="radio-inline"  style="padding-right: 7px;">
-          <input class="form-check-input" type="radio" name="area" id="areaW" value="west"> West
-        </label>
-        <label class="radio-inline" style="padding-right: 7px;" >
-          <input class="form-check-input" type="radio" name="area" id="areaC" value="central"> Central
-        </label>
-      </div>
-
-      <div class="col-6">
-        <label for="itemCategory" class="form-label">Item Category</label>
-        <select class="form-select" id="itemCategory" required>
-        </select>
-      </div>
-
-      <div class="col-6">
-        <div class="form-group">
-            <label for="itemPhoto">Upload Photo</label>
-            <br >
-            <input type="file" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
-          </div>
-      </div>
-
-      <div class="col-6">
-        <label for="itemName" class="form-label">Item Name</label>
-        <select class="form-select" id="itemName" required>
-          <option selected value="T-shirts">T-shirts</option>
-          <option value="1">Pants</option>
-          <option value="2">Hat</option>
-        </select>
-      </div>
-      <div class="col-6">
-        <label for="quantity" class="form-label">Quantity</label>
-        <select class="form-select" id="quantity" required>
-          <option selected value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-        </select>
-      </div>
-
-      <div class="col-6">
-        <label for="homeDelivery" class="form-label">Require delivery from home?</label>
-        <select class="form-select" id="homeDelivery" required>
-          <option selected value="1">Yes</option>
-          <option value="0">No</option>
-        </select>
-      </div>
-     
-
-
+        <section id="faq" class="faq section-bg">
+            <div class="container">
       
-      <br><br>
-      <hr style="border:solid; "> 
-      <br>
-      <!--Editing portion starts from here-->
+                <div id="worker" class="faq-list">
+                    <h4>Migrant Worker</h4>
+                </div>
 
-      <div class="col-md-6">
-        <input type="password" class="form-control" id="inputContactNumber" placeholder="Enter Input field Name">
-      </div>
+                <div id="donor" class="faq-list">
+                    <h4>Donor</h4>
+                </div>
 
-
-        <div class="col-md-6" style="padding-top: 1%;">
-            
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-                <label class="form-check-label" for="inlineRadio1">Text Input</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-                <label class="form-check-label" for="inlineRadio2">Checkbox</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="editOptionsDropdown" id="inlineRadio3" value="option3">
-                <label class="form-check-label" for="inlineRadio3">Dropdown</label>
-              </div>
+                <div id="driver" class="faq-list">
+                    <h4>Driver</h4>
+                </div>
             </div>
-      
-            <div class="col-12" style='text-align: right; color: #A57F60;'>
-                <button type="submit" class="btn btn-outline-light" style="color:white; background-color: #A57F60;">Add Input Field</button>
+        </section>
+
+        <hr style="border:solid; "> 
+        <br>
+        <!--Editing portion starts from here-->
+        <form>
+            <div class="mb-3">
+                <label for="section" class="form-label">Section</label>
+                <select class="form-select" id="section" required>
+                    <option selected value="worker">Migrant Worker</option>
+                    <option value="donor">Donor</option>
+                    <option value="driver">Driver</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="question" class="form-label">Question</label>
+                <input type="text" class="form-control" id="question" placeholder="Enter question here" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="answer" class="form-label">Answer</label>
+                <input type="text" class="form-control" id="answer" placeholder="Enter answer here" required>
             </div>
         
-     
-      <div class="col-12" style='text-align: center; color: #A57F60;'>
-        <button type="submit" class="btn btn-outline-light" style="color:white; background-color: #A57F60;">Save</button>
-      </div>
-    </form>
-    <br>
-  </div>
-
-  
+            <div class="col-12" style='text-align: right; color: #A57F60;'>
+                <button id="addBtn" type="button" onclick="postFaq()" class="btn btn-outline-light" style="color:white; background-color: #A57F60;">Add Question</button>
+            </div>
+        
+        </form>
+        
+        <div class="col-12" style='text-align: center; color: #A57F60;'>
+            <button type="submit" class="btn btn-outline-light m-3" style="color:white; background-color: #A57F60;">Save</button>
+        </div>
+    </div>
 
   </main><!-- End #main -->
 
@@ -284,6 +221,131 @@
 
   <!-- Template Main JS File -->
   <script src="../assets/js/main.js"></script>
+
+    <script>
+        async function postFaq(faqID = "") {
+            var qn = $('#question').val();
+            var ans = $('#answer').val();
+            var section = $('#section').val();
+
+            var serviceURL = "http://127.0.0.1:5001/faq" + faqID;
+
+            return fetch (serviceURL,
+            {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({question: qn, answer: ans, section: section})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                window.location.reload();
+            })
+        };
+        
+        async function editFaq(faqID) {
+            var serviceURL = "http://127.0.0.1:5001/faq/" + faqID;
+    
+            try {
+                // Retrieve list of all FAQ
+                const response =
+                await fetch(
+                   serviceURL, { method: 'GET' }
+                );
+                const result = await response.json();
+                if (response.ok) {
+                    var faq = result.data;
+                    $('#question').val(faq.question);
+                    $('#answer').val(faq.answer);
+                    $('#section').val(faq.section);
+                    $('#addBtn').attr("onclick", "postFaq('/"+ faqID + "')")
+                    
+                }
+            } catch (error) {
+                // Errors when calling the service; such as network error, 
+                // service offline, etc
+                console.log(error)
+                alert('There is a problem retrieving data, please refresh the page or try again later.');
+            } // error
+        }
+
+        async function deleteFaq(faqID) {
+            var serviceURL = "http://127.0.0.1:5001/faq-delete/" + faqID;
+    
+            try {
+                // Retrieve list of all FAQ
+                const response =
+                await fetch(
+                   serviceURL, { method: 'GET' }
+                );
+                const result = await response.json();
+                if (response.ok) {
+                    console.log(result);
+                    alert("Question deleted successfully.")
+                    window.location.reload();
+                }
+            } catch (error) {
+                // Errors when calling the service; such as network error, 
+                // service offline, etc
+                console.log(error)
+                alert('There is a problem retrieving data, please refresh the page or try again later.');
+            } // error
+        }
+
+        // retrieve FAQ questions
+        $(async() => {            
+            var serviceURL = "http://127.0.0.1:5001/faq";
+    
+            try {
+                // Retrieve list of all FAQ
+                const response =
+                await fetch(
+                   serviceURL, { method: 'GET' }
+                );
+                const result = await response.json();
+                if (response.ok) {
+                    // success case
+                    var allFaq = result.data.items;
+                    var worker = "<ul>";
+                    var donor = "<ul>";
+                    var driver = "<ul>";
+                    for (faq of allFaq) {
+                        item = `<li data-aos="fade-up">
+                                    <i class="bx bx-help-circle icon-help"></i><a data-bs-toggle="collapse" class="collapsed" data-bs-target="#id` + faq.faqID + `">` + faq.question + ` <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+                                    <div id="id` + faq.faqID + `" class="collapse">
+                                    <p>` + faq.answer + `</p>
+                                    </div>
+                                    <br>
+                                    <button type="button" onclick="editFaq(` + faq.faqID +`)" class="btn btn-secondary btn-sm">Edit</button>
+                                    <button type="button" onclick="deleteFaq(` + faq.faqID +`)" class="btn btn-danger btn-sm">Delete</button>
+                                </li>`
+                        if (faq.section == "worker") {
+                            worker += item
+                        } else if (faq.section == "donor") {
+                            donor += item
+                        } else if (faq.section == "driver") {
+                            driver += item
+                        }
+                    }
+                    
+                    worker += "</ul>";
+                    donor += "</ul>";
+                    driver += "</ul>";
+                    
+                    $('#worker').append(worker);
+                    $('#donor').append(donor);
+                    $('#driver').append(driver);
+                }
+            } catch (error) {
+                // Errors when calling the service; such as network error, 
+                // service offline, etc
+                console.log(error)
+                alert('There is a problem retrieving data, please refresh the page or try again later.');
+            } // error
+        });
+  </script>
 
 </body>
 

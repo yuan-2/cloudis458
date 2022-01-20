@@ -30,17 +30,11 @@
   <!-- Template Main CSS File -->
   <link href="adminStyle.css" rel="stylesheet">
 
-
-  <!-- datatables.net -->
-  <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-
   <!-- jQuery & Popper.js -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
-
-  <script src="../admin/amanda/amanda.js" type="text/javascript"></script>
   <!-- =======================================================
   * Template Name: Medilab - v4.7.0
   * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
@@ -49,7 +43,7 @@
   ======================================================== -->
 </head>
 
-<body>
+<body onload="checkLogin()">
 
   <!-- ======= Top Bar ======= -->
   <div id="topbar" class="d-flex align-items-center fixed-top">
@@ -76,7 +70,7 @@
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
             <li><a class="nav-link" href="#hero">Home</a></li>
-            <li><a class="nav-link" href="adminViewForms.html">Requests</a></li>
+            <li><a class="nav-link" href="adminViewRequests.html">Requests</a></li>
             <li><a class="nav-link" href="adminViewSuccessfulMatches.html">Matches</a></li>
             <li><a class="nav-link" href="adminEditInventory.html">Inventory</a></li>
             <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
@@ -115,25 +109,22 @@
           <label for="address" class="form-label">Address</label>
           <input type="text" class="form-control" id="address" placeholder="Enter Address" required>
         </div>
-
-
-      <!--FOR LOOP JS-->
+        
+      <!-- On change of this dropdown, auto get item names listed under this category -->
       <div class="col-6">
-        <label for="itemCategory" class="form-label">Item Category</label>
-        <select class="form-select" id="itemCategory" required>
-          <option value="Clothes"selected>Clothes</option>
-          <option value="Home Appliances">Home Appliances</option>
+        <label for="itemCategoryOptions" class="form-label">Item Category</label>
+        <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions" required>
+            <!-- Dynamically dropdown categories listed in existing db  -->
         </select>
       </div>
 
+      <!--Option value for item name needs to be dynamic, based on category-->
       <div class="col-6">
-        <label for="itemName" class="form-label">Item Name</label>
-        <select class="form-select" id="itemName" required>
-          <option selected value="T-shirts">T-shirts</option>
-          <option value="1">Pants</option>
-          <option value="2">Hat</option>
+        <label for="itemNameOptions" class="form-label">Item Name</label>
+        <select class="form-select" id="itemNameOptions" required>
+            <!--Dynamically update item names-->
         </select>
-      </div>
+    </div>
 
       <div class="col-6">
         <label for="quantity" class="form-label">Quantity</label>
@@ -233,6 +224,7 @@
 
   <!-- Template Main JS File -->
   <script src="../assets/js/main.js"></script>
+  <script src="../admin/amanda.js" type="text/javascript"></script>
 
 </body>
 

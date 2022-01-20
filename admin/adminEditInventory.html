@@ -72,7 +72,7 @@
             <nav id="navbar" class="navbar order-last order-lg-0">
                 <ul>
                     <li><a class="nav-link" href="#hero">Home</a></li>
-                    <li><a class="nav-link" href="adminViewForms.html">Requests</a></li>
+                    <li><a class="nav-link" href="adminViewRequests.html">Requests</a></li>
                     <li><a class="nav-link" href="adminViewSuccessfulMatches.html">Matches</a></li>
                     <li><a class="nav-link" href="adminEditInventory.html">Inventory</a></li>
                     <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
@@ -126,7 +126,9 @@
                 </table>
             </div>
             <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow()">Edit Specific Row</button>
-            <br><br><br>
+            <br><br>
+            <hr>
+            <br>
             <div id="edit-section" style="display: none">
                 <div class="row">
                     <div class="col-2">
@@ -167,7 +169,7 @@
                     </div>
                     <div class="col-2">
                         <label for="needDelivery">Need Delivery?</label>
-                        <input class="form-control mb-2" type="number" placeholder="Need Delivery?" id="needDelivery">
+                        <input class="form-control mb-2" type="text" placeholder="Need Delivery?" id="needDelivery">
                     </div>
                     <div class="col-2">
                         <label for="area">Area</label>
@@ -175,7 +177,7 @@
                     </div>
                     <div class="col-2">
                         <label for="status">Item Status</label>
-                        <input class="form-control mb-2" type="number" placeholder="Status" id="status">
+                        <input class="form-control mb-2" type="text" placeholder="Status" id="status">
                     </div>
                 </div>
                 <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editInventory()">Save Changes</button>
