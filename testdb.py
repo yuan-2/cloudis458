@@ -203,20 +203,21 @@ def getItemsInCategory(cat):
 # API to add item into carousel table from donor form
 
 
-# @app.route("/addDonation", methods=['POST'])
-# def addCarouselItem():
-#     self.name = name
-#     self.description = description
-#     self.donorName = donorName
-#     self.donorAddr = donorAddr
-#     self.contactNo = contactNo
-#     self.category = category
-#     self.quantity = quantity
-#     self.requireDelivery = requireDelivery
-#     self.region = region
-#     self.timeSubmitted = timeSubmitted
-#     self.itemStatus = itemStatus
-#     self.filename = filename
+@app.route("/addDonation", methods=['POST'])
+def addCarouselItem():
+    if request.method == 'POST':
+        itemname = request.form.get('itemName')
+        description = request.form.get('itemDesc')
+        donorName = request.form.get('dName')
+        donorAddr = request.form.get('dAddress')
+        contactNo = request.form.get('dContact')
+        category = request.form.get('category')
+        quantity = request.form.get('quantity')
+        requireDelivery = request.form.get('r_Delivery')
+        region = request.form.get('region')
+        timeSubmitted = request.form.get('timeSubmitted')
+        itemStatus = request.form.get('itemStatus')
+        fileName = request.form.get('itemImg')
 
 
 if __name__ == "__main__":
