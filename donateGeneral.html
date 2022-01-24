@@ -118,21 +118,21 @@
                 <div class="col-md-6">
                     <label for="donorFullName" class="form-label">Name</label>
                     <input type="text" class="form-control" id="donorFullName"
-                        placeholder="Your name or the Organization you are representing" required>
+                        placeholder="Your name or the Organization you are representing" name="dName" required>
                 </div>
                 <div class="col-md-6">
                     <label for="donorContact" class="form-label">Contact Number</label>
                     <input type="text" class="form-control" id="donorContact" placeholder="Enter a valid contact number"
-                        required>
+                        name="dContact" required>
                 </div>
                 <div class="col-6">
                     <label for="donorAddress" class="form-label">Address</label>
                     <input type="text" class="form-control" id="donorAddress" placeholder="Enter a valid address"
-                        required>
+                        name="dAddress" required>
                 </div>
 
                 <div class="col-6">
-                    <label for="donorAddress" class="form-label">Area</label>
+                    <label class="form-label">Area</label>
                     <br>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="region" id="inlineRadio1" value="North">
@@ -159,7 +159,7 @@
                 <!--On change of this dropdown, auto get item names listed under this category-->
                 <div class="col-6">
                     <label for="itemCategoryOptions" class="form-label">Item Category</label>
-                    <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions" required>
+                    <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions" name="category" required>
                         <!--Dynamically dropdown categories listed in existing db-->
                     </select>
                 </div>
@@ -168,25 +168,29 @@
                     <div class="form-group">
                         <label for="itemPhoto">Upload Photo</label>
                         <br>
-                        <input type="file" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
+                        <input type="file" name="itemImg" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
                     </div>
                 </div>
 
                 <!--Option value for item name needs to be dynamic, based on category-->
                 <div class="col-6">
                     <label for="itemNameOptions" class="form-label">Item Name</label>
-                    <select class="form-select" id="itemNameOptions" required>
+                    <select class="form-select" id="itemNameOptions" name="itemName" required>
                         <!--Dynamically update item names-->
                     </select>
                 </div>
                 <div class="col-6">
+                    <label for="itemDescription" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="itemDescription" name="itemDesc" placeholder="Brief description of the item you are donating">
+                </div>
+                <div class="col-6">
                     <label for="itemQty" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" id="itemQty">
+                    <input type="number" class="form-control" name="quantity" id="itemQty">
                 </div>
 
                 <div class="col-6">
                     <label for="pickUpOption" class="form-label">Require drivers to pick it up?</label>
-                    <select class="form-select" id="pickUpOption" required>
+                    <select class="form-select" id="pickUpOption" name="r_Delivery" required>
                         <option selected value="yes">Yes</option>
                         <option value="no">No</option>
                     </select>
@@ -247,7 +251,7 @@
                     <div class="col-lg-4 col-md-6 footer-newsletter">
                         <h4>Join Our Newsletter</h4>
                         <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
-                        <form action="" method="post">
+                        <form method="post">
                             <input type="email" name="email"><input type="submit" value="Subscribe">
                         </form>
                     </div>
@@ -363,14 +367,27 @@
             var donateFormElements = document.forms[0].elements
 
             // console.log(donateFormElements)
+            var postData = {}
 
-            for (i in donateFormElements) {
-                console.log(donateFormElements[i].value)
+            for (ele in donateFormElements) {
+                if (donateFormElements[ele].name == "region") {
+                    if (donateFormElements[ele].checked == true) {
+                        postData.region = donateFormElements[ele].value
+                    }
+                }
+                if (donateFormElements[ele].name == "itemImg") {
+                    postData.itemImg = donateFormElements[ele].files[0].name
+                    // console.log(donateFormElements[ele].files[0].name)
+                }
+                else {
+                    postData[donateFormElements[ele].name] = donateFormElements[ele].value
+                }
             }
+            console.log(postData)
         })
 
         // Example POST method implementation:
-        async function addDonation(url = 'http://127.0.0.1:5004/addDonation', data = {}) {
+        async function addDonation(url = 'http://127.0.0.1:5004/addDonation', data) {
             // Default options are marked with *
             const response = await fetch(url, {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
