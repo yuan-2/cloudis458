@@ -97,36 +97,25 @@
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
 
-            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;" class="appointment-btn scrollto">Login</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
 
+    <section id="hero" class="d-flex align-items-center"></section>
+
     <main id="main">
-
-        <!-- ======= Breadcrumbs Section ======= -->
-        <section class="breadcrumbs">
-            <div class="container">
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>Inner Page</h2>
-                    <ol>
-                        <li><a href="index.html">Home</a></li>
-                        <li>Inner Page</li>
-                    </ol>
-                </div>
-
-            </div>
-        </section><!-- End Breadcrumbs Section -->
 
         <section id="faq" class="faq section-bg">
             <div class="container">
-      
+
                 <div class="section-title">
                     <h2>Frequently Asked Questions</h2>
                     <div class="d-flex flex-row justify-content-center" style="font-style: italic;">
                         <p>Got a question?<br>
-                            Here are our non-exhaustive list of answers. You can contact us if you are unable to find the answers here.<br>
+                            Here are our non-exhaustive list of answers. You can contact us if you are unable to find
+                            the answers here.<br>
                             Quick navigation: &nbsp;
                             <a href="#worker">Migrant Worker</a> |
                             <a href="#donor">Donor</a> |
@@ -134,7 +123,7 @@
                         </p>
                     </div>
                 </div>
-      
+
                 <div id="worker" class="faq-list">
                     <h4>Migrant Worker</h4>
                 </div>
@@ -146,7 +135,7 @@
                 <div id="driver" class="faq-list">
                     <h4>Driver</h4>
                 </div>
-        
+
             </div>
         </section>
 
@@ -244,10 +233,25 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        
+        function checkLogin() {
+            if (window.sessionStorage.getItem("userType") != null) {
+                userType = window.sessionStorage.getItem("userType")
+
+                document.getElementById("loginLogoutButton").innerText = "Logout"
+            }
+        }
+
+        function loginLogout() {
+            if (document.getElementById("loginLogoutButton").innerText === "Login") {
+                window.location.href = "login.html"
+            } else {
+                window.sessionStorage.removeItem("userType")
+                window.location.reload()
+            }
+        }
         $(async() => {            
             var serviceURL = "http://127.0.0.1:5001/faq";
-    
+
             try {
                 // Retrieve list of all students in the class
                 const response =
@@ -276,11 +280,11 @@
                             driver += item
                         }
                     }
-                    
+
                     worker += "</ul>";
                     donor += "</ul>";
                     driver += "</ul>";
-                    
+
                     $('#worker').append(worker);
                     $('#donor').append(donor);
                     $('#driver').append(driver);
@@ -292,7 +296,6 @@
                 alert('There is a problem retrieving data, please refresh the page or try again later.');
             } // error
         });
-
     </script>
 
 </body>
