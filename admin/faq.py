@@ -79,7 +79,7 @@ def create_faq():
         try:
             db.session.add(item)
             db.session.commit()
-            return jsonify(item.to_dict()), 201
+            return jsonify(item.json()), 201
         except Exception:
             return jsonify({
                 "message": "Unable to commit to database."
@@ -96,7 +96,7 @@ def edit_faq(faqID):
             item.answer = data['answer']
             item.section = data['section']
             db.session.commit()
-            return jsonify(item.to_dict()), 201
+            return jsonify(item.json()), 201
         except Exception:
             return jsonify({
                 "message": "Unable to commit to database."
@@ -110,7 +110,7 @@ def delete_faq(faqID):
         try:
             db.session.delete(item)
             db.session.commit()
-            return jsonify(item.to_dict()), 201
+            return jsonify(item.json()), 201
         except Exception:
             return jsonify({
                 "message": "Unable to commit to database."
