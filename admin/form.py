@@ -1,13 +1,7 @@
-from dataclasses import field
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
-import os
-import sys
-from os import environ
-
-from numpy import place
 
 app = Flask(__name__)
 
