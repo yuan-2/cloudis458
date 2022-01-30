@@ -28,6 +28,9 @@
 
   <!-- Template Main CSS File -->
   <link href="adminStyle.css" rel="stylesheet">
+  
+  <script src="../admin/amanda.js" type="text/javascript"></script>
+  <script src="form.js" type="text/javascript"></script>
 
    <!-- jQuery & Popper.js -->
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -94,9 +97,9 @@
       <form  method='POST'>
         <div class="row g-3" id='donorForm'>
           <div class="col-md-6">
-          <label for="name" class="form-label">Name</label>
-          <input type="text" class="form-control" id="name" placeholder="Enter Name">
-        </div>
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Enter Name">
+          </div>
 
         <div class="col-md-6">
           <label for="contactNumber" class="form-label">Contact Number</label>
@@ -127,26 +130,6 @@
             <input class="form-check-input" type="radio" name="area" id="area" value="central"> Central
           </label>
         </div>
-
-      <!-- <div class="col-6">
-        <label for="itemCategory" class="form-label">Item Category</label>
-        <select class="form-select" id="itemCategory">
-        </select>
-      </div>
-
-      <div class="col-6">
-        <div class="form-group">
-            <label for="itemPhoto">Upload Photo</label>
-            <br >
-            <input type="file" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
-          </div>
-      </div>
-
-      <div class="col-6">
-        <label for="itemName" class="form-label">Item Name</label>
-        <select class="form-select" id="itemName">
-        </select>
-      </div> -->
 
        <!--On change of this dropdown, auto get item names listed under this category-->
        <div class="col-6">
@@ -345,7 +328,6 @@
 
   <!-- Template Main JS File -->
   <script src="../assets/js/main.js"></script>
-  <script src="../admin/amanda.js" type="text/javascript"></script>
 </body>
 
 </html>

@@ -79,7 +79,7 @@ def create_faq():
         try:
             db.session.add(item)
             db.session.commit()
-            return jsonify(item.to_dict()), 201
+            return jsonify(item.json()), 201
         except Exception:
             return jsonify({
                 "message": "Unable to commit to database."
@@ -96,21 +96,21 @@ def edit_faq(faqID):
             item.answer = data['answer']
             item.section = data['section']
             db.session.commit()
-            return jsonify(item.to_dict()), 201
+            return jsonify(item.json()), 201
         except Exception:
             return jsonify({
                 "message": "Unable to commit to database."
             }), 500
 
 # delete existing faq
-@app.route('/faq-delete/<int:faqID>')
+@app.route('/faq-delete/<int:faqID>', methods=["DELETE"])
 def delete_faq(faqID):
     item = Faq.query.filter_by(faqID=faqID).first()
     if ( item is not None ): 
         try:
             db.session.delete(item)
             db.session.commit()
-            return jsonify(item.to_dict()), 201
+            return jsonify(item.json()), 201
         except Exception:
             return jsonify({
                 "message": "Unable to commit to database."

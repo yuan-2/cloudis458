@@ -75,21 +75,21 @@
                     <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
                     <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
+            <li><a href="#">Drop Down 1</a></li>
+            <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
+            <ul>
+                <li><a href="#">Deep Drop Down 1</a></li>
+                <li><a href="#">Deep Drop Down 2</a></li>
+                <li><a href="#">Deep Drop Down 3</a></li>
+                <li><a href="#">Deep Drop Down 4</a></li>
+                <li><a href="#">Deep Drop Down 5</a></li>
             </ul>
-          </li> -->
+            </li>
+            <li><a href="#">Drop Down 2</a></li>
+            <li><a href="#">Drop Down 3</a></li>
+            <li><a href="#">Drop Down 4</a></li>
+        </ul>
+        </li> -->
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
@@ -135,24 +135,24 @@
                     <label class="form-label">Area</label>
                     <br>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="inlineRadio1" value="North">
-                        <label class="form-check-label" for="inlineRadio1">North</label>
+                        <input class="form-check-input" type="radio" name="region" id="area" value="North">
+                        <label class="form-check-label">North</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="inlineRadio2" value="South">
-                        <label class="form-check-label" for="inlineRadio2">South</label>
+                        <input class="form-check-input" type="radio" name="region" id="area" value="South">
+                        <label class="form-check-label">South</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="inlineRadio3" value="East">
-                        <label class="form-check-label" for="inlineRadio3">East</label>
+                        <input class="form-check-input" type="radio" name="region" id="area" value="East">
+                        <label class="form-check-label">East</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="inlineRadio4" value="West">
-                        <label class="form-check-label" for="inlineRadio4">West</label>
+                        <input class="form-check-input" type="radio" name="region" id="area" value="West">
+                        <label class="form-check-label">West</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="inlineRadio5" value="Central">
-                        <label class="form-check-label" for="inlineRadio5">Central</label>
+                        <input class="form-check-input" type="radio" name="region" id="area" value="Central">
+                        <label class="form-check-label">Central</label>
                     </div>
                 </div>
 
@@ -199,7 +199,7 @@
                 <br>
 
                 <div class="col-12" style='text-align: center; color: #E3A587;'>
-                    <button type="submit" class="btn btn-outline-light"
+                    <button type="button" onclick="submitDonation()" class="btn btn-outline-light"
                         style="color:white; background-color: #E3A587;">Submit</button>
                 </div>
             </form>
@@ -361,30 +361,28 @@
 
         const form = document.getElementById("donateForm")
 
-        form.addEventListener("submit", (event) => {
-            event.preventDefault();
-
+        // form.addEventListener("submit", (event) => {
+        //     event.preventDefault();
+        function submitDonation() {
             var donateFormElements = document.forms[0].elements
 
-            // console.log(donateFormElements)
+            console.log(donateFormElements)
             var postData = {}
 
             for (ele in donateFormElements) {
-                if (donateFormElements[ele].name == "region") {
-                    if (donateFormElements[ele].checked == true) {
-                        postData.region = donateFormElements[ele].value
-                    }
+                var eleName = donateFormElements[ele].name
+                if (donateFormElements[ele].type == "radio") {
+                    postData[donateFormElements[ele].name] = document.querySelector("input[name='"+eleName+"']:checked").value
                 }
-                if (donateFormElements[ele].name == "itemImg") {
-                    postData.itemImg = donateFormElements[ele].files[0].name
-                    // console.log(donateFormElements[ele].files[0].name)
+                else if (donateFormElements[ele].type == "file") {
+                    postData[donateFormElements[ele].name] = donateFormElements[ele].files[0].name
                 }
                 else {
                     postData[donateFormElements[ele].name] = donateFormElements[ele].value
                 }
             }
             console.log(postData)
-        })
+        }
 
         // Example POST method implementation:
         async function addDonation(url = 'http://127.0.0.1:5004/addDonation', data) {
