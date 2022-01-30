@@ -24,6 +24,12 @@ async function retrieveForm(formName) {
                 if (field.fieldType == "file") {
                     buildFile(field);
                 }
+                if (field.fieldType == "dropdown") {
+                    buildDropdown(field);
+                }
+                if (field.fieldType == "number") {
+                    buildNumber(field);
+                }
             }
         }
     } catch (error) {
@@ -46,7 +52,7 @@ function buildRadio(field) {
     for (var option of options) {
         radioField += 
                     `<label class="radio-inline" style="padding-right: 7px;" >
-                        <input class="form-check-input" type="radio" id="` + field.fieldName + `" value="` + option + `"> ` + option + `
+                        <input class="form-check-input" type="radio" name="` + field.fieldName + `" value="` + option + `"> ` + option + `
                     </label>`;
     }
 
@@ -65,6 +71,16 @@ function buildText(field) {
     document.getElementById(field.formName).innerHTML += textField;
 }
 
+function buildNumber(field) {
+    var numField = `<div class="col-md-6">
+                        <label for="` + field.fieldName + `" class="form-label">` + field.fieldName + `</label>
+                        <input type="number" class="form-control" id="` + field.fieldName + `">
+                    </div>`;
+
+
+    document.getElementById(field.formName).innerHTML += numField;
+}
+
 function buildFile(field) {
     var fileField = `<div class="col-6">
                         <div class="form-group">
@@ -77,19 +93,40 @@ function buildFile(field) {
     document.getElementById(field.formName).innerHTML += fileField;
 }
 
+function buildDropdown(field) {
+    var dropdownField = `
+            <div class="col-6">
+              <label for="` + field.fieldName +`" class="form-label">` + field.fieldName + `</label>
+              <select class="form-select" name="` + field.fieldName +`">`;
+    
+    if (field.options != null) {
+        var options = field.options.split(";");
+        for (var option of options) {
+            dropdownField += `<option value="` + option + `"> ` + option + `</option>`;
+        }
+    }
+
+    dropdownField += `</select></div>`;
+
+    document.getElementById(field.formName).innerHTML += dropdownField;
+}
+
 function buildCheckbox(field) {
+
     var checkboxField = `
             <div class="col-6">
               <label for="` + field.fieldName +`" class="form-label">` + field.fieldName + `</label>
-              <select class="form-select" id="` + field.fieldName +`">`;
+              <br>`;
         
     var options = field.options.split(";");
     
     for (var option of options) {
-        checkboxField += `<option value="` + option + `"> ` + option + `</option>`;
+        radioField += 
+                    `<input class="form-check-input" type="checkbox" name="` + field.fieldName + `" value="` + option + `">
+                    <label class="form-check-inline" style="padding-right: 7px;" >` + option + `</label>`;
     }
 
-    checkboxField += `</select></div>`;
+    checkboxField += `</div>`;
 
     document.getElementById(field.formName).innerHTML += checkboxField;
 }

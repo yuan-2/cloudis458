@@ -374,9 +374,8 @@
                 if (donateFormElements[ele].type == "radio") {
                     postData[donateFormElements[ele].name] = document.querySelector("input[name='"+eleName+"']:checked").value
                 }
-                if (donateFormElements[ele].type == "file") {
+                else if (donateFormElements[ele].type == "file") {
                     postData[donateFormElements[ele].name] = donateFormElements[ele].files[0].name
-                    // console.log(donateFormElements[ele].files[0].name)
                 }
                 else {
                     postData[donateFormElements[ele].name] = donateFormElements[ele].value
