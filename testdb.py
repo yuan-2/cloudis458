@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from datetime import datetime
 
 import os
 import sys
@@ -30,10 +31,11 @@ class CarouselItem(db.Model):
     requireDelivery = db.Column(db.Integer, nullable=False)
     region = db.Column(db.String(20), nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
-    itemStatus = db.Column(db.Integer, nullable=False)
+    itemStatus = db.Column(db.String(50), nullable=False)
     fileName = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, name, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, filename):
+    def __init__(self, id, name, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, filename):
+        self.id = id
         self.name = name
         self.description = description
         self.donorName = donorName
@@ -205,19 +207,37 @@ def getItemsInCategory(cat):
 
 @app.route("/addDonation", methods=['POST'])
 def addCarouselItem():
-    if request.method == 'POST':
-        itemname = request.form.get('itemName')
-        description = request.form.get('itemDesc')
-        donorName = request.form.get('dName')
-        donorAddr = request.form.get('dAddress')
-        contactNo = request.form.get('dContact')
-        category = request.form.get('category')
-        quantity = request.form.get('quantity')
-        requireDelivery = request.form.get('r_Delivery')
-        region = request.form.get('region')
-        timeSubmitted = request.form.get('timeSubmitted')
-        itemStatus = request.form.get('itemStatus')
-        fileName = request.form.get('itemImg')
+    if request.method == 'POST' and request.json:
+
+        itemName = request.json['itemName']
+        itemDesc = request.json['itemDesc']
+        donorName = request.json['dName']
+        donorAddr = request.json['dAddress']
+        contactNo = request.json['dContact']
+        category = request.json['category']
+        quantity = request.json['quantity']
+        requireDelivery = request.json['r_Delivery']
+        region = request.json['region']
+        
+        # Get datetime of donation posting
+        now = datetime.now()
+        currentDT = now.strftime("%d/%m/%Y %H:%M:%S")
+        timeSubmitted = currentDT
+        fileName = request.json['itemImg']
+        
+        addtodb = CarouselItem(0, itemName, itemDesc, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, "open", fileName)
+
+        try:
+            db.session.add(addtodb)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while adding material :" + str(e)
+                }
+            ), 500
 
 
 if __name__ == "__main__":
