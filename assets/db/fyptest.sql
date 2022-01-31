@@ -125,6 +125,17 @@ CREATE TABLE IF NOT EXISTS `faq` (
   PRIMARY KEY (`faqID`)
 ) ;
 
+DROP TABLE IF EXISTS `formbuilder`;
+CREATE TABLE IF NOT EXISTS `formbuilder` (
+  `fieldID` int(11) NOT NULL AUTO_INCREMENT,
+  `formName` varchar(15) NOT NULL,
+  `fieldName` varchar(50) NOT NULL,
+  `fieldType` varchar(15) NOT NULL,
+  `placeholder` varchar(50),
+  `options` varchar(200),
+  PRIMARY KEY (`fieldID`)
+) ;
+
 
 -- INSERT values
 
@@ -182,6 +193,27 @@ INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I donate?', 'J
 INSERT INTO faq (`question`, `answer`, `section`) VALUES ('What do I donate?', 'Check out our wishlist', 'donor');
 INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I request for an item?', 'Just do it!', 'worker');
 INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I drive?', 'Just do it!', 'driver');
+
+
+-- for formbuilder table
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
+('donate', 'Name', 'text', 'Enter Name');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
+('donate', 'Contact Number', 'text', 'Enter Contact Number');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
+('donate', 'Address', 'text', 'Enter Address');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
+('donate', 'Area', 'radio', 'North;South;East;West;Central');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('donate', 'Item Category', 'dropdown');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('donate', 'Item Name', 'dropdown');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('donate', 'Upload Photo', 'file');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
+('donate', 'Quantity', 'dropdown', '1;2;3;4');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
+('donate', 'Require delivery from home?', 'dropdown', 'Yes;No');
 
 
 -- categoryitem table
