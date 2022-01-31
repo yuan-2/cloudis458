@@ -293,21 +293,27 @@
         var carouselItemList = result
 
         mainCarouselDisplay.innerHTML = ""
-
+        
         for (i in carouselItemList) {
-          mainCarouselDisplay.innerHTML += `
-            <div class="col-lg-4 d-flex align-items-stretch p-3 rounded-2">
-              <div class="card" style="width: 20rem;">
-                <img src="./assets/img/donations/${carouselItemList[i].fileName}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">${carouselItemList[i].name}</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">${carouselItemList[i].category}</h6>
-                  <p class="card-text">${carouselItemList[i].description}</p>
-                  <a data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
+          date = new Date(carouselItemList[i].timeSubmitted);
+          lastDate = date.setDate(date.getDate() + 1);
+          dateNow = Date.now();
+          // if current date is earlier/smaller than expiry date
+          if ((dateNow - lastDate) < 0) {
+            mainCarouselDisplay.innerHTML += `
+                <div class="col-lg-4 d-flex align-items-stretch p-3 rounded-2">
+                <div class="card" style="width: 20rem;">
+                    <img src="./assets/img/donations/${carouselItemList[i].fileName}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                    <h5 class="card-title">${carouselItemList[i].name}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">${carouselItemList[i].category}</h6>
+                    <p class="card-text">${carouselItemList[i].description}</p>
+                    <a data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
+                    </div>
                 </div>
-              </div>
-            </div>
-          `
+                </div>
+            `
+          }
         }
       })
       
@@ -350,9 +356,13 @@
         
       }
       else if (userType == "MW") {
-
+        if (dateNow - lastDate < 0){
+            window.location.href = `requestItemPage.html?id=${itemData}` // pass itemId over to request page to retrieve full item info
+        }
+        else {
+            alert("This item has expired. Please refresh the page to see the list of items available.")
+        }
         // console.log(itemData)
-        window.location.href = `requestItemPage.html?id=${itemData}` // pass itemId over to request page to retrieve full item info
       }
     }
 
