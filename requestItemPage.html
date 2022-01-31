@@ -287,6 +287,11 @@
                             </div>
                         `
                         }
+                        // If the count down is over, show that item has expired and clear interval 
+                        if (difference < 0) {
+                            clearInterval(x);
+                            document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
+                        }
                     }
                     }, 1000)                    
                 })
