@@ -238,7 +238,8 @@
                     // console.log(itemInfo)
 
                     // item info API Works but request is not done up for dynamic work 
-                    for (item of itemInfo) {
+                    var x = setInterval(function() {
+                        for (item of itemInfo) {
                         itemReqDisplay.innerHTML = `
                         <div class="row">
                             <div class="col-sm-12 col-lg-6">
@@ -254,6 +255,14 @@
                         <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
                         `
 
+                        date = new Date(item.timeSubmitted);
+                        lastDate = date.setDate(date.getDate() + 1);
+                        dateNow = Date.now();
+                        difference = lastDate - dateNow
+                        var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        var mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
                         if (item.requireDelivery == 1) {
                             donorInfo.innerHTML = `
                             <div class="pt-5">
@@ -261,6 +270,7 @@
                                 <p>Contact No: <span id="donorContact">${item.contactNo}</span></p>
                                 <p>Item Description: <span id="itemDesc">${item.description}</span></p>
                                 <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
+                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
                                 <button class="btn btn-outline-secondary" onclick="reqItem()">Request!</button>
                             </div>
                         `
@@ -272,15 +282,14 @@
                                 <p>Contact No: <span id="donorContact">${item.contactNo}</span></p>
                                 <p>Item Description: <span id="itemDesc">${item.description}</span></p>
                                 <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
+                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
                                 <button class="btn btn-outline-secondary" onclick="reqItem()">Request!</button>
                             </div>
                         `
                         }
                     }
-                    
-                    
+                    }, 1000)                    
                 })
-
             }
             else {
                 let confirmMsg = confirm("Only Migrant Workers who are logged in can request for items. Please try logging in again.")
@@ -305,7 +314,7 @@
 
         }
 
-        // Request button to POST item request
+        // Request button to POST item request, set alert when timer = 0 to redirect to homepage
         function reqItem() {
 
         }
