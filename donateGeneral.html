@@ -168,7 +168,7 @@
                     <div class="form-group">
                         <label for="itemPhoto">Upload Photo</label>
                         <br>
-                        <input type="file" name="itemImg" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
+                        <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
                     </div>
                 </div>
 
@@ -371,8 +371,11 @@
 
             for (ele in donateFormElements) {
                 var eleName = donateFormElements[ele].name
-                if (donateFormElements[ele].type == "radio") {
+                // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
+                if (donateFormElements[ele].type == "radio" && postData[donateFormElements[ele].name] == "") {
                     postData[donateFormElements[ele].name] = document.querySelector("input[name='"+eleName+"']:checked").value
+                    // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
+                    // console.log(postData['region'])
                 }
                 else if (donateFormElements[ele].type == "file") {
                     postData[donateFormElements[ele].name] = donateFormElements[ele].files[0].name
@@ -380,6 +383,7 @@
                 else {
                     postData[donateFormElements[ele].name] = donateFormElements[ele].value
                 }
+                // console.log(postData['region'])
             }
             console.log(postData)
         }
