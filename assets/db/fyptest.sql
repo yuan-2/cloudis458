@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `migrantworker` (
   `address` varchar(300) NOT NULL,
   `reqHistory` varchar(50) NOT NULL,
   PRIMARY KEY (`migrantid`),
+  UNIQUE KEY (`contactNo`),
   FOREIGN KEY (`migrantid`) references user (`id`)
 ) ;
 
@@ -134,6 +135,16 @@ CREATE TABLE IF NOT EXISTS `formbuilder` (
   `placeholder` varchar(50),
   `options` varchar(200),
   PRIMARY KEY (`fieldID`)
+) ;
+
+DROP TABLE IF EXISTS `criteria`;
+CREATE TABLE IF NOT EXISTS `criteria` (
+  `migrantid` varchar(50) NOT NULL,
+  `successMatchCount` varchar(15) NOT NULL,
+  `failMatchCount` varchar(15) NOT NULL,
+  `daysFromLastItem` varchar(50) NOT NULL,
+  PRIMARY KEY (`migrantid`),
+  FOREIGN KEY (`migrantid`) references migrantworker (`contactNo`)
 ) ;
 
 
