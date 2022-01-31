@@ -216,10 +216,6 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VA
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Area', 'radio', 'North;South;East;West;Central');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
-('donate', 'Item Category', 'dropdown');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
-('donate', 'Item Name', 'dropdown');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('donate', 'Upload Photo', 'file');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Quantity', 'dropdown', '1;2;3;4');
