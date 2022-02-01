@@ -216,6 +216,8 @@ def addCarouselItem():
         formDict = formData.to_dict()
         # for key in request.files.keys():
         #     print(key)
+        # print(formDict)
+        # print(request.files['file'])
         imgFile = request.files['file']
         itemName = formDict['itemName'].capitalize()
         itemDesc = formDict['itemDesc'].capitalize()
@@ -235,9 +237,10 @@ def addCarouselItem():
         fileName = secure_filename(imgFile.filename)
         imgFile.save(os.path.join(uploads_dir, fileName))
         os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
+        # print(fileName)
 
         addtodb = CarouselItem(0, itemName, itemDesc, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, "open", fileName)
-
+        # print(addtodb.json())
         try:
             db.session.add(addtodb)
             db.session.commit()
