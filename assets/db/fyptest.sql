@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `migrantworker` (
   `address` varchar(300) NOT NULL,
   `reqHistory` varchar(50) NOT NULL,
   PRIMARY KEY (`migrantid`),
+  UNIQUE KEY (`contactNo`),
   FOREIGN KEY (`migrantid`) references user (`id`)
 ) ;
 
@@ -136,6 +137,16 @@ CREATE TABLE IF NOT EXISTS `formbuilder` (
   PRIMARY KEY (`fieldID`)
 ) ;
 
+DROP TABLE IF EXISTS `criteria`;
+CREATE TABLE IF NOT EXISTS `criteria` (
+  `migrantid` varchar(50) NOT NULL,
+  `successMatchCount` varchar(15) NOT NULL,
+  `failMatchCount` varchar(15) NOT NULL,
+  `daysFromLastItem` varchar(50) NOT NULL,
+  PRIMARY KEY (`migrantid`),
+  FOREIGN KEY (`migrantid`) references migrantworker (`contactNo`)
+) ;
+
 
 -- INSERT values
 
@@ -204,10 +215,6 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VA
 ('donate', 'Address', 'text', 'Enter Address');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Area', 'radio', 'North;South;East;West;Central');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
-('donate', 'Item Category', 'dropdown');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
-('donate', 'Item Name', 'dropdown');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('donate', 'Upload Photo', 'file');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
