@@ -228,4 +228,4 @@ INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES
 ('Toothbrush', 'Toiletries'), ('Blender', 'Electronics'), ('Television', 'Electronics'), ('T-Shirt', 'Clothes')
 ;
 
-select * from categoryitem;
+select * from carousel;

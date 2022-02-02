@@ -39,7 +39,7 @@ class CarouselItem(db.Model):
     itemStatus = db.Column(db.String(50), nullable=False)
     fileName = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, id, itemName, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, filename):
+    def __init__(self, id, itemName, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, fileName):
         self.id = id
         self.itemName = itemName
         self.description = description
@@ -52,7 +52,7 @@ class CarouselItem(db.Model):
         self.region = region
         self.timeSubmitted = timeSubmitted
         self.itemStatus = itemStatus
-        self.filename = filename
+        self.fileName = fileName
 
     def json(self):
         return {"id": self.id, "name": self.itemName, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
@@ -214,11 +214,8 @@ def getItemsInCategory(cat):
 def addCarouselItem():
         formData = request.form
         formDict = formData.to_dict()
-        # for key in request.files.keys():
-        #     print(key)
-        # print(formDict)
-        # print(request.files['file'])
         imgFile = request.files['file']
+        # print(imgFile)
         itemName = formDict['itemName'].capitalize()
         itemDesc = formDict['itemDesc'].capitalize()
         donorName = formDict['dName'].capitalize()
@@ -231,19 +228,26 @@ def addCarouselItem():
 
         # Get datetime of donation posting
         now = datetime.now()
-        currentDT = now.strftime("%d/%m/%Y %H:%M:%S")
+        currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
         timeSubmitted = currentDT
         # save file
         fileName = secure_filename(imgFile.filename)
+        # print(formDict)
         imgFile.save(os.path.join(uploads_dir, fileName))
-        os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
-        # print(fileName)
+        # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
+        file = formDict['itemImg']
 
-        addtodb = CarouselItem(0, itemName, itemDesc, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, "open", fileName)
-        # print(addtodb.json())
+        addtodb = CarouselItem(0, itemName, itemDesc, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, "open", file)
+        
         try:
             db.session.add(addtodb)
             db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Item Successfully added into Donation Listing"
+                }
+            )
         except Exception as e:
             print(e)
             return jsonify(
