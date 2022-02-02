@@ -380,6 +380,7 @@
                 }
                 else if (donateFormElements[ele].type == "file") {
                     formData.append(donateFormElements[ele].name, donateFormElements[ele].files[0].name)
+                    formData.append("file", donateFormElements[ele].files[0])
                 }
                 else {
                     formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
