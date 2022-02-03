@@ -114,7 +114,7 @@
         </section>
 
         <div style="max-width: 1000px; margin: auto;">
-            <form id="donateForm" class="row g-3">
+            <form id="donateForm" class="row g-3" enctype="multipart/form-data">
                 <div class="col-md-6">
                     <label for="donorFullName" class="form-label">Name</label>
                     <input type="text" class="form-control" id="donorFullName"
@@ -168,7 +168,7 @@
                     <div class="form-group">
                         <label for="itemPhoto">Upload Photo</label>
                         <br>
-                        <input type="file" name="itemImg" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
+                        <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
                     </div>
                 </div>
 
@@ -366,41 +366,53 @@
         function submitDonation() {
             var donateFormElements = document.forms[0].elements
 
-            console.log(donateFormElements)
-            var postData = {}
+            // console.log(donateFormElements)
+            // var postData = {}
+
+            var formData = new FormData();
 
             for (ele in donateFormElements) {
                 var eleName = donateFormElements[ele].name
+                // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
                 if (donateFormElements[ele].type == "radio") {
-                    postData[donateFormElements[ele].name] = document.querySelector("input[name='"+eleName+"']:checked").value
+                    formData.append(donateFormElements[ele].name, document.querySelector("input[name='"+eleName+"']:checked").value)
+                    // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
                 }
                 else if (donateFormElements[ele].type == "file") {
-                    postData[donateFormElements[ele].name] = donateFormElements[ele].files[0].name
+                    formData.append(donateFormElements[ele].name, donateFormElements[ele].files[0].name)
+                    formData.append("file", donateFormElements[ele].files[0])
                 }
                 else {
-                    postData[donateFormElements[ele].name] = donateFormElements[ele].value
+                    formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
                 }
             }
-            console.log(postData)
+            // for (pair of formData.entries()) {
+            //     console.log(pair[0] + ", " + pair[1]);
+            // }
+
+
+            addDonation(formData, 'http://127.0.0.1:5004/addDonation')
+            alert("Item has been posted successfully")
         }
 
         // Example POST method implementation:
-        async function addDonation(url = 'http://127.0.0.1:5004/addDonation', data) {
+        async function addDonation(data, url) {
             // Default options are marked with *
+            // console.log(data)
+
             const response = await fetch(url, {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                mode: 'cors', // no-cors, *cors, same-origin
-                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: 'same-origin', // include, *same-origin, omit
-                headers: {
-                    'Content-Type': 'application/json'
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                redirect: 'follow', // manual, *follow, error
-                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                body: JSON.stringify(data) // body data type must match "Content-Type" header
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'no-cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: data // body data type must match "Content-Type" header
             });
-            return response.json(); // parses JSON response into native JavaScript objects
+            
+            console.log(response.message)
+
+            return "OK"; // parses JSON response into native JavaScript objects
         }
 
         function loginLogout() {
