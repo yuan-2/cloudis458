@@ -9,7 +9,7 @@
 # General
 --------------------------------------------------------------*/
 body {
-    font-family: "Open Sans", sans-serif;
+    font-family: "Open Sans,Arial,sans-serif";
     color: #444444;
   }
   
@@ -694,19 +694,58 @@ body {
   
   .carouselheader table {
       width: 100%;
-    max-height: 50px;
+      max-height: 50px;
       padding: 15px;
       text-align: left;
       border-collapse: collapse;
   }
   
   #carouselBody .card img {
-    height: 100%;
-    width: 100%;
+    width: 80%;
+    margin: auto;
   }
 
-  .card:hover {
+  /* .card:hover {
     box-shadow: 10px 10px 5px grey;
+  } */
+
+  .card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-body {
+    color: #ffffff;
+  }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    margin: 0px;
+  }
+
+  .card-subtitle {
+    color: #ffffff;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-top: 1.25rem;    
+    font-weight: 550;
+  }
+
+  .card-content {
+    padding: 1rem;
+    background: linear-gradient(to bottom left, #E19587 40%, #DB5A42 100%);
+  }
+
+  .card-body > a {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
   }
   
   /*--------------------------------------------------------------
