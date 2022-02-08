@@ -33,11 +33,12 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
+  -- `id` int(11) NOT NULL AUTO_INCREMENT,
+  -- `username` varchar(50) NOT NULL,
+  `usertype` varchar(30) NOT NULL,
   `username` varchar(300) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
+  `password`  hash() NOT NULL,
+  PRIMARY KEY (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `driver`;

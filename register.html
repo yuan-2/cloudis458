@@ -39,7 +39,7 @@
   ======================================================== -->
 </head>
 
-<body onload="checkLoginForReq()">
+<body onload="checkLogin()">
 
     <!-- ======= Top Bar ======= -->
     <div id="topbar" class="d-flex align-items-center fixed-top">
@@ -70,38 +70,68 @@
             <nav id="navbar" class="navbar order-last order-lg-0">
                 <ul>
                     <li><a class="nav-link scrollto" href="index.html">Home</a></li>
-                    <li><a class="nav-link scrollto" href="donateGeneral.html">Donate</a></li>
-                    <li><a class="nav-link scrollto active" href="requestWishList.html">Request</a></li>
+                    <li><a class="nav-link scrollto active" href="donateGeneral.html">Donate</a></li>
+                    <li><a class="nav-link scrollto" href="requestWishList.html">Request</a></li>
                     <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
 
-            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;" class="appointment-btn scrollto">Login</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
 
-    <!-- ======= Image Banner Section ======= -->
     <section id="hero" class="d-flex align-items-center"></section>
 
     <main id="main">
 
-        <!-- Adaptive section to auto populate data carried over from carousel page click -->
-        <section id="pageTitle">
-            <div class="container" id="itemReqDisplay">
+
+        <section>
+            <div class="container">
+                <div class="section-title">
+                    <h2>Migrant Worker Registration</h2>
+                </div>
             </div>
         </section>
 
-        <section>
-            <div style="max-width: 1000px; margin: auto;">
-                <form id="requestForm" enctype="multipart/form-data" class="row g-3">
-                    <div id="itemImage" class="col-md-6"></div>
-                    <div id="donorInfo" class="col-md-6"></div>
-                </form>
-                <br>
-            </div>
-        </section>
+        <div style="max-width: 1000px; margin: auto;">
+            <form id="registerFormMW" class="row g-3" enctype="multipart/form-data">
+                <div class="col-md-6">
+                    <label for="userContact" class="form-label">Contact Number</label>
+                    <input type="text" placeholder="Please enter your Handphone number (e.g. 81234561)"
+                        class="form-control" id="userContact" name="userName" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="pw" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="confirm" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm" name="confirmPw" required>
+                </div>
+
+                <!-- <div class="col-6">
+                    <label class="form-label">User Type</label>
+                    <br>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="uType" id="userType" value="Worker">
+                        <label class="form-check-label">Worker</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="uType" id="userType" value="Driver">
+                        <label class="form-check-label">Driver</label>
+                    </div>
+                </div> -->
+
+                <div class="col-12" style='text-align: center; color: #E3A587;'>
+                    <button type="button" onclick="registerUser()" class="btn btn-outline-light"
+                        style="color:white; background-color: #E3A587;">Submit</button>
+                </div>
+            </form>
+            <br>
+        </div>
 
     </main><!-- End #main -->
 
@@ -148,7 +178,7 @@
                     <div class="col-lg-4 col-md-6 footer-newsletter">
                         <h4>Join Our Newsletter</h4>
                         <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
-                        <form action="" method="post">
+                        <form method="post">
                             <input type="email" name="email"><input type="submit" value="Subscribe">
                         </form>
                     </div>
@@ -197,108 +227,63 @@
 
     <script>
         var userType = ""
-        var itemId = ""
-        var itemReqDisplay = document.getElementById("itemReqDisplay")
-        var itemImage = document.getElementById("itemImage")
-        var donorInfo = document.getElementById("donorInfo")
 
-        function checkLoginForReq() {
+        var itemCategoryOptions = document.getElementById('itemCategoryOptions')
+
+        var itemNameOptions = document.getElementById("itemNameOptions")
+
+        function checkLogin() {
+
             if (window.sessionStorage.getItem("userType") != null) {
                 userType = window.sessionStorage.getItem("userType")
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
-
-                const queryString = window.location.search;
-                const urlParams = new URLSearchParams(queryString);
-                itemId = urlParams.get('id')
-
-                loadItem().then(function retriveInfo(result) {
-                    var itemInfo = result
-                    // console.log(itemInfo)
-
-                    // item info API Works but request is not done up for dynamic work 
-                    var x = setInterval(function() {
-                        for (item of itemInfo) {
-                        itemReqDisplay.innerHTML = `
-                        <div class="row">
-                            <div class="col-sm-12 col-lg-6">
-                                <div class="pt-3">
-                                    <h2 id="itemName">${item.name}</h2>
-                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span></p>
-                                </div>
-                            </div>
-                        </div>
-                        `
-
-                        itemImage.innerHTML = `
-                        <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
-                        `
-
-                        date = new Date(item.timeSubmitted);
-                        lastDate = date.setDate(date.getDate() + 1);
-                        dateNow = Date.now();
-                        difference = lastDate - dateNow
-                        var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        var mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-                        var seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-                        if (item.requireDelivery == 1) {
-                            donorInfo.innerHTML = `
-                            <div class="pt-5">
-                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
-                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
-                                <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
-                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-outline-success" onclick="reqItem()">Request!</button>
-                            </div>
-                        `
-                        }
-                        else {
-                            donorInfo.innerHTML = `
-                            <div class="pt-5">
-                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
-                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
-                                <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
-                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-success" onclick="reqItem()">Request!</button>
-                            </div>
-                        `
-                        }
-                        // If the count down is over, show that item has expired and clear interval 
-                        if (difference < 0) {
-                            clearInterval(x);
-                            document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
-                        }
-                    }
-                    }, 1000)                    
-                })
             }
-            else {
-                let confirmMsg = confirm("Only Migrant Workers who are logged in can request for items. Please try logging in again.")
-                if (confirmMsg == true) {
-                    window.location.href = "index.html"
-                }
-                else {
-                    window.location.href = "index.html"
+        }
+
+        const form = document.getElementById("registerFormMW")
+
+        function registerUser() {
+            var registerFormElements = document.forms[0].elements
+
+            var formData = new FormData();
+
+            for (ele in registerFormElements) {
+                var eleName = registerFormElements[ele].name
+                // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
+
+                formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
+            }
+
+            let res = addNewMW(formData, 'http://127.0.0.1:5004/registermw')
+            if (res == "OK") {
+                let ans = confirm("Account created successfully, click ok to return to login page")
+
+                if (ans) {
+                    window.location.href = "login.html"
+
                 }
             }
         }
 
-        async function loadItem() {
-            let response = await fetch("http://127.0.0.1:5004/getItemById/" + itemId)
-            let responseCode = await response.json()
-            if (responseCode.code == 200) {
-                return responseCode.data.itemDetail
-            }
-            else {
-                alert(responseCode.message)
-            }
+        // Example POST method implementation:
+        async function addNewMW(data, url) {
+            // Default options are marked with *
+            // console.log(data)
 
-        }
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'no-cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: data // body data type must match "Content-Type" header
+            });
 
-        // Request button to POST item request, set alert when timer = 0 to redirect to homepage
-        function reqItem() {
+            console.log(response.message)
 
+            return "OK"; // parses JSON response into native JavaScript objects
         }
 
         function loginLogout() {
