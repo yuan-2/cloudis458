@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
+import hashlib
 
 import os
 import sys
@@ -84,6 +85,21 @@ class CategoryItem(db.Model):
 
     def json(self):
         return {"itemId": self.itemId, "itemName": self.itemName, "attachedCategory": self.attachedCategory}
+    
+class User(db.Model):
+    __tablename__ = 'user'
+    
+    userName = db.Column(db.String, primary_key=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    userType = db.Column(db.String, nullable=False)
+
+    def __init__(self, userName, password, userType):
+        self.userName = userName
+        self.password = password
+        self.userType = userType
+
+    def json(self):
+        return {"userName": self.userName, "password": self.password, "userType": self.userType}
 
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
 
@@ -256,6 +272,35 @@ def addCarouselItem():
                     "message": "An error occurred while adding material :" + str(e)
                 }
             ), 500
+            
+@app.route("/registermw", methods=['POST'])
+def register():
+        formData = request.form
+        formDict = formData.to_dict()
+        username = formDict['userName']
+        pw = formDict['pw']
+        pw = hashlib.md5(pw)
+
+        addtodb = User(username, pw, "worker")
+        
+        try:
+            db.session.add(addtodb)
+            db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Worker account successfully created!"
+                }
+            )
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while registering user :" + str(e)
+                }
+            ), 500
+
 
 
 if __name__ == "__main__":

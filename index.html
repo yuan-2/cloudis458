@@ -70,28 +70,11 @@
           <li><a class="nav-link scrollto" href="donateGeneral.html">Donate</a></li>
           <li><a class="nav-link scrollto" href="requestWishList.html">Request</a></li>
           <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
-          <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
-            </ul>
-          </li> -->
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
-
-      <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;" class="appointment-btn scrollto">Login</a>
+      <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+        class="appointment-btn scrollto">Login</a>
 
     </div>
   </header><!-- End Header -->
@@ -279,13 +262,13 @@
     var userType = ""
 
     var mainCarouselDisplay = document.getElementById("mainCarouselDisplay")
-    
+
     function checkLogin() {
       if (window.sessionStorage.getItem("userType") != null) {
         userType = window.sessionStorage.getItem("userType")
 
         document.getElementById("loginLogoutButton").innerText = "Logout"
-        
+
       }
 
       // async to return promise and update carousel page with items 
@@ -293,7 +276,7 @@
         var carouselItemList = result
 
         mainCarouselDisplay.innerHTML = ""
-        
+
         for (i in carouselItemList) {
           date = new Date(carouselItemList[i].timeSubmitted);
           lastDate = date.setDate(date.getDate() + 1);
@@ -304,11 +287,13 @@
                 <div class="col-lg-4 d-flex align-items-stretch p-3 rounded-2">
                 <div class="card" style="width: 20rem;">
                     <img src="./assets/img/donations/${carouselItemList[i].fileName}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                    <h5 class="card-title">${carouselItemList[i].name}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">${carouselItemList[i].category}</h6>
-                    <p class="card-text">${carouselItemList[i].description}</p>
-                    <a data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
+                    <div class="card-content">
+                      <div class="card-body">
+                        <h5 class="card-title">${carouselItemList[i].name}</h5>
+                        <h6 class="card-subtitle mb-2">${carouselItemList[i].category}</h6>
+                        <h6 class="card-subtitle">${carouselItemList[i].description}</h6>
+                        <a data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
+                      </div>
                     </div>
                 </div>
                 </div>
@@ -316,7 +301,7 @@
           }
         }
       })
-      
+
     }
 
     async function loadCarousel() {
@@ -325,8 +310,7 @@
         let responseCode = await response.json()
         if (responseCode.code == 200) {
           return responseCode.data.items
-        }
-        else {
+        } else {
           alert(responseCode.message)
         }
       } catch (error) {
@@ -337,13 +321,12 @@
     function loginLogout() {
       if (document.getElementById("loginLogoutButton").innerText === "Login") {
         window.location.href = "login.html"
-      }
-      else {
+      } else {
         window.sessionStorage.removeItem("userType")
         window.location.reload()
       }
     }
-    
+
     function checkUserType(x) {
       var itemData = x.getAttribute("data-tip")
 
@@ -353,20 +336,17 @@
         if (confirmMsg == true) {
           window.location.href = "login.html"
         }
-        
-      }
-      else if (userType == "MW") {
-        if (dateNow - lastDate < 0){
-            window.location.href = `requestItemPage.html?id=${itemData}` // pass itemId over to request page to retrieve full item info
-        }
-        else {
-            alert("This item has expired. Please refresh the page to see the list of items available.")
+
+      } else if (userType == "MW") {
+        if (dateNow - lastDate < 0) {
+          window.location.href =
+            `requestItemPage.html?id=${itemData}` // pass itemId over to request page to retrieve full item info
+        } else {
+          alert("This item has expired. Please refresh the page to see the list of items available.")
         }
         // console.log(itemData)
       }
     }
-
-
   </script>
 
 </body>
