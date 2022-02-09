@@ -213,8 +213,8 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Area', 'radio', 'North;South;East;West;Central');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('donate', 'Upload Photo', 'file');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
-('donate', 'Quantity', 'dropdown', '1;2;3;4');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('donate', 'Quantity', 'number');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Require delivery from home?', 'dropdown', 'Yes;No');
 

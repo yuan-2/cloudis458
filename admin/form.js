@@ -33,6 +33,11 @@ async function retrieveForm(formName) {
                     buildNumber(field);
                 }
             }
+            
+            // if admin page --> change as needed or check if admin is logged in
+            if (window.location.href.indexOf("admin") > -1) {
+                addIcons();
+            }
         }
     } catch (error) {
         // Errors when calling the service; such as network error, 
@@ -86,7 +91,7 @@ function buildNumber(field) {
 function buildFile(field) {
     var fileField = `<div class="col-6">
                         <div class="form-group">
-                            <label for="` + field.fieldName + `">` + field.fieldName + `</label>
+                            <label for="` + field.fieldName + `" class="form-label">` + field.fieldName + `</label>
                             <br>
                             <input type="file" class="form-control-file" id="` + field.fieldName + `" style='padding-top: 10px;'>
                         </div>
@@ -122,16 +127,26 @@ function buildCheckbox(field) {
 
     var options = field.options.split(";");
 
+    var optionNo = 1;
     for (var option of options) {
-        radioField +=
-            `<input class="form-check-input" type="checkbox" name="` + field.fieldName + `" value="` + option + `">
-                    <label class="form-check-inline" style="padding-right: 7px;" >` + option + `</label>`;
+        checkboxField +=
+            `<input id="` + optionNo + `" class="form-check-input" type="checkbox" name="` + field.fieldName + `" value="` + option + `">
+                    <label for="` + optionNo + `" class="form-check-inline" style="padding-right: 7px;" >` + option + `</label>`;
+        optionNo++;
     }
 
     checkboxField += `</div>`;
 
     document.getElementById(field.formName).innerHTML += checkboxField;
 }
+
+// add edit icons to each field
+function addIcons() {
+    var editIcon = ` <i type="button" class="bi bi-pencil m-1" style="font-size:14px"></i>`;
+    $('label.form-label').each(function() {
+        $(this).after(editIcon);
+    });
+};
 //#endregion
 
 // POPULATING ITEM CATEGORIES AND NAMES DROPDOWN LISTS
@@ -184,13 +199,13 @@ async function populateItemNames(cat) {
 }
 //#endregion
 
-// EDITING FORM
+// DISPLAYING EDITING FORM
 //#region 
-function showInputType(){
-    var inputType = $("#inputType :selected").val();
+function showFieldType(){
+    var inputType = $("#fieldType :selected").val();
     if (inputType == "text") {
         if ($('#textInput').length == 0) {
-            $('#newInput').append(`<div id="textInput">
+            $('#newField').append(`<div id="textInput">
                                     <input type="text" class="form-control" id="placeholder" placeholder="Enter placeholder text here (optional)">
                                 </div>`);
         }
@@ -198,10 +213,10 @@ function showInputType(){
         $('#textInput').show();
     } else if (inputType == "radio" || inputType == "dropdown" || inputType == "checkbox"){
         if ($('#addOptions').length == 0) {
-            $('#newInput').append(`<div id="addOptions"><ol id="optionsList"></ol></div>`)
-            addOptionField();
-            $('#addOptions').append(`<button class="btn btn-outline-secondary ms-3" type='button' id="add-input"
-                                    onclick="addOptionField()">+ Add Option</button>`);
+            $('#newField').append(`<div id="addOptions"><ol id="optionsList"></ol></div>`)
+            addOption();
+            $('#addOptions').append(`<button class="btn btn-outline-secondary ms-3" type='button' id="addOptionBtn"
+                                    onclick="addOption()">+ Add Option</button>`);
         }
         $('#textInput').hide();
         $('#addOptions').show();
@@ -211,15 +226,51 @@ function showInputType(){
     }
 }
 
-function addOptionField(){
-    var optionField = `<li><div class="input-group">
+function addOption(){
+    var option = `<li><div class="input-group">
                         <input type="text" class="form-control mb-3" name="option" placeholder="Enter new option">
                         <button type="button" onclick="removeOption(this)" class="btn-close m-2" aria-label="Close"></button>
                     </div></li>`;
-    $('#optionsList').append(optionField);
+    $('#optionsList').append(option);
 }
 
 function removeOption(elem){
     elem.parentNode.parentNode.remove();
 }
+//#endregion
+
+// FORM CRUD
+//#region 
+async function addField(formName) {
+    var fieldName = $('#fieldName').val();
+    var fieldType = $('#fieldType').val();
+    if (fieldType == "text") {
+        var placeholder = $('#placeholder').val();
+        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType, placeholder: placeholder})
+    } else if (fieldType == "radio" || fieldType == "dropdown" || fieldType == "checkbox"){
+        var options = '';
+        $("[name='option']").each(function() {
+            options += this.value + ';';
+        });
+        options = options.slice(0,-1);
+        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType, options: options})
+    } else {
+        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType})}
+
+    var serviceURL = "http://127.0.0.1:5003/formbuilder";
+
+    return fetch (serviceURL,
+    {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: fieldData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // console.log(data);
+        window.location = window.location;
+    })
+};
 //#endregion
