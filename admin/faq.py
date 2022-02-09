@@ -103,7 +103,7 @@ def edit_faq(faqID):
             }), 500
 
 # delete existing faq
-@app.route('/faq-delete/<int:faqID>', methods=["DELETE"])
+@app.route('/faq/<int:faqID>', methods=["DELETE"])
 def delete_faq(faqID):
     item = Faq.query.filter_by(faqID=faqID).first()
     if ( item is not None ): 
