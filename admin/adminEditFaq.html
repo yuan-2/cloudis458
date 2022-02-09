@@ -241,7 +241,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                window.location.reload();
+                window.location = window.location;
             })
         };
         
@@ -284,7 +284,7 @@
                     if (response.ok) {
                         console.log(result);
                         alert("Question deleted successfully.")
-                        window.location.reload();
+                        window.location = window.location;
                     }
                 } catch (error) {
                     // Errors when calling the service; such as network error, 
