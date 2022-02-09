@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
+import hashlib
 
 import os
 import sys
@@ -278,6 +279,7 @@ def register():
         formDict = formData.to_dict()
         username = formDict['userName']
         pw = formDict['pw']
+        pw = hashlib.md5(pw)
 
         addtodb = User(username, pw, "worker")
         
@@ -287,7 +289,7 @@ def register():
             return jsonify (
                 {
                     "code": 200,
-                    "message": "Worker successfully added to database!"
+                    "message": "Worker account successfully created!"
                 }
             )
         except Exception as e:

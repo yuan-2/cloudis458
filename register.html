@@ -97,19 +97,22 @@
         </section>
 
         <div style="max-width: 1000px; margin: auto;">
+            <div id="errorDiv" class="alert alert-warning d-none" role="alert">
+                <ul id="errorDisplay"></ul>
+            </div>
             <form id="registerFormMW" class="row g-3" enctype="multipart/form-data">
                 <div class="col-md-6">
                     <label for="userContact" class="form-label">Contact Number</label>
-                    <input type="text" placeholder="Please enter your Handphone number (e.g. 81234561)"
+                    <input type="text" placeholder="Enter your handphone number (e.g. 91325522)"
                         class="form-control" id="userContact" name="userName" required>
                 </div>
                 <div class="col-md-6">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="pw" required>
+                    <input type="password" class="form-control" id="password" name="pw" placeholder="Enter a password between 6 to 8 characters long" required>
                 </div>
                 <div class="col-md-6">
                     <label for="confirm" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirm" name="confirmPw" required>
+                    <input type="password" class="form-control" id="confirm" name="confirmPw" placeholder="Re-enter your password" required>
                 </div>
 
                 <!-- <div class="col-6">
@@ -246,24 +249,80 @@
         function registerUser() {
             var registerFormElements = document.forms[0].elements
 
-            var formData = new FormData();
-
+            let userName = ""
+            let pw1 = ""
+            let pw2 = ""
             for (ele in registerFormElements) {
-                var eleName = registerFormElements[ele].name
-                // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
-
-                formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
-            }
-
-            let res = addNewMW(formData, 'http://127.0.0.1:5004/registermw')
-            if (res == "OK") {
-                let ans = confirm("Account created successfully, click ok to return to login page")
-
-                if (ans) {
-                    window.location.href = "login.html"
-
+                if (registerFormElements[ele].name == "pw") {
+                    pw1 = registerFormElements[ele].value
+                }
+                else if (registerFormElements[ele].name == "confirmPw") {
+                    pw2 = registerFormElements[ele].value
+                }
+                else if (registerFormElements[ele].name == "userName") {
+                    userName = registerFormElements[ele].value
                 }
             }
+            var errorArr = [] // Used to store errors to be displayed
+
+            // Validate passwords
+            if (pw1.length != pw2.length) {
+                errorArr.push("Length of your password and your confirmation password are not the same")
+            }
+            else if (pw1.length < 6 || pw2.length > 8 ) {
+                errorArr.push("Length of your password must be within 6 to 8 characters")
+            }
+            else if (pw1 !== pw2) {
+                errorArr.push("The two passwords that you have entered do not match")
+            }
+
+            // Validate Username/Contact
+            if (userName.length > 8 || userName.length < 8) {
+                errorArr.push("The contact number you have entered has more or less than 8 digits")
+            }
+            else if (parseInt(userName) == NaN) {
+                errorArr.push("Please make sure your contact number has no spaces, and only consist of numbers")
+            }
+
+            // Retrieve errorDiv to add/remove alert class
+            var errorDiv = document.getElementById('errorDiv')
+            var errorDisplay = document.getElementById('errorDisplay')
+
+            if (errorArr.length > 0) {
+                errorDiv.innerHTML = ""
+                errorDisplay.innerHTML = ""
+
+                errorDiv.classList.remove("d-none")
+
+                for (err of errorArr) {
+                    errorDisplay.innerHTML += `
+                    <li>${err}</li>
+                    `
+                }
+                errorDiv.innerHTML += `<p class="text-center">Please ensure the above errors are resolved and registering again.</p>`
+            }
+            else {
+                errorDiv.classList.add("d-none")
+            }
+
+            // var formData = new FormData();
+
+            // for (ele in registerFormElements) {
+            //     var eleName = registerFormElements[ele].name
+            //     // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
+
+            //     formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
+            // }
+
+            // let res = addNewMW(formData, 'http://127.0.0.1:5004/registermw')
+            // if (res == "OK") {
+            //     let ans = confirm("Account created successfully, click ok to return to login page")
+
+            //     if (ans) {
+            //         window.location.href = "login.html"
+
+            //     }
+            // }
         }
 
         // Example POST method implementation:
