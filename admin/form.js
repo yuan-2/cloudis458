@@ -33,6 +33,11 @@ async function retrieveForm(formName) {
                     buildNumber(field);
                 }
             }
+            
+            // if admin page --> change as needed or check if admin is logged in
+            if (window.location.href.indexOf("admin") > -1) {
+                addIcons();
+            }
         }
     } catch (error) {
         // Errors when calling the service; such as network error, 
@@ -46,7 +51,7 @@ function buildRadio(field) {
 
     var radioField = `
             <div class="col-6">
-              <label for="` + field.fieldName + `" class="form-label">` + field.fieldName + `</label>
+              <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
               <br>`;
 
     var options = field.options.split(";");
@@ -54,7 +59,7 @@ function buildRadio(field) {
     for (var option of options) {
         radioField +=
             `<label class="radio-inline" style="padding-right: 7px;" >
-                        <input class="form-check-input" type="radio" name="` + field.fieldName + `" value="` + option + `"> ` + option + `
+                        <input class="form-check-input" type="radio" name="${field.fieldID}" value="${option}"> ${option}
                     </label>`;
     }
 
@@ -65,8 +70,8 @@ function buildRadio(field) {
 
 function buildText(field) {
     var textField = `<div class="col-md-6">
-                        <label for="` + field.fieldName + `" class="form-label">` + field.fieldName + `</label>
-                        <input type="text" class="form-control" id="` + field.fieldName + `" placeholder="` + field.placeholder + `">
+                        <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
+                        <input type="text" class="form-control" id="${field.fieldID}" placeholder="${field.placeholder}">
                     </div>`;
 
 
@@ -75,8 +80,8 @@ function buildText(field) {
 
 function buildNumber(field) {
     var numField = `<div class="col-md-6">
-                        <label for="` + field.fieldName + `" class="form-label">` + field.fieldName + `</label>
-                        <input type="number" class="form-control" id="` + field.fieldName + `">
+                        <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
+                        <input type="number" class="form-control" id="${field.fieldID}">
                     </div>`;
 
 
@@ -86,9 +91,8 @@ function buildNumber(field) {
 function buildFile(field) {
     var fileField = `<div class="col-6">
                         <div class="form-group">
-                            <label for="` + field.fieldName + `">` + field.fieldName + `</label>
-                            <br>
-                            <input type="file" class="form-control-file" id="` + field.fieldName + `" style='padding-top: 10px;'>
+                            <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
+                            <input type="file" class="form-control-file" id="${field.fieldID}" style="display:block">
                         </div>
                     </div>`;
 
@@ -98,13 +102,13 @@ function buildFile(field) {
 function buildDropdown(field) {
     var dropdownField = `
             <div class="col-6">
-              <label for="` + field.fieldName + `" class="form-label">` + field.fieldName + `</label>
-              <select class="form-select" name="` + field.fieldName + `">`;
+              <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
+              <select class="form-select" id="${field.fieldID}">`;
 
-    if (field.options != null) {
+    if (field.options !== null) {
         var options = field.options.split(";");
         for (var option of options) {
-            dropdownField += `<option value="` + option + `"> ` + option + `</option>`;
+            dropdownField += `<option value="${option}"> ${option}</option>`;
         }
     }
 
@@ -117,21 +121,38 @@ function buildCheckbox(field) {
 
     var checkboxField = `
             <div class="col-6">
-              <label for="` + field.fieldName + `" class="form-label">` + field.fieldName + `</label>
+              <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
               <br>`;
 
     var options = field.options.split(";");
 
+    var optionNo = 1;
     for (var option of options) {
-        radioField +=
-            `<input class="form-check-input" type="checkbox" name="` + field.fieldName + `" value="` + option + `">
-                    <label class="form-check-inline" style="padding-right: 7px;" >` + option + `</label>`;
+        checkboxField +=
+            `<input id="${field.fieldID}-${optionNo}" class="form-check-input" type="checkbox" name="${field.fieldID}" value="${option}">
+                    <label for="${field.fieldID}-${optionNo}" class="form-check-inline" style="padding-right: 7px;" >${option}</label>`;
+        optionNo++;
     }
 
     checkboxField += `</div>`;
 
     document.getElementById(field.formName).innerHTML += checkboxField;
 }
+
+// add edit icons to each field
+function addIcons() {
+    $('#donate').find('input, select').each(function() {
+        var fieldID = $(this).attr("name");
+        if (fieldID === undefined) {
+            fieldID = $(this).attr("id");
+        }
+        var editIcon = ` <i type="button" onclick="editField(${fieldID})" class="bi bi-pencil m-1" style="font-size:14px"></i>`;
+        var label = $(`label[for="${fieldID}"]`);
+        if (!label.next().is("i")){
+            label.after(editIcon);
+        }
+    });
+};
 //#endregion
 
 // POPULATING ITEM CATEGORIES AND NAMES DROPDOWN LISTS
@@ -184,13 +205,13 @@ async function populateItemNames(cat) {
 }
 //#endregion
 
-// EDITING FORM
+// DISPLAYING EDITING FORM
 //#region 
-function showInputType(){
-    var inputType = $("#inputType :selected").val();
+function showFieldType(){
+    var inputType = $("#fieldType :selected").val();
     if (inputType == "text") {
         if ($('#textInput').length == 0) {
-            $('#newInput').append(`<div id="textInput">
+            $('#newField').append(`<div id="textInput">
                                     <input type="text" class="form-control" id="placeholder" placeholder="Enter placeholder text here (optional)">
                                 </div>`);
         }
@@ -198,10 +219,10 @@ function showInputType(){
         $('#textInput').show();
     } else if (inputType == "radio" || inputType == "dropdown" || inputType == "checkbox"){
         if ($('#addOptions').length == 0) {
-            $('#newInput').append(`<div id="addOptions"><ol id="optionsList"></ol></div>`)
-            addOptionField();
-            $('#addOptions').append(`<button class="btn btn-outline-secondary ms-3" type='button' id="add-input"
-                                    onclick="addOptionField()">+ Add Option</button>`);
+            $('#newField').append(`<div id="addOptions"><ol id="optionsList"></ol></div>`)
+            addOption();
+            $('#addOptions').append(`<button class="btn btn-outline-secondary ms-3" type='button' id="addOptionBtn"
+                                    onclick="addOption()">+ Add Option</button>`);
         }
         $('#textInput').hide();
         $('#addOptions').show();
@@ -211,15 +232,137 @@ function showInputType(){
     }
 }
 
-function addOptionField(){
-    var optionField = `<li><div class="input-group">
-                        <input type="text" class="form-control mb-3" name="option" placeholder="Enter new option">
+function addOption(value=""){
+    var option = `<li><div class="input-group">
+                        <input type="text" class="form-control mb-3" ${value} name="option" placeholder="Enter new option">
                         <button type="button" onclick="removeOption(this)" class="btn-close m-2" aria-label="Close"></button>
                     </div></li>`;
-    $('#optionsList').append(optionField);
+    $('#optionsList').append(option);
 }
 
 function removeOption(elem){
     elem.parentNode.parentNode.remove();
+}
+//#endregion
+
+// FORM CRUD
+//#region 
+async function addField(formName, fieldID="") {
+    var fieldName = $('#fieldName').val();
+    var fieldType = $('#fieldType').val();
+    if (fieldType == "text") {
+        var placeholder = $('#placeholder').val();
+        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType, placeholder: placeholder})
+    } else if (fieldType == "radio" || fieldType == "dropdown" || fieldType == "checkbox"){
+        var options = '';
+        $("[name='option']").each(function() {
+            options += this.value + ';';
+        });
+        options = options.slice(0,-1);
+        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType, options: options})
+    } else {
+        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType})}
+
+    var serviceURL = "http://127.0.0.1:5003/formbuilder" + fieldID;
+
+    return fetch (serviceURL,
+    {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: fieldData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // console.log(data);
+        window.location = window.location;
+    })
+};
+
+async function editField(fieldID) {
+    var serviceURL = "http://127.0.0.1:5003/formbuilder/" + fieldID;
+
+    try {
+        // Retrieve list of all FAQ
+        const response =
+        await fetch(
+           serviceURL, { method: 'GET' }
+        );
+        const result = await response.json();
+        if (response.ok) {
+            var field = result.data;
+            $('#fieldName').val(field.fieldName);
+            $('#fieldType').val(field.fieldType);
+
+            if (field.placeholder !== null) {
+                // resets placeholder field
+                if ($('#textInput').length != 0) {
+                    $('#textInput').remove()
+                }
+
+                // build placeholder field
+                $('#newField').append(`<div id="textInput">
+                                    <input type="text" class="form-control" id="placeholder" placeholder="Enter placeholder text here (optional)">
+                                </div>`);
+                $('#placeholder').val(field.placeholder);
+            }
+
+            if (field.options !== null) {
+                // resets options fields
+                if ($('#addOptions').length != 0) {
+                    $('#addOptions').remove()
+                }
+
+                // build options fields
+                $('#newField').append(`<div id="addOptions"><ol id="optionsList"></ol></div>`);
+                var options = field.options.split(";");
+                for (var option of options) {
+                    addOption(`value="${option}"`);
+                }
+                $('#addOptions').append(`<button class="btn btn-outline-secondary ms-3" type='button' id="addOptionBtn"
+                                    onclick="addOption()">+ Add Option</button>`)
+            }
+
+            showFieldType();
+            
+            $('#editHeader').append(`<div class="col-md-6">
+                                        <button type="button" class="btn btn-danger float-end" onclick="deleteField(${field.fieldID})" id="deleteFieldBtn">Delete Field</button>
+                                    </div>`)
+            $('#addFieldBtn').attr("onclick", `addField('${field.formName}', '/${field.fieldID}')`);
+            $('#addFieldBtn').text("Save Changes");
+        }
+    } catch (error) {
+        // Errors when calling the service; such as network error, 
+        // service offline, etc
+        console.log(error)
+        alert('There is a problem retrieving data, please refresh the page or try again later.');
+    } // error
+}
+
+async function deleteField(fieldID) {
+    if (confirm("Are you sure you want to delete the field?")){
+        var serviceURL = "http://127.0.0.1:5003/formbuilder/" + fieldID;
+
+        try {
+            // Retrieve list of all FAQ
+            const response =
+            await fetch(
+            serviceURL, { method: 'DELETE' }
+            );
+            const result = await response.json();
+            if (response.ok) {
+                // console.log(result);
+                alert("Field deleted successfully.")
+                window.location = window.location;
+            }
+        } catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            console.log(error)
+            alert('There is a problem retrieving data, please refresh the page or try again later.');
+        } // error
+
+    }
 }
 //#endregion

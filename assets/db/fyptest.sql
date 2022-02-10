@@ -33,30 +33,26 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  `username` varchar(300) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
+  `usertype` varchar(20)  NOT NULL,
+  `username` varchar(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  PRIMARY KEY (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `driver`;
 CREATE TABLE IF NOT EXISTS `driver` (
-  `driverid` int(11) NOT NULL AUTO_INCREMENT,
   `contactNo` varchar(50) NOT NULL,
-  PRIMARY KEY (`driverid`),
-  FOREIGN KEY (`driverid`) references user (`id`)
+  PRIMARY KEY (`contactNo`),
+  FOREIGN KEY (`contactNo`) references user (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `migrantworker`;
 CREATE TABLE IF NOT EXISTS `migrantworker` (
-  `migrantid` int(11) NOT NULL AUTO_INCREMENT,
   `contactNo` varchar(50) NOT NULL,
   `address` varchar(300) NOT NULL,
   `reqHistory` varchar(50) NOT NULL,
-  PRIMARY KEY (`migrantid`),
-  UNIQUE KEY (`contactNo`),
-  FOREIGN KEY (`migrantid`) references user (`id`)
+  PRIMARY KEY (`contactNo`),
+  FOREIGN KEY (`contactNo`) REFERENCES `user` (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `request`;
@@ -90,7 +86,7 @@ DROP TABLE IF EXISTS `matches`;
 CREATE TABLE IF NOT EXISTS `matches` (
   `matchid` int(11) NOT NULL AUTO_INCREMENT,
   `reqid` int(11) NOT NULL,
-  `requestorName` varchar(50) NOT NULL,
+--   `requestorName` varchar(50) NOT NULL,
   `requestorContactNo` varchar(50) NOT NULL,
   `donorName` varchar(50) NOT NULL,
   `donorContactNo` varchar(50) NOT NULL,
@@ -217,8 +213,8 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Area', 'radio', 'North;South;East;West;Central');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('donate', 'Upload Photo', 'file');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
-('donate', 'Quantity', 'dropdown', '1;2;3;4');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('donate', 'Quantity', 'number');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Require delivery from home?', 'dropdown', 'Yes;No');
 

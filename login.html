@@ -99,31 +99,9 @@
         </div>
     </header><!-- End Header -->
 
+    <section></section>
+
     <main id="main">
-
-        <!-- ======= Breadcrumbs Section ======= -->
-        <section class="breadcrumbs">
-            <div class="container">
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>Inner Page</h2>
-                    <ol>
-                        <li><a href="index.html">Home</a></li>
-                        <li>Inner Page</li>
-                    </ol>
-                </div>
-
-            </div>
-        </section><!-- End Breadcrumbs Section -->
-
-        <!-- <section class="inner-page">
-          <div class="container">
-            <p>
-              Example inner page template
-            </p>
-          </div>
-        </section> -->
-
 
         <section>
             <div class="container">
@@ -134,27 +112,30 @@
             </div>
         </section>
 
-        <div style="max-width: 1000px; margin: auto;">
-            <form id="loginInfo" onsubmit="event.preventDefault()" class="row g-3">
-                <div class="col-12">
-                    <label for="username" class="form-label w-50">Username</label>
-                    <input type="text" class="form-control w-50" name="username"
-                        placeholder="Enter Username or Phone number (Worker)" required>
-                </div>
-                <div class="col-12 pt-3">
-                    <label for="password" class="form-label w-50">Password</label>
-                    <input type="password" class="form-control w-50" name="password" required>
-                </div>
+        <section class="pt-0">
+            <div class="container">
+                <form id="loginInfo">
+                    <div class="row g-3 mx-auto">
+                        <div class="col-lg-6 col-sm-12 text-center">
+                            <label for="username" class="form-label w-75 mt-2 labelStyle">Username:</label>
+                            <input type="text" class="form-control w-75 d-inline-block mt-2" name="username"
+                                placeholder="Enter Username or Phone number (Worker)" required>
 
+                            <label for="password" class="form-label w-75 mt-2 labelStyle">Password:</label>
+                            <input type="password" class="form-control w-75 d-inline-block mt-2" name="password" required>
+                        </div>
+                        <div class="d-flex col-lg-6 col-sm-12 justify-content-evenly">
+                            <button type="button" class="btn btn-outline-light w-25 h-50 mt-5" onclick="login()"
+                                style="color:white; background-color: #E3A587;">Login</button>
+                            <button type="button" class="btn btn-outline-light w-25 h-50 mt-5" onclick="register()"
+                                style="color:white; background-color: #E3A587;">Register</button>
+                        </div>
+                    </div>
+                </form>
                 <br>
+            </div>
+        </section>
 
-                <div class="col-12 pt-5" style='text-align: center; color: #E3A587;'>
-                    <button type="submit" class="btn btn-outline-light" onclick="login()"
-                        style="color:white; background-color: #E3A587;">Login</button>
-                </div>
-            </form>
-            <br>
-        </div>
 
     </main><!-- End #main -->
 
@@ -249,7 +230,6 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-
         function checkLogin() {
             if (window.sessionStorage.getItem("userType") != null) {
                 var userType = window.sessionStorage.getItem("userType")
@@ -275,30 +255,29 @@
                     if (confirmMsg == true) {
                         window.location.href = "index.html"
                     }
-                }
-                else if (formData.username.value === "admin") {
+                } else if (formData.username.value === "admin") {
                     window.sessionStorage.setItem("userType", "A")
                     let confirmMsg = confirm("Logging in as Admin")
                     if (confirmMsg == true) {
                         // window.location.href = "index.html"
                     }
-                }
-                else if (formData.username.value === "driver") {
+                } else if (formData.username.value === "driver") {
                     window.sessionStorage.setItem("userType", "D")
                     let confirmMsg = confirm("Logging in as a Driver")
                     if (confirmMsg == true) {
                         // window.location.href = "index.html"
                     }
-                }
-
-                else {
+                } else {
                     alert("Please check if you have a registered account with the organization before logging in again")
                 }
+            } else {
+                alert("Please check the " + alertMsgFieldCount +
+                    " field(s) that you have left empty and try to log in again")
             }
-            else {
-                alert("Please check the " + alertMsgFieldCount + " field(s) that you have left empty and try to log in again")
-            }
-            
+        }
+
+        function register() {
+            window.location.href = "register.html"
         }
     </script>
 
