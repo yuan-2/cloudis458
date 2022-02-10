@@ -1,104 +1,20 @@
+// get column headers
+
+
 $(document).ready(function() {
-    $('#inventory').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getAllItems',
-            dataSrc: 'data.items',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'id' },
-            { data: 'name' },
-            { data: 'description' },
-            { data: 'donorName' },
-            { data: 'donorAddr' },
-            { data: 'contactNo' },
-            { data: 'category' },
-            { data: 'quantity' },
-            { data: 'requireDelivery' },
-            { data: 'region' },
-            { data: 'timeSubmitted' }, 
-            { data: 'itemStatus' }
-        ],
-        // responsive: true,
-        fixedHeader: true,
-        // "scrollX": true,
-        // scrollY: 200,
-        // deferRender: true,
-        // scroller: true, 
-    });
-
-    $('#requests').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getRequests',
-            dataSrc: 'data',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'reqid' },
-            { data: 'requestor' },
-            { data: 'deliveryLocation' },
-            { data: 'itemCategory' },
-            { data: 'requestQty' },
-            { data: 'timeSubmitted' }
-        ],
-        fixedHeader: true,
-    });
-
-    $('#wishlist').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getWishlist',
-            dataSrc: 'data',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'id' },
-            { data: 'itemName' },
-            { data: 'remarks' },
-            { data: 'category' },
-            { data: 'timeSubmitted' },
-            { data: 'itemStatus' }
-        ],
-        fixedHeader: true,
-    });
-
-    $('#successMatches').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getSuccessfulMatches',
-            dataSrc: 'data',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'matchid' },
-            { data: 'reqid' },
-            { data: 'requestorName' },
-            { data: 'requestorContactNo' },
-            { data: 'donorName' },
-            { data: 'donorContactNo' },
-            { data: 'requestedItem' },
-            { data: 'itemCategory' },
-            { data: 'dateSubmitted' }
-        ],
-        fixedHeader: true,
-        responsive: true,
-    });
-
     $('#example').DataTable( {
+        ajax: {
+            url: 'sth',
+            dataSrc: 'data',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            type: "GET",
+            dataType: "json"
+        },
+        columns: [ 
+            { data: 'sth' }
+        ],
         fixedHeader: true,
     });
 
@@ -106,6 +22,7 @@ $(document).ready(function() {
 
 function editSpecificRow() {
     document.getElementById("edit-section").style.display = "block";
+    document.getElementById("edit-photo").style.display = "none";
 }
 
 function fillInventoryDetails(val) {
@@ -121,16 +38,28 @@ function fillInventoryDetails(val) {
             const result = await response.json();
             if (response.status == 200) {
                 // success case
-                document.getElementById("itemName").value = result.data.name;
+                // for (var i in result.data) {
+                    // console.log(Object.keys(result.data))
+                    // console.log(i.toString());
+                    // attributes = Object.keys(result.data);
+                    // id = attributes[i];
+                    // console.log(id);
+                //     if (i != "fileName") {
+                //         console.log(i, result.data.i)
+                //         document.getElementById(i).value = result.data[i];
+                //     }
+                // }
+                // console.log(document.getElementById('itemName'));
+                document.getElementById("itemName").value = result.data.itemName;
                 document.getElementById("description").value = result.data.description;
                 document.getElementById("donorName").value = result.data.donorName;
                 document.getElementById("donorAddr").value = result.data.donorAddr;
                 document.getElementById("contactNo").value = result.data.contactNo;
-                document.getElementById("itemCat").value = result.data.category;
+                document.getElementById("category").value = result.data.category;
                 document.getElementById("quantity").value = result.data.quantity;
                 document.getElementById("needDelivery").value = result.data.requireDelivery;
-                document.getElementById("area").value = result.data.region;
-                document.getElementById("status").value = result.data.itemStatus;
+                document.getElementById("region").value = result.data.region;
+                document.getElementById("itemStatus").value = result.data.itemStatus;
             }
             if (response.status == 404) {
                 alert('There is no such request ID in the database, please enter a valid ID.')
@@ -158,6 +87,7 @@ function editInventory() {
     data["requireDelivery"] = document.getElementById("needDelivery").value;
     data["region"] = document.getElementById("area").value;
     data["itemStatus"] = document.getElementById("status").value;
+    // data["fileName"] = document.getElementById("file").value;
     var jsondata = JSON.stringify(data);
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/updateItem/" + data.id;
@@ -173,6 +103,59 @@ function editInventory() {
             if (response.status == 200) {
                 // success case
                 alert('Successfully updated data in database. Please refresh to view changes.')
+                window.location.reload();
+            }
+        }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem updating the data, please try again later.');
+        } // error
+    });
+}
+
+function editPhoto() {
+    document.getElementById("edit-section").style.display = "none";
+    document.getElementById("edit-photo").style.display = "block";
+}
+
+function editPhotoFile() {
+    var data = {};
+    var editElements = document.getElementById("edit-photo").children;
+    for (child in editElements) {
+        // console.log(editElements[child].children);
+        childElement = editElements[child].children;
+        if (childElement != undefined) {
+            for (innerChild in childElement) {
+                if (childElement[innerChild].type == 'number') {
+                    data['id'] = childElement[innerChild].value;
+                }
+                else if (childElement[innerChild].type == 'file') {
+                    data[childElement[innerChild].name] = childElement[innerChild].files[0].name;
+                    data['file'] = childElement[innerChild].files[0];
+                }
+            }
+        }
+    }
+    var jsondata = JSON.stringify(data);
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + data.id;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'POST',
+                mode: 'no-cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: jsondata,
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                alert('Successfully updated photo in database. Please refresh to view changes.')
                 window.location.reload();
             }
         }
@@ -287,7 +270,6 @@ function editRequest() {
     data["itemCategory"] = document.getElementById("itemCat").value;
     data["requestQty"] = document.getElementById("quantity").value;
     var jsondata = JSON.stringify(data);
-    console.log(jsondata);
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/updateRequest/" + data.reqid;
         try {
