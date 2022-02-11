@@ -148,12 +148,14 @@ def updateItem(itemID):
             }
         )
     else:
-        item.name = data['itemName']
+        # for col in data:
+        #     item.col = data[col]
+        item.itemName = data['itemName']
         item.description = data['description']
         item.donorName = data['donorName']
         item.donorAddr = data['donorAddr']
         item.contactNo = data['contactNo']
-        item.category = data['itemCategory']
+        item.category = data['category']
         item.quantity = data['quantity']
         item.requireDelivery = data['requireDelivery']
         item.region = data['region']
@@ -370,7 +372,7 @@ def updateWishlist(id):
     else:
         wishlistItem.itemName = data['itemName']
         wishlistItem.remarks = data['remarks']
-        wishlistItem.category = data['itemCategory']
+        wishlistItem.category = data['category']
         wishlistItem.itemStatus = data['itemStatus']
         db.session.add(wishlistItem)
         db.session.commit()
@@ -442,12 +444,12 @@ def getAllSuccessfulMatches():
 # get specific successful match
 @app.route("/getSuccessfulMatches/<int:id>")
 def getSuccessfulMatch(id):
-    match = Matches.query.filter_by(id=id).first()
+    match = Matches.query.filter_by(reqid=id).first()
     if match:
         return jsonify(
             {
                 "code": 200,
-                "data": { match.json() }
+                "data": match.json() 
             }
         )
     return jsonify(
@@ -457,6 +459,33 @@ def getSuccessfulMatch(id):
         }
     ), 404
 
+# edit wishlist in table
+@app.route("/updateSuccessfulMatches/<int:id>", methods=["PUT"])
+def updateSuccessfulMatches(id):
+    match = Matches.query.filter_by(reqid=id).first()
+    data = request.get_json()
+    if (match is None):
+        return jsonify( 
+            {
+                "code": 404,
+                "message": "This ReqID is not found in the database."
+            }
+        )
+    else:
+        match.reqid = data['reqid']
+        match.requestorContactNo = data['requestorContactNo']
+        match.donorName = data['donorName']
+        match.donorContactNo = data['donorContactNo']
+        match.requestedItem = data['requestedItem']
+        match.itemCategory = data['itemCategory']
+        db.session.add(match)
+        db.session.commit()
+        return jsonify(
+            {
+                "code": 200,
+                "message": "Match successfully updated."
+            }
+        )
 
 
 # get consolidated criteria of migrant worker

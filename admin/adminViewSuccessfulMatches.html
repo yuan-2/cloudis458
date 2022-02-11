@@ -103,19 +103,13 @@
             <div id="edit-section" style="display: none">
                 <div class="row">
                     <div class="col-2">
-                        <label for="reqID">Request ID</label>
-                        <input class="form-control mb-2" type="number" placeholder="Request ID" id="reqID" onchange="fillMatchDetails(this.value)">
+                        <label for="reqid">Request ID</label>
+                        <input class="form-control mb-2" type="number" placeholder="Request ID" id="reqid" onchange="fillMatchDetails(this.value)">
                     </div>
-                    <div class="col-4">
-                        <label for="requestorName">Requestor Name</label>
-                        <input class="form-control mb-2" type="text" placeholder="Requestor Name" id="requestorName">
-                    </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <label for="requestorContactNo">Requestor Contact No.</label>
                         <input class="form-control mb-2" type="text" placeholder="Requestor Contact No." id="requestorContactNo">
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-3">
                         <label for="donorName">Donor Name</label>
                         <input class="form-control mb-2" type="text" placeholder="Donor Name" id="donorName">
@@ -124,16 +118,18 @@
                         <label for="donorContactNo">Donor Contact No.</label>
                         <input class="form-control mb-2" type="text" placeholder="Donor Contact No." id="donorContactNo">
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-3">
-                        <label for="reqItem">Requested Item</label>
-                        <input class="form-control mb-2" type="text" placeholder="Requested Item" id="reqItem">
+                        <label for="requestedItem">Requested Item</label>
+                        <input class="form-control mb-2" type="text" placeholder="Requested Item" id="requestedItem">
                     </div>
                     <div class="col-3">
-                        <label for="itemCat">Item Category</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCat">
+                        <label for="itemCategory">Item Category</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCategory">
                     </div>
                 </div>
-                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editWishlist()">Save Changes</button>
+                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editSuccessfulMatches()">Save Changes</button>
             </div>
         </div>
     </section>
@@ -162,7 +158,8 @@
                         data: data.data,
                         columns: columns,
                         fixedHeader: true,
-                        responsive: true,
+                        // scrollY: true,
+                        // scrollX: true,
                     } );
                 },
                 error: function () {

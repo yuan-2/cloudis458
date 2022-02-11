@@ -38,28 +38,11 @@ function fillInventoryDetails(val) {
             const result = await response.json();
             if (response.status == 200) {
                 // success case
-                // for (var i in result.data) {
-                    // console.log(Object.keys(result.data))
-                    // console.log(i.toString());
-                    // attributes = Object.keys(result.data);
-                    // id = attributes[i];
-                    // console.log(id);
-                //     if (i != "fileName") {
-                //         console.log(i, result.data.i)
-                //         document.getElementById(i).value = result.data[i];
-                //     }
-                // }
-                // console.log(document.getElementById('itemName'));
-                document.getElementById("itemName").value = result.data.itemName;
-                document.getElementById("description").value = result.data.description;
-                document.getElementById("donorName").value = result.data.donorName;
-                document.getElementById("donorAddr").value = result.data.donorAddr;
-                document.getElementById("contactNo").value = result.data.contactNo;
-                document.getElementById("category").value = result.data.category;
-                document.getElementById("quantity").value = result.data.quantity;
-                document.getElementById("needDelivery").value = result.data.requireDelivery;
-                document.getElementById("region").value = result.data.region;
-                document.getElementById("itemStatus").value = result.data.itemStatus;
+                for (var i in result.data) {
+                    if (i != "fileName" && i != "id" && i != "timeSubmitted") {
+                        document.getElementById(i).value = result.data[i];
+                    }
+                }
             }
             if (response.status == 404) {
                 alert('There is no such request ID in the database, please enter a valid ID.')
@@ -76,21 +59,21 @@ function fillInventoryDetails(val) {
 
 function editInventory() {
     var data = {};
-    data["id"] = document.getElementById("itemID").value;
-    data["itemName"] = document.getElementById("itemName").value;
-    data["description"] = document.getElementById("description").value;
-    data["donorName"] = document.getElementById("donorName").value;
-    data["donorAddr"] = document.getElementById("donorAddr").value;
-    data["contactNo"] = document.getElementById("contactNo").value;
-    data["itemCategory"] = document.getElementById("itemCat").value;
-    data["quantity"] = document.getElementById("quantity").value;
-    data["requireDelivery"] = document.getElementById("needDelivery").value;
-    data["region"] = document.getElementById("area").value;
-    data["itemStatus"] = document.getElementById("status").value;
-    // data["fileName"] = document.getElementById("file").value;
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
     var jsondata = JSON.stringify(data);
     $(async () => {
-        var serviceURL = "http://127.0.0.1:5000/updateItem/" + data.id;
+        var serviceURL = "http://127.0.0.1:5000/updateItem/" + data.itemID;
         try {
             const response =
             await fetch(
@@ -180,10 +163,12 @@ function fillWishlistDetails(val) {
             const result = await response.json();
             if (response.status == 200) {
                 // success case
-                document.getElementById("itemName").value = result.data.itemName;
-                document.getElementById("remarks").value = result.data.remarks;
-                document.getElementById("itemCat").value = result.data.category;
-                document.getElementById("status").value = result.data.itemStatus;
+                for (var i in result.data) {
+                    if (i != "timeSubmitted") {
+                        document.getElementById(i).value = result.data[i];
+                        console.log(document.getElementById(i).value, result.data[i]);
+                    }
+                }
             }
             if (response.status == 404) {
                 alert('There is no such request ID in the database, please enter a valid ID.')
@@ -199,11 +184,19 @@ function fillWishlistDetails(val) {
 
 function editWishlist() {
     var data = {};
-    data["id"] = document.getElementById("id").value;
-    data["itemName"] = document.getElementById("itemName").value;
-    data["remarks"] = document.getElementById("remarks").value;
-    data["itemCategory"] = document.getElementById("itemCat").value;
-    data["itemStatus"] = document.getElementById("status").value;
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
+
     var jsondata = JSON.stringify(data);
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/updateWishlist/" + data.id;
@@ -272,6 +265,79 @@ function editRequest() {
     var jsondata = JSON.stringify(data);
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/updateRequest/" + data.reqid;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json'},
+                body: jsondata,
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                alert('Successfully updated data in database. Please refresh to view changes.')
+                window.location.reload();
+            }
+            }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem updating the data, please try again later.');
+        } // error
+    });
+}
+
+function fillMatchDetails(val) {
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/getSuccessfulMatches/" + val;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json'},
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                for (var i in result.data) {
+                    if (i != "dateSubmitted" && i != "matchid") {
+                        document.getElementById(i).value = result.data[i];
+                        // console.log(document.getElementById(i).value, result.data[i]);
+                    }
+                }
+            }
+            if (response.status == 404) {
+                alert('There is no such request ID in the database, please enter a valid ID.')
+            }
+        }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem retrieving the data, please try again later.');
+        } // error
+    });
+}
+
+function editSuccessfulMatches() {
+    var data = {};
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
+    console.log(data);
+    var jsondata = JSON.stringify(data);
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/updateSuccessfulMatches/" + data.reqid;
         try {
             const response =
             await fetch(
