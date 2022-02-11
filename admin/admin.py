@@ -199,22 +199,22 @@ class Request(db.Model):
     __tablename__ = 'request'
 
     reqid = db.Column(db.Integer, primary_key=True, nullable=False)
-    requestor = db.Column(db.String(50), nullable=False)
+    requestorContactNo = db.Column(db.String(50), nullable=False)
     deliveryLocation = db.Column(db.String(300), nullable=False)
     itemCategory = db.Column(db.String(50), nullable=False)
     requestQty = db.Column(db.String(50), nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
 
-    def __init__(self, reqid, requestor, deliveryLocation, itemCategory, requestQty, timeSubmitted):
+    def __init__(self, reqid, requestorContactNo, deliveryLocation, itemCategory, requestQty, timeSubmitted):
         self.reqid = reqid
-        self.requestor = requestor
+        self.requestorContactNo = requestorContactNo
         self.deliveryLocation = deliveryLocation
         self.itemCategory = itemCategory
         self.requestyQty = requestQty
         self.timeSubmitted = timeSubmitted
 
     def json(self):
-        return {"reqid": self.reqid, "requestor": self.requestor, "deliveryLocation": self.deliveryLocation, "itemCategory": self.itemCategory, 
+        return {"reqid": self.reqid, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, "itemCategory": self.itemCategory, 
                 "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
 
 # get all requests submitted by migrant workers
@@ -285,7 +285,6 @@ def updateRequest(id):
             }
         )
     else:
-        requested.requestor = data['requestor']
         requested.deliveryLocation = data['deliveryLocation']
         requested.itemCategory = data['itemCategory']
         requested.requestQty = data['requestQty']

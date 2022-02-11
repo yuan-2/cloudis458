@@ -237,11 +237,12 @@ function fillRequestDetails(val) {
             const result = await response.json();
             if (response.status == 200) {
                 // success case
-                document.getElementById("reqID").value = result.data.reqid;
-                document.getElementById("requestorName").value = result.data.requestor;
-                document.getElementById("deliveryLocation").value = result.data.deliveryLocation;
-                document.getElementById("itemCat").value = result.data.itemCategory;
-                document.getElementById("quantity").value = result.data.requestQty;
+                for (var i in result.data) {
+                    if (i != "timeSubmitted" && i != "requestorContactNo") {
+                        document.getElementById(i).value = result.data[i];
+                    }
+                }
+
             }
             if (response.status == 404) {
                 alert('There is no such request ID in the database, please enter a valid ID.')
@@ -257,11 +258,18 @@ function fillRequestDetails(val) {
 
 function editRequest() {
     var data = {};
-    data["reqid"] = document.getElementById("reqID").value;
-    data["requestor"] = document.getElementById("requestorName").value;
-    data["deliveryLocation"] = document.getElementById("deliveryLocation").value;
-    data["itemCategory"] = document.getElementById("itemCat").value;
-    data["requestQty"] = document.getElementById("quantity").value;
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
     var jsondata = JSON.stringify(data);
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/updateRequest/" + data.reqid;

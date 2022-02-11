@@ -112,23 +112,17 @@
                         <label for="reqid">Request ID</label>
                         <input class="form-control mb-2" type="number" placeholder="Request ID" id="reqid" onchange="fillRequestDetails(this.value)">
                     </div>
-                    <div class="col-4">
-                        <label for="requestorName">Requestor Name</label>
-                        <input class="form-control mb-2" type="text" placeholder="Requestor Name" id="requestorName">
-                    </div>
-                    <div class="col-6">
+                    <div class="col-3">
                         <label for="deliveryLocation">Delivery Location</label>
                         <input class="form-control mb-2" type="text" placeholder="Delivery Location" id="deliveryLocation">
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <label for="itemCat">Item Category</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCat">
+                    <div class="col-3">
+                        <label for="itemCategory">Item Category</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCategory">
                     </div>
-                    <div class="col-4">
-                        <label for="quantity">Quantity</label>
-                        <input class="form-control mb-2" type="number" placeholder="Quantity" id="quantity">
+                    <div class="col-3">
+                        <label for="requestQty">Request Quantity</label>
+                        <input class="form-control mb-2" type="number" placeholder="Request Quantity" id="requestQty">
                     </div>
                 </div>
                 <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editRequest()">Save Changes</button>
@@ -139,7 +133,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
-    <script src="../assets/js/table.js"></script>
     <script>
         var columns = [];
         function getDT() {
@@ -174,6 +167,7 @@
         } );
 
     </script>
+    <script src="../assets/js/table.js"></script>
 
     </main><!-- End #main -->
 
