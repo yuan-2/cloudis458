@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `migrantworker` (
 DROP TABLE IF EXISTS `request`;
 CREATE TABLE IF NOT EXISTS `request` (
   `reqid` int(11) NOT NULL AUTO_INCREMENT,
-  `requestorContactNo` varchar(50) NOT NULL,
+  `requestorContactNo` int NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
   `itemCategory` varchar(300) NOT NULL,
   `requestQty` varchar(50) NOT NULL,
@@ -181,8 +181,8 @@ INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmit
 
 
 -- for user table
-INSERT INTO user(`username`, `password`, `userType`) VALUES 
-(93261073, ENCRYPT('cheah1124'), 'admin');
+-- INSERT INTO user(`username`, `password`, `userType`) VALUES 
+-- (93261073, ENCRYPT('cheah1124'), 'admin');
 
 -- for category table 
 -- INSERT INTO category(`categoryName`) VALUES ('Food');
