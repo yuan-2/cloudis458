@@ -63,21 +63,23 @@ class WishList(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     itemName = db.Column(db.String(50), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
     remarks = db.Column(db.String(300))
     category = db.Column(db.String(50), nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
     itemStatus = db.Column(db.String(50), nullable=False)
     
-    def __inti__(self, id, itemName, remarks, category, timeSubmitted, itemStatus):
+    def __inti__(self, id, itemName, quantity, remarks, category, timeSubmitted, itemStatus):
         self.id = id
         self.itemName = itemName
+        self.quantity = quantity
         self.remarks = remarks
         self.category = category
         self.timeSubmitted = timeSubmitted
         self.itemStatus = itemStatus
         
     def json(self):
-        return {"id": self.id, "itemName": self.itemName, "remarks": self.remarks, "category": self.category, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
+        return {"id": self.id, "itemName": self.itemName, "quantity": self.quantity, "remarks": self.remarks, "category": self.category, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
         
     
 

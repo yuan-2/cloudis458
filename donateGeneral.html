@@ -355,7 +355,7 @@
             if (responseCode.code == 200) {
                 itemNameOptions.innerHTML += "<option selected> </option>"
                 for (cat of responseCode.data.itemsInCat) {
-                    itemNameOptions.innerHTML += `<option>${cat.itemName}</option>`
+                    itemNameOptions.innerHTML += `<option value="${cat.itemName}">${cat.itemName}</option>`
                 }
             }
         }
