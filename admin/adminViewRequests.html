@@ -101,27 +101,6 @@
     <section class="inner-page">
         <div class="container">
             <table id="requests" class="table table-striped table-hover" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Request ID</th>
-                        <th>Requestor Name</th>
-                        <th>Delivery Location</th>
-                        <th>Item Category</th>
-                        <th>Quantity</th>
-                        <th>Date Submitted</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-                <!-- <tfoot>
-                    <tr>
-                        <th>Form ID</th>
-                        <th>Requestor Name</th>
-                        <th>Contact No.</th>
-                        <th>Requested Item</th>
-                        <th>Item Category</th>
-                        <th>Date Submitted</th>
-                    </tr>
-                </tfoot> -->
             </table>
             <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow()">Edit Specific Row</button>
             <br><br>
@@ -130,26 +109,20 @@
             <div id="edit-section" style="display: none">
                 <div class="row">
                     <div class="col-2">
-                        <label for="reqID">Request ID</label>
-                        <input class="form-control mb-2" type="number" placeholder="Request ID" id="reqID" onchange="fillRequestDetails(this.value)">
+                        <label for="reqid">Request ID</label>
+                        <input class="form-control mb-2" type="number" placeholder="Request ID" id="reqid" onchange="fillRequestDetails(this.value)">
                     </div>
-                    <div class="col-4">
-                        <label for="requestorName">Requestor Name</label>
-                        <input class="form-control mb-2" type="text" placeholder="Requestor Name" id="requestorName">
-                    </div>
-                    <div class="col-6">
+                    <div class="col-3">
                         <label for="deliveryLocation">Delivery Location</label>
                         <input class="form-control mb-2" type="text" placeholder="Delivery Location" id="deliveryLocation">
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <label for="itemCat">Item Category</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCat">
+                    <div class="col-3">
+                        <label for="itemCategory">Item Category</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCategory">
                     </div>
-                    <div class="col-4">
-                        <label for="quantity">Quantity</label>
-                        <input class="form-control mb-2" type="number" placeholder="Quantity" id="quantity">
+                    <div class="col-3">
+                        <label for="requestQty">Request Quantity</label>
+                        <input class="form-control mb-2" type="number" placeholder="Request Quantity" id="requestQty">
                     </div>
                 </div>
                 <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editRequest()">Save Changes</button>
@@ -160,6 +133,40 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        var columns = [];
+        function getDT() {
+            $.ajax({
+                url: "http://127.0.0.1:5000/getRequests",
+                success: function (data) {
+                    columnNames = Object.keys(data.data[0]);
+                    // items = data.data.items;
+                    // console.log(data.data.items)
+                    // editFields = "";
+                    for (var i in columnNames) {
+                        columns.push({data: columnNames[i], 
+                                    title: columnNames[i]});
+                    }
+                    var table = $('#requests').DataTable( {
+                        data: data.data,
+                        columns: columns,
+                        fixedHeader: true,
+                        responsive: true,
+                    } );
+                },
+                error: function () {
+                    document.getElementById("edit-btn").style.display = "none";
+                    alert("There are currently no requests to be found.")
+                }
+
+            })
+        }
+
+        $(document).ready(function() {
+            getDT();
+        } );
+
+    </script>
     <script src="../assets/js/table.js"></script>
 
     </main><!-- End #main -->

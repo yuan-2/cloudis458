@@ -1,104 +1,20 @@
+// get column headers
+
+
 $(document).ready(function() {
-    $('#inventory').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getAllItems',
-            dataSrc: 'data.items',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'id' },
-            { data: 'name' },
-            { data: 'description' },
-            { data: 'donorName' },
-            { data: 'donorAddr' },
-            { data: 'contactNo' },
-            { data: 'category' },
-            { data: 'quantity' },
-            { data: 'requireDelivery' },
-            { data: 'region' },
-            { data: 'timeSubmitted' }, 
-            { data: 'itemStatus' }
-        ],
-        // responsive: true,
-        fixedHeader: true,
-        // "scrollX": true,
-        // scrollY: 200,
-        // deferRender: true,
-        // scroller: true, 
-    });
-
-    $('#requests').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getRequests',
-            dataSrc: 'data',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'reqid' },
-            { data: 'requestor' },
-            { data: 'deliveryLocation' },
-            { data: 'itemCategory' },
-            { data: 'requestQty' },
-            { data: 'timeSubmitted' }
-        ],
-        fixedHeader: true,
-    });
-
-    $('#wishlist').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getWishlist',
-            dataSrc: 'data',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'id' },
-            { data: 'itemName' },
-            { data: 'remarks' },
-            { data: 'category' },
-            { data: 'timeSubmitted' },
-            { data: 'itemStatus' }
-        ],
-        fixedHeader: true,
-    });
-
-    $('#successMatches').DataTable( {
-        ajax: {
-            url: 'http://127.0.0.1:5000/getSuccessfulMatches',
-            dataSrc: 'data',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            type: "GET",
-            dataType: "json"
-        },
-        columns: [
-            { data: 'matchid' },
-            { data: 'reqid' },
-            { data: 'requestorName' },
-            { data: 'requestorContactNo' },
-            { data: 'donorName' },
-            { data: 'donorContactNo' },
-            { data: 'requestedItem' },
-            { data: 'itemCategory' },
-            { data: 'dateSubmitted' }
-        ],
-        fixedHeader: true,
-        responsive: true,
-    });
-
     $('#example').DataTable( {
+        ajax: {
+            url: 'sth',
+            dataSrc: 'data',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            type: "GET",
+            dataType: "json"
+        },
+        columns: [ 
+            { data: 'sth' }
+        ],
         fixedHeader: true,
     });
 
@@ -106,6 +22,7 @@ $(document).ready(function() {
 
 function editSpecificRow() {
     document.getElementById("edit-section").style.display = "block";
+    document.getElementById("edit-photo").style.display = "none";
 }
 
 function fillInventoryDetails(val) {
@@ -121,16 +38,11 @@ function fillInventoryDetails(val) {
             const result = await response.json();
             if (response.status == 200) {
                 // success case
-                document.getElementById("itemName").value = result.data.name;
-                document.getElementById("description").value = result.data.description;
-                document.getElementById("donorName").value = result.data.donorName;
-                document.getElementById("donorAddr").value = result.data.donorAddr;
-                document.getElementById("contactNo").value = result.data.contactNo;
-                document.getElementById("itemCat").value = result.data.category;
-                document.getElementById("quantity").value = result.data.quantity;
-                document.getElementById("needDelivery").value = result.data.requireDelivery;
-                document.getElementById("area").value = result.data.region;
-                document.getElementById("status").value = result.data.itemStatus;
+                for (var i in result.data) {
+                    if (i != "fileName" && i != "id" && i != "timeSubmitted") {
+                        document.getElementById(i).value = result.data[i];
+                    }
+                }
             }
             if (response.status == 404) {
                 alert('There is no such request ID in the database, please enter a valid ID.')
@@ -147,20 +59,21 @@ function fillInventoryDetails(val) {
 
 function editInventory() {
     var data = {};
-    data["id"] = document.getElementById("itemID").value;
-    data["itemName"] = document.getElementById("itemName").value;
-    data["description"] = document.getElementById("description").value;
-    data["donorName"] = document.getElementById("donorName").value;
-    data["donorAddr"] = document.getElementById("donorAddr").value;
-    data["contactNo"] = document.getElementById("contactNo").value;
-    data["itemCategory"] = document.getElementById("itemCat").value;
-    data["quantity"] = document.getElementById("quantity").value;
-    data["requireDelivery"] = document.getElementById("needDelivery").value;
-    data["region"] = document.getElementById("area").value;
-    data["itemStatus"] = document.getElementById("status").value;
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
     var jsondata = JSON.stringify(data);
     $(async () => {
-        var serviceURL = "http://127.0.0.1:5000/updateItem/" + data.id;
+        var serviceURL = "http://127.0.0.1:5000/updateItem/" + data.itemID;
         try {
             const response =
             await fetch(
@@ -173,6 +86,59 @@ function editInventory() {
             if (response.status == 200) {
                 // success case
                 alert('Successfully updated data in database. Please refresh to view changes.')
+                window.location.reload();
+            }
+        }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem updating the data, please try again later.');
+        } // error
+    });
+}
+
+function editPhoto() {
+    document.getElementById("edit-section").style.display = "none";
+    document.getElementById("edit-photo").style.display = "block";
+}
+
+function editPhotoFile() {
+    var data = {};
+    var editElements = document.getElementById("edit-photo").children;
+    for (child in editElements) {
+        // console.log(editElements[child].children);
+        childElement = editElements[child].children;
+        if (childElement != undefined) {
+            for (innerChild in childElement) {
+                if (childElement[innerChild].type == 'number') {
+                    data['id'] = childElement[innerChild].value;
+                }
+                else if (childElement[innerChild].type == 'file') {
+                    data[childElement[innerChild].name] = childElement[innerChild].files[0].name;
+                    data['file'] = childElement[innerChild].files[0];
+                }
+            }
+        }
+    }
+    var jsondata = JSON.stringify(data);
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + data.id;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'POST',
+                mode: 'no-cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: jsondata,
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                alert('Successfully updated photo in database. Please refresh to view changes.')
                 window.location.reload();
             }
         }
@@ -197,10 +163,12 @@ function fillWishlistDetails(val) {
             const result = await response.json();
             if (response.status == 200) {
                 // success case
-                document.getElementById("itemName").value = result.data.itemName;
-                document.getElementById("remarks").value = result.data.remarks;
-                document.getElementById("itemCat").value = result.data.category;
-                document.getElementById("status").value = result.data.itemStatus;
+                for (var i in result.data) {
+                    if (i != "timeSubmitted") {
+                        document.getElementById(i).value = result.data[i];
+                        console.log(document.getElementById(i).value, result.data[i]);
+                    }
+                }
             }
             if (response.status == 404) {
                 alert('There is no such request ID in the database, please enter a valid ID.')
@@ -216,11 +184,19 @@ function fillWishlistDetails(val) {
 
 function editWishlist() {
     var data = {};
-    data["id"] = document.getElementById("id").value;
-    data["itemName"] = document.getElementById("itemName").value;
-    data["remarks"] = document.getElementById("remarks").value;
-    data["itemCategory"] = document.getElementById("itemCat").value;
-    data["itemStatus"] = document.getElementById("status").value;
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
+
     var jsondata = JSON.stringify(data);
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/updateWishlist/" + data.id;
@@ -261,11 +237,12 @@ function fillRequestDetails(val) {
             const result = await response.json();
             if (response.status == 200) {
                 // success case
-                document.getElementById("reqID").value = result.data.reqid;
-                document.getElementById("requestorName").value = result.data.requestor;
-                document.getElementById("deliveryLocation").value = result.data.deliveryLocation;
-                document.getElementById("itemCat").value = result.data.itemCategory;
-                document.getElementById("quantity").value = result.data.requestQty;
+                for (var i in result.data) {
+                    if (i != "timeSubmitted" && i != "requestorContactNo") {
+                        document.getElementById(i).value = result.data[i];
+                    }
+                }
+
             }
             if (response.status == 404) {
                 alert('There is no such request ID in the database, please enter a valid ID.')
@@ -281,15 +258,94 @@ function fillRequestDetails(val) {
 
 function editRequest() {
     var data = {};
-    data["reqid"] = document.getElementById("reqID").value;
-    data["requestor"] = document.getElementById("requestorName").value;
-    data["deliveryLocation"] = document.getElementById("deliveryLocation").value;
-    data["itemCategory"] = document.getElementById("itemCat").value;
-    data["requestQty"] = document.getElementById("quantity").value;
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
     var jsondata = JSON.stringify(data);
-    console.log(jsondata);
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/updateRequest/" + data.reqid;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json'},
+                body: jsondata,
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                alert('Successfully updated data in database. Please refresh to view changes.')
+                window.location.reload();
+            }
+            }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem updating the data, please try again later.');
+        } // error
+    });
+}
+
+function fillMatchDetails(val) {
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/getSuccessfulMatches/" + val;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json'},
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                for (var i in result.data) {
+                    if (i != "dateSubmitted" && i != "matchid") {
+                        document.getElementById(i).value = result.data[i];
+                        // console.log(document.getElementById(i).value, result.data[i]);
+                    }
+                }
+            }
+            if (response.status == 404) {
+                alert('There is no such request ID in the database, please enter a valid ID.')
+            }
+        }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem retrieving the data, please try again later.');
+        } // error
+    });
+}
+
+function editSuccessfulMatches() {
+    var data = {};
+    var inputFields = document.getElementById("edit-section").children;
+    for (var i in inputFields) {
+        input = inputFields[i];
+        inputChildrenCount = input.childElementCount;
+        inputChildren = inputFields[i].children;
+        if (inputChildrenCount > 0) {
+            for (j = 0; j < inputChildrenCount; j++) {
+                inputChildElement = inputChildren[j].children[1];
+                data[inputChildElement.id] = inputChildElement.value;
+            }
+        }
+    }
+    console.log(data);
+    var jsondata = JSON.stringify(data);
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/updateSuccessfulMatches/" + data.reqid;
         try {
             const response =
             await fetch(

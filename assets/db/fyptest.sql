@@ -53,18 +53,19 @@ CREATE TABLE IF NOT EXISTS `migrantworker` (
   `address` varchar(300) NOT NULL,
   `reqHistory` varchar(50) NOT NULL,
   PRIMARY KEY (`contactNo`),
-  FOREIGN KEY (`contactNo`) REFERENCES `user` (`username`)
+  FOREIGN KEY (`contactNo`) REFERENCES user (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `request`;
 CREATE TABLE IF NOT EXISTS `request` (
   `reqid` int(11) NOT NULL AUTO_INCREMENT,
-  `requestor` varchar(50) NOT NULL,
+  `requestorContactNo` varchar(50) NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
   `itemCategory` varchar(300) NOT NULL,
   `requestQty` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
-  PRIMARY KEY (`reqid`)
+  PRIMARY KEY (`reqid`),
+  FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `delivery`;
@@ -218,8 +219,8 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Area', 'radio', 'North;South;East;West;Central');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('donate', 'Upload Photo', 'file');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
-('donate', 'Quantity', 'dropdown', '1;2;3;4');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('donate', 'Quantity', 'number');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Require delivery from home?', 'dropdown', 'Yes;No');
 
