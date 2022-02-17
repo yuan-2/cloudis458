@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS `wishlist`;
 CREATE TABLE IF NOT EXISTS `wishlist` (
   `id` int NOT NULL AUTO_INCREMENT,
   `itemName` varchar(50) NOT NULL,
+  `quantity` int NOT NULL,
   `remarks` varchar(300) NOT NULL,
   `category` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
@@ -33,9 +34,9 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
-  `usertype` varchar(20)  NOT NULL,
   `username` int NOT NULL,
   `password` varchar(100) NOT NULL,
+  `usertype` varchar(20)  NOT NULL,
   PRIMARY KEY (`username`)
 ) ;
 
@@ -176,21 +177,25 @@ CREATE TABLE IF NOT EXISTS `formanswers` (
 
 
 -- for wishlist table
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('backpack', 'my backpack broke, need a new one', 'others', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('stool', 'need a small chair to sit on', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('chair', 'chair broke, need a new one', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('table', 'a small table for dining and other purposes', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('shoes', 'shoes for work', 'clothing', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('wardrobe', 'wardrobe to store my clothes', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('drawers', 'drawers to store things', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('backpack', 1, 'my backpack broke, need a new one', 'others', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('stool', 2, 'need a small chair to sit on', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('chair', 1, 'chair broke, need a new one', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('table', 1, 'a small table for dining and other purposes', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('shoes', 2, 'shoes for work', 'clothing', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('wardrobe', 1, 'wardrobe to store my clothes', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('drawers', 1, 'drawers to store things', 'home furniture', now(), 'available');
 
+
+-- for user table
+-- INSERT INTO user(`username`, `password`, `userType`) VALUES 
+-- (93261073, ENCRYPT('cheah1124'), 'admin');
 
 -- for category table 
 -- INSERT INTO category(`categoryName`) VALUES ('Food');
@@ -237,7 +242,8 @@ INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`
 INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '2', 'pasir ris grove');
 INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '3', 'East');
 INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '4', 'toothbrush.png');
-INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '5', 'No');
+INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '5', '3');
+INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '6', 'No');
 
 
 
@@ -246,4 +252,4 @@ INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES
 ('Toothbrush', 'Toiletries'), ('Blender', 'Electronics'), ('Television', 'Electronics'), ('T-Shirt', 'Clothes')
 ;
 
-select * from carousel;
+select * from user;

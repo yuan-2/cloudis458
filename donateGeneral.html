@@ -159,7 +159,8 @@
                 <!--On change of this dropdown, auto get item names listed under this category-->
                 <div class="col-6">
                     <label for="itemCategoryOptions" class="form-label">Item Category</label>
-                    <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions" name="category" required>
+                    <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions"
+                        name="category" required>
                         <!--Dynamically dropdown categories listed in existing db-->
                     </select>
                 </div>
@@ -168,7 +169,8 @@
                     <div class="form-group">
                         <label for="itemPhoto">Upload Photo</label>
                         <br>
-                        <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto" style='padding-top: 10px;'>
+                        <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto"
+                            style='padding-top: 10px;'>
                     </div>
                 </div>
 
@@ -181,7 +183,8 @@
                 </div>
                 <div class="col-6">
                     <label for="itemDescription" class="form-label">Description</label>
-                    <input type="text" class="form-control" id="itemDescription" name="itemDesc" placeholder="Brief description of the item you are donating">
+                    <input type="text" class="form-control" id="itemDescription" name="itemDesc"
+                        placeholder="Brief description of the item you are donating">
                 </div>
                 <div class="col-6">
                     <label for="itemQty" class="form-label">Quantity</label>
@@ -299,14 +302,18 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        var userType = ""
+        var user = ""
 
         var itemCategoryOptions = document.getElementById('itemCategoryOptions')
 
         var itemNameOptions = document.getElementById("itemNameOptions")
 
         function checkLogin() {
+            if (sessionStorage.getItem("user") != null) {
+                user = JSON.parse(sessionStorage.getItem("user"))
 
+                document.getElementById("loginLogoutButton").innerText = "Logout"
+            }
             getDropDownCat().then(function autoPopCategories(result) {
                     var catList = result
 
@@ -323,15 +330,9 @@
                         <option value="${cat}">${cat}</option>
                     `
                     }
-
                 }
-
             )
-            if (window.sessionStorage.getItem("userType") != null) {
-                userType = window.sessionStorage.getItem("userType")
 
-                document.getElementById("loginLogoutButton").innerText = "Logout"
-            }
         }
 
         async function getDropDownCat() {
@@ -354,20 +355,15 @@
             if (responseCode.code == 200) {
                 itemNameOptions.innerHTML += "<option selected> </option>"
                 for (cat of responseCode.data.itemsInCat) {
-                    itemNameOptions.innerHTML += `<option>${cat.itemName}</option>`
+                    itemNameOptions.innerHTML += `<option value="${cat.itemName}">${cat.itemName}</option>`
                 }
             }
         }
 
         const form = document.getElementById("donateForm")
 
-        // form.addEventListener("submit", (event) => {
-        //     event.preventDefault();
         function submitDonation() {
             var donateFormElements = document.forms[0].elements
-
-            // console.log(donateFormElements)
-            // var postData = {}
 
             var formData = new FormData();
 
@@ -375,51 +371,57 @@
                 var eleName = donateFormElements[ele].name
                 // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
                 if (donateFormElements[ele].type == "radio") {
-                    formData.append(donateFormElements[ele].name, document.querySelector("input[name='"+eleName+"']:checked").value)
+                    formData.append(donateFormElements[ele].name, document.querySelector("input[name='" + eleName +
+                        "']:checked").value)
                     // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
-                }
-                else if (donateFormElements[ele].type == "file") {
+                } else if (donateFormElements[ele].type == "file") {
                     formData.append(donateFormElements[ele].name, donateFormElements[ele].files[0].name)
                     formData.append("file", donateFormElements[ele].files[0])
-                }
-                else {
+                } else {
                     formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
                 }
             }
-            // for (pair of formData.entries()) {
-            //     console.log(pair[0] + ", " + pair[1]);
-            // }
-
-
             addDonation(formData, 'http://127.0.0.1:5004/addDonation')
-            alert("Item has been posted successfully")
+
         }
 
-        // Example POST method implementation:
         async function addDonation(data, url) {
-            // Default options are marked with *
-            // console.log(data)
 
             const response = await fetch(url, {
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'no-cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, *same-origin, omit
-            redirect: 'follow', // manual, *follow, error
-            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-            body: data // body data type must match "Content-Type" header
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: data // body data type must match "Content-Type" header
             });
-            
-            console.log(response.message)
 
-            return "OK"; // parses JSON response into native JavaScript objects
+            if (response.status >= 200 && response.status < 300) {
+                data = await response.json()
+                if (data.code == "200") {
+                    let res = confirm(
+                        "Item has been posted successfully, Click 'cancel' to make another donation or ok to return to the home page"
+                    )
+
+                    if (res) {
+                        window.location.href = "index.html"
+                    } else {
+                        form.reset()
+                    }
+                }
+            } else {
+                data = await response.json()
+                alert(data.message)
+                form.reset()
+            }
         }
 
         function loginLogout() {
             if (document.getElementById("loginLogoutButton").innerText === "Login") {
                 window.location.href = "login.html"
             } else {
-                window.sessionStorage.removeItem("userType")
+                sessionStorage.removeItem("user")
                 window.location.reload()
             }
         }

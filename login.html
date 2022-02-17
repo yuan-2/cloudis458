@@ -39,7 +39,7 @@
   ======================================================== -->
 </head>
 
-<body onload="checkLogin()">
+<body>
 
     <!-- ======= Top Bar ======= -->
     <div id="topbar" class="d-flex align-items-center fixed-top">
@@ -73,23 +73,6 @@
                     <li><a class="nav-link scrollto" href="donateGeneral.html">Donate</a></li>
                     <li><a class="nav-link scrollto" href="requestWishList.html">Request</a></li>
                     <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
-                    <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
-            </ul>
-          </li> -->
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
@@ -114,15 +97,20 @@
 
         <section class="pt-0">
             <div class="container">
+                <div id="errorDiv" class="alert alert-warning d-none">
+                    <ul id="errorList"></ul>
+                    <p class="text-center">Please resolve the above errors before logging in again.</p>
+                </div>
                 <form id="loginInfo">
                     <div class="row g-3 mx-auto">
                         <div class="col-lg-6 col-sm-12 text-center">
                             <label for="username" class="form-label w-75 mt-2 labelStyle">Username:</label>
                             <input type="text" class="form-control w-75 d-inline-block mt-2" name="username"
-                                placeholder="Enter Username or Phone number (Worker)" required>
+                                placeholder="Please enter your registered contact number" required>
 
                             <label for="password" class="form-label w-75 mt-2 labelStyle">Password:</label>
-                            <input type="password" class="form-control w-75 d-inline-block mt-2" name="password" required>
+                            <input type="password" class="form-control w-75 d-inline-block mt-2" name="password"
+                                required>
                         </div>
                         <div class="d-flex col-lg-6 col-sm-12 justify-content-evenly">
                             <button type="button" class="btn btn-outline-light w-25 h-50 mt-5" onclick="login()"
@@ -230,49 +218,98 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        function checkLogin() {
-            if (window.sessionStorage.getItem("userType") != null) {
-                var userType = window.sessionStorage.getItem("userType")
+
+        function login() {
+            let errorArr = []
+
+            const loginForm = document.forms["loginInfo"].elements
+
+            if (loginForm.username.value === "") {
+                errorArr.push("Username field cannot be empty")
+            }  
+            
+            if (loginForm.password.value === "") {
+                errorArr.push("Password field cannot be empty")
+            }
+
+            var errorDiv = document.getElementById('errorDiv')
+            var errorList = document.getElementById('errorList')
+
+            errorList.innerHTML = ""
+
+            if (errorArr.length < 1) {
+
+                errorDiv.classList.remove('d-block')
+                errorDiv.classList.add('d-none')
+
+                var formData = new FormData()
+                for (ele in loginForm) {
+                    formData.append(loginForm[ele].name, loginForm[ele].value)
+                }
+
+                checkCred(formData, "http://127.0.0.1:5004/login")
+
+
+            } else {
+
+                errorDiv.classList.add('d-block')
+                errorDiv.classList.remove('d-none')
+
+                for (err of errorArr) {
+                    errorList.innerHTML += `<li> ${err} </li>`
+                }
             }
         }
 
-        function login() {
-            let alertMsgFieldCount = 0
+        async function checkCred(data, url) {
+            // Default options are marked with *
+            // console.log(data)
 
-            const formData = document.forms["loginInfo"]
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: data // body data type must match "Content-Type" header
+            });
 
-            if (formData.username.value === "") {
-                alertMsgFieldCount += 1
-            }
-            if (formData.password.value === "") {
-                alertMsgFieldCount += 1
-            }
+            if (response.status >= 200 && response.status < 300) {
+                data = await response.json()
+                alert(data.data.message)
 
-            if (alertMsgFieldCount == 0) {
-                if (formData.username.value === "mw") {
-                    window.sessionStorage.setItem("userType", "MW")
-                    let confirmMsg = confirm("Logging in as a Migrant Worker")
+                var userData = data.data.userType
+                // console.log(userData)
+
+                if (userData.userType === "worker") {
+                    sessionStorage.setItem("user", JSON.stringify(userData))
+                    let confirmMsg = confirm("Logging in as Migrant Worker (" + String(userData.username) + ")")
                     if (confirmMsg == true) {
                         window.location.href = "index.html"
                     }
-                } else if (formData.username.value === "admin") {
-                    window.sessionStorage.setItem("userType", "A")
+                } else if (userData.userType === "admin") {
+                    sessionStorage.setItem("user", JSON.stringify(userData))
                     let confirmMsg = confirm("Logging in as Admin")
                     if (confirmMsg == true) {
                         // window.location.href = "index.html"
                     }
-                } else if (formData.username.value === "driver") {
-                    window.sessionStorage.setItem("userType", "D")
+                } else if (userData.userType === "driver") {
+                    sessionStorage.setItem("user", JSON.stringify(userData))
                     let confirmMsg = confirm("Logging in as a Driver")
                     if (confirmMsg == true) {
                         // window.location.href = "index.html"
                     }
-                } else {
-                    alert("Please check if you have a registered account with the organization before logging in again")
                 }
-            } else {
-                alert("Please check the " + alertMsgFieldCount +
-                    " field(s) that you have left empty and try to log in again")
+
+                return "ok"
+            }
+            else {
+                data = await reponse.json()
+
+                alert(data.message)
+
+                return "ok"
             }
         }
 

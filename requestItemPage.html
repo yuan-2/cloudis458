@@ -196,15 +196,15 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        var userType = ""
+        var user = ""
         var itemId = ""
         var itemReqDisplay = document.getElementById("itemReqDisplay")
         var itemImage = document.getElementById("itemImage")
         var donorInfo = document.getElementById("donorInfo")
 
         function checkLoginForReq() {
-            if (window.sessionStorage.getItem("userType") != null) {
-                userType = window.sessionStorage.getItem("userType")
+            if (sessionStorage.getItem("user") != null) {
+                user = JSON.parse(sessionStorage.getItem("user"))
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
 
@@ -305,7 +305,7 @@
             if (document.getElementById("loginLogoutButton").innerText === "Login") {
                 window.location.href = "login.html"
             } else {
-                window.sessionStorage.removeItem("userType")
+                sessionStorage.removeItem("user")
                 window.location.reload()
             }
         }
