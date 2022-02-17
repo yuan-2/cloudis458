@@ -109,7 +109,8 @@ def delete_field(fieldID):
             db.session.delete(item)
             db.session.commit()
             return jsonify(item.json()), 201
-        except Exception:
+        except Exception as e:
+            print(e)
             return jsonify({
                 "message": "Unable to commit to database."
             }), 500
