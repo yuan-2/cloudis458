@@ -22,8 +22,9 @@ CREATE TABLE IF NOT EXISTS `carousel` (
 
 DROP TABLE IF EXISTS `wishlist`;
 CREATE TABLE IF NOT EXISTS `wishlist` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `itemName` varchar(50) NOT NULL,
+  `quantity` int NOT NULL,
   `remarks` varchar(300) NOT NULL,
   `category` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
@@ -33,22 +34,22 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
-  `usertype` varchar(20)  NOT NULL,
-  `username` varchar(20) NOT NULL,
+  `username` int NOT NULL,
   `password` varchar(100) NOT NULL,
+  `usertype` varchar(20)  NOT NULL,
   PRIMARY KEY (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `driver`;
 CREATE TABLE IF NOT EXISTS `driver` (
-  `contactNo` varchar(50) NOT NULL,
+  `contactNo` int NOT NULL,
   PRIMARY KEY (`contactNo`),
   FOREIGN KEY (`contactNo`) references user (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `migrantworker`;
 CREATE TABLE IF NOT EXISTS `migrantworker` (
-  `contactNo` varchar(50) NOT NULL,
+  `contactNo` int NOT NULL,
   `address` varchar(300) NOT NULL,
   `reqHistory` varchar(50) NOT NULL,
   PRIMARY KEY (`contactNo`),
@@ -87,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `matches` (
   `matchid` int(11) NOT NULL AUTO_INCREMENT,
   `reqid` int(11) NOT NULL,
 --   `requestorName` varchar(50) NOT NULL,
-  `requestorContactNo` varchar(50) NOT NULL,
+  `requestorContactNo` int NOT NULL,
   `donorName` varchar(50) NOT NULL,
   `donorContactNo` varchar(50) NOT NULL,
   `requestedItem` varchar(50) NOT NULL,
@@ -135,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `formbuilder` (
 
 DROP TABLE IF EXISTS `criteria`;
 CREATE TABLE IF NOT EXISTS `criteria` (
-  `migrantid` varchar(50) NOT NULL,
+  `migrantid` int NOT NULL,
   `successMatchCount` varchar(15) NOT NULL,
   `failMatchCount` varchar(15) NOT NULL,
   `daysFromLastItem` varchar(50) NOT NULL,
@@ -162,21 +163,25 @@ INSERT INTO carousel (`itemName`, `description`, `donorName`, `donorAddr`, `cont
 
 
 -- for wishlist table
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('backpack', 'my backpack broke, need a new one', 'others', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('stool', 'need a small chair to sit on', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('chair', 'chair broke, need a new one', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('table', 'a small table for dining and other purposes', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('shoes', 'shoes for work', 'clothing', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('wardrobe', 'wardrobe to store my clothes', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('drawers', 'drawers to store things', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('backpack', 1, 'my backpack broke, need a new one', 'others', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('stool', 2, 'need a small chair to sit on', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('chair', 1, 'chair broke, need a new one', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('table', 1, 'a small table for dining and other purposes', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('shoes', 2, 'shoes for work', 'clothing', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('wardrobe', 1, 'wardrobe to store my clothes', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
+('drawers', 1, 'drawers to store things', 'home furniture', now(), 'available');
 
+
+-- for user table
+INSERT INTO user(`username`, `password`, `userType`) VALUES 
+(93261073, ENCRYPT('cheah1124'), 'admin');
 
 -- for category table 
 -- INSERT INTO category(`categoryName`) VALUES ('Food');
@@ -224,4 +229,4 @@ INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES
 ('Toothbrush', 'Toiletries'), ('Blender', 'Electronics'), ('Television', 'Electronics'), ('T-Shirt', 'Clothes')
 ;
 
-select * from carousel;
+select * from user;

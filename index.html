@@ -259,13 +259,16 @@
   <script src="assets/js/main.js"></script>
 
   <script>
-    var userType = ""
+    var user = ""
 
     var mainCarouselDisplay = document.getElementById("mainCarouselDisplay")
 
     function checkLogin() {
-      if (window.sessionStorage.getItem("userType") != null) {
-        userType = window.sessionStorage.getItem("userType")
+      if (sessionStorage.getItem("user") != null) {
+        user = JSON.parse(sessionStorage.getItem("user"))
+        // console.log(JSON.parse(user))
+        
+        
 
         document.getElementById("loginLogoutButton").innerText = "Logout"
 
@@ -318,11 +321,26 @@
       }
     }
 
+    async function loadWishList() {
+      try {
+        let response = await fetch("http://127.0.0.1:5004/getWL")
+        let responseCode = await response.json()
+        if (responseCode.code == 200) {
+          return responseCode.data.items
+        } else {
+          alert(responseCode.message)
+        }
+      } catch (error) {
+        alert(error)
+      }
+    }
+
     function loginLogout() {
       if (document.getElementById("loginLogoutButton").innerText === "Login") {
         window.location.href = "login.html"
       } else {
-        window.sessionStorage.removeItem("userType")
+        // user = ""
+        sessionStorage.removeItem("user")
         window.location.reload()
       }
     }
@@ -330,14 +348,14 @@
     function checkUserType(x) {
       var itemData = x.getAttribute("data-tip")
 
-      if (userType == "") {
-        let confirmMsg = confirm("Only Migrant Workers can request for items. Click on OK to go to the Login Page.")
+      if (user == "") {
+        let confirmMsg = confirm("Only Migrant Workers who are logged in are able to request for items, click 'Ok' to go to the Login Page.")
 
         if (confirmMsg == true) {
           window.location.href = "login.html"
         }
 
-      } else if (userType == "MW") {
+      } else if (user.userType == "worker") {
         if (dateNow - lastDate < 0) {
           window.location.href =
             `requestItemPage.html?id=${itemData}` // pass itemId over to request page to retrieve full item info
