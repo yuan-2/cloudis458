@@ -89,8 +89,10 @@ def edit_field(fieldID):
         try:
             item.fieldName = data['fieldName']
             item.fieldType = data['fieldType']
-            item.placeholder = data['placeholder']
-            item.options = data['options']
+            if 'placeholder' in data:
+                item.placeholder = data['placeholder']
+            if 'options' in data:
+                item.options = data['options']
             db.session.commit()
             return jsonify(item.json()), 201
         except Exception:
@@ -99,7 +101,7 @@ def edit_field(fieldID):
             }), 500
 
 # delete existing field
-@app.route('/field-delete/<int:fieldID>', methods=["DELETE"])
+@app.route('/formbuilder/<int:fieldID>', methods=["DELETE"])
 def delete_field(fieldID):
     item = FormBuilder.query.filter_by(fieldID=fieldID).first()
     if ( item is not None ): 
@@ -107,7 +109,8 @@ def delete_field(fieldID):
             db.session.delete(item)
             db.session.commit()
             return jsonify(item.json()), 201
-        except Exception:
+        except Exception as e:
+            print(e)
             return jsonify({
                 "message": "Unable to commit to database."
             }), 500

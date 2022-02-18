@@ -95,63 +95,30 @@
 
             <!-- search box for categories, add onchange event here -->
             <div>
-              <label for="carouselDataList" class="form-label pt-3">Search by Category</label>
-              <input style="width: 50%;" class="form-control" list="datalistOptions" id="carouselDataList"
-                placeholder="Type to search...">
-              <datalist id="datalistOptions">
-                <option value="Toiletries">
-                <option value="Clothes">
-                <option value="Electronics">
-                <option value="Snacks">
-              </datalist>
+              <div id="catDropdown">
+                <label for="catSearchList" class="form-label pt-3">Category</label>
+                <select onchange="populateItemNames(this)" class="form-select" style="width: 50%;" id="catSearchList"
+                  name="catSearch">
+                  <!--Dynamically dropdown categories listed in existing db-->
+                </select>
+              </div>
+              <div id="itemDropdown">
+                <label for="itemSearchList" class="form-label pt-3">Item Name:</label>
+                <select class="form-select" style="width: 50%;" id="itemSearchList"
+                  name="itemSearch">
+                  <!--Update items found based on above dropdown-->
+                </select>
+              </div>
             </div>
 
           </div>
           <!-- wishlist starts here (auto populate using db) -->
           <div class="col-lg-6 col-sm-12" id="table-wrapper">
             <h2 class="text-center">Wishlist</h2>
-            <table class="table table-sm table-hover float-end text-center">
-              <tr>
-                <th>Item Name</th>
-                <th>Quantity</th>
-              </tr>
-              <tr>
-                <td>Toothbrush</td>
-                <td>2</td>
-              </tr>
-              <tr>
-                <td>Headset</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <td>Shirt</td>
-                <td>7</td>
-              </tr>
-              <tr>
-                <td>Colored Paper</td>
-                <td>10</td>
-              </tr>
-              <tr>
-                <td>Earpiece</td>
-                <td>5</td>
-              </tr>
-              <tr>
-                <td>Medicated Oil</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <td>Pillow</td>
-                <td>3</td>
-              </tr>
-              <tr>
-                <td>Blanket</td>
-                <td>4</td>
-              </tr>
-              <tr>
-                <td>Jacket</td>
-                <td>2</td>
-              </tr>
+            <table id="wishListTable"
+              class="table table-hover float-end text-center d-none table-bordered border border-2">
             </table>
+            <p id="emptyWLDisplay" class="text-center d-none">There are currently no items in the WishList</p>
           </div>
           <!-- wishlist ends here -->
         </div>
@@ -259,16 +226,22 @@
   <script src="assets/js/main.js"></script>
 
   <script>
-    var userType = ""
+    var user = ""
 
     var mainCarouselDisplay = document.getElementById("mainCarouselDisplay")
+    var wishListTable = document.getElementById('wishListTable')
+    var emptyWLDisplay = document.getElementById('emptyWLDisplay')
+
+    // DataList display
+    var catSearchList = document.getElementById('catSearchList')
+    var itemSearchList = document.getElementById('itemSearchList')
 
     function checkLogin() {
-      if (window.sessionStorage.getItem("userType") != null) {
-        userType = window.sessionStorage.getItem("userType")
+      if (sessionStorage.getItem("user") != null) {
+        user = JSON.parse(sessionStorage.getItem("user"))
+        // console.log(JSON.parse(user))
 
         document.getElementById("loginLogoutButton").innerText = "Logout"
-
       }
 
       // async to return promise and update carousel page with items 
@@ -302,6 +275,56 @@
         }
       })
 
+      loadWishList().then(function getWishList(result) {
+        var wishListItems = result
+        console.log(wishListItems)
+
+        // Reset Table when page refreshes
+        wishListTable.innerHTML = ""
+
+        // Check if wishlist has items within it
+        if (Object.keys(wishListItems).length > 0) {
+
+          wishListTable.classList.remove('d-none')
+          emptyWLDisplay.classList.remove('d-block')
+          emptyWLDisplay.classList.add('d-none')
+
+          wishListTable.innerHTML = `<tr>
+                <th>Item Name</th>
+                <th>Quantity</th>
+              </tr>`
+
+          for (let i in wishListItems) {
+            wishListTable.innerHTML += `
+            <tr>
+              <td>${wishListItems[i].itemName}</td>
+              <td>${wishListItems[i].quantity}</td>
+            </tr>
+            `
+          }
+        } else {
+          wishListTable.classList.add('d-none')
+          emptyWLDisplay.classList.add('d-block')
+          emptyWLDisplay.classList.remove('d-none')
+        }
+      })
+      getDropDownCat().then(function autoPopCategories(result) {
+        var catList = result
+
+        // reset search fields
+        catSearchList.innerHTML = ""
+
+        itemSearchList.innerHTML = ""
+
+        // Add a default empty selection
+        catSearchList.innerHTML = "<option selected> </option>"
+
+        for (cat of catList) {
+          catSearchList.innerHTML += `
+                        <option value="${cat}">${cat}</option>
+                    `
+        }
+      })
     }
 
     async function loadCarousel() {
@@ -318,11 +341,49 @@
       }
     }
 
+    async function loadWishList() {
+      try {
+        let response = await fetch("http://127.0.0.1:5004/getWL")
+        let responseCode = await response.json()
+        if (responseCode.code == 200) {
+          return responseCode.data.items
+        }
+      } catch (error) {
+        alert(error)
+      }
+    }
+    // Async function for Search Dropdown (Index Page)
+    async function getDropDownCat() {
+      let response = await fetch("http://127.0.0.1:5004/getCat")
+      let responseCode = await response.json()
+
+      if (responseCode.code == 200) {
+        return responseCode.data.categories
+      } else {
+        alert(responseCode.message)
+      }
+    }
+
+    async function populateItemNames(cat) {
+      itemSearchList.innerHTML = ""
+      itemSearchList.innerHTML = "<option selected> Please select a Category above </option>"
+      cat = cat.value
+      let response = await fetch("http://127.0.0.1:5004/getItemsInCat/" + cat)
+      let responseCode = await response.json()
+
+      if (responseCode.code == 200) {
+        for (cat of responseCode.data.itemsInCat) {
+          itemSearchList.innerHTML += `<option value="${cat.itemName}">${cat.itemName}</option>`
+        }
+      }
+    }
+
     function loginLogout() {
       if (document.getElementById("loginLogoutButton").innerText === "Login") {
         window.location.href = "login.html"
       } else {
-        window.sessionStorage.removeItem("userType")
+        // user = ""
+        sessionStorage.removeItem("user")
         window.location.reload()
       }
     }
@@ -330,14 +391,15 @@
     function checkUserType(x) {
       var itemData = x.getAttribute("data-tip")
 
-      if (userType == "") {
-        let confirmMsg = confirm("Only Migrant Workers can request for items. Click on OK to go to the Login Page.")
+      if (user == "") {
+        let confirmMsg = confirm(
+          "Only Migrant Workers who are logged in are able to request for items, click 'Ok' to go to the Login Page.")
 
         if (confirmMsg == true) {
           window.location.href = "login.html"
         }
 
-      } else if (userType == "MW") {
+      } else if (user.userType == "worker") {
         if (dateNow - lastDate < 0) {
           window.location.href =
             `requestItemPage.html?id=${itemData}` // pass itemId over to request page to retrieve full item info
