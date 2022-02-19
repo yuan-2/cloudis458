@@ -409,19 +409,6 @@ class Matches(db.Model):
         return { "matchid": self.matchid, "reqid": self.reqid, "requestorContactNo": self.requestorContactNo, "donorName": self.donorName, 
                 "donorContactNo": self.donorContactNo, "requestedItem": self.requestedItem, "itemCategory": self.itemCategory, "dateSubmitted": self.dateSubmitted }
 
-# get column headers
-# @app.route("/getSuccessMatchColHeaders")
-# def getSuccessfulMatchesColumnHeaders():
-#     return jsonify(
-#         {
-#             "code": 200,
-#             "data": {
-#                 "columns": Matches.metadata.tables["carousel"].columns.keys()
-#             }
-#         }
-#     )
-
-
 # get all successful matches
 @app.route("/getSuccessfulMatches")
 def getAllSuccessfulMatches():
@@ -510,6 +497,185 @@ def getMigrantWorkerCriteria(migrantworker):
             "message": "There are no successful matches at the moment."
         }
     ), 404
+
+
+class FormBuilder(db.Model):
+    __tablename__ = 'formbuilder'
+
+    fieldID = db.Column(db.Integer, primary_key=True, nullable=False)
+    formName = db.Column(db.String(15), nullable=False)
+    fieldName = db.Column(db.String(50), nullable=False)
+    fieldType = db.Column(db.String(15), nullable=False)
+    placeholder = db.Column(db.String(50), nullable=False)
+    options = db.Column(db.String(200), nullable=False)
+
+    def __init__(self, fieldID, formName, fieldName, fieldType, placeholder, options):
+        self.fieldID = fieldID
+        self.formName = formName
+        self.fieldType = fieldType
+        self.placeholder = placeholder
+        self.options = options
+
+    def json(self):
+        return { "fieldID": self.fieldID, "formName": self.formName, "fieldName": self.fieldName, "placeholder": self.placeholder, 
+                "options": self.options }
+
+# get form fields
+@app.route("/getFormFields/<formName>")
+def getForms(formName):
+    formFields = FormBuilder.query.filter_by(formName=formName)
+    fieldNames = {}
+    for field in formFields:
+        # fieldNames.append(field.fieldName)
+        fieldNames[field.fieldID] = field.fieldName
+    if (formFields):
+        return jsonify( 
+            {
+                "code": 404,
+                "data": fieldNames
+            }
+        )
+
+class FormAnswers(db.Model):
+    __tablename__ = 'formanswers'
+
+    answerID = db.Column(db.Integer, primary_key=True, nullable=False)
+    submissionID = db.Column(db.String(30), nullable=False)
+    migrantID = db.Column(db.Integer, nullable=False)
+    donorID = db.Column(db.Integer, nullable=False)
+    formName = db.Column(db.String(15), nullable=False)
+    fieldID = db.Column(db.Integer, nullable=False)
+    answer = db.Column(db.String(50), nullable=False)
+
+    def __init__(self, answerID, submissionID, migrantID, donorID, formName, fieldID, answer):
+        self.answerID = answerID
+        self.submissionID = submissionID
+        self.migrantID = migrantID
+        self.donorID = donorID
+        self.formName = formName
+        self.fieldID = fieldID
+        self.answer = answer
+
+    def json(self):
+        return { "answerID": self.answerID, "submissionID": self.submissionID, "migrantID": self.migrantID, "donorID": self.donorID, 
+                "formName": self.formName, "fieldID": self.fieldID, "answer": self.answer }
+
+# get all form answers for any form
+@app.route("/getFormAnswers/<formName>")
+def getFormAnswers(formName):
+    formFields = FormBuilder.query.filter_by(formName=formName)
+    formAnswers = FormAnswers.query.filter_by(formName=formName)
+    fieldNames = {}
+    for field in formFields:
+        fieldNames[field.fieldID] = field.fieldName
+    fieldNames[len(fieldNames) + 1] = "submissionID"
+    if formName == "donate":
+        fieldNames[len(fieldNames) + 1] = "donorID"
+    elif formName == "request":
+        fieldNames[len(fieldNames) + 1] = "migrantID"
+    data = []
+    row = {}
+    submissionID = ""
+    for ans in formAnswers:
+        if ans.submissionID != submissionID:
+            data.append(row)
+            submissionID = ans.submissionID
+            row["submissionID"] = submissionID
+            if formName == "donate":
+                row["donorID"] = ans.donorID
+            elif formName == "request":
+                row["migrantID"] = ans.migrantID
+        row[fieldNames[ans.fieldID]] = ans.answer
+    if len(data) > 0:
+        return jsonify( 
+            {
+                "code": 200,
+                "columnHeaders": fieldNames,
+                "data": data
+            }
+        )
+    else:
+        return jsonify( 
+            {
+                "code": 404,
+                "message": "No form answers can be found for this form."
+            }
+        )
+
+
+# get all form answers for specific forms (carousel items)
+@app.route("/getFormAnswers/<formName>/<submissionID>")
+def getSpecificFormAnswers(formName, submissionID):
+    formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
+    formFields = FormBuilder.query.filter_by(formName=formName)
+    fieldNames = {}
+    for field in formFields:
+        fieldNames[field.fieldID] = field.fieldName
+    fieldNames[len(fieldNames) + 1] = "submissionID"
+    if formName == "donate":
+        fieldNames[len(fieldNames) + 1] = "donorID"
+    elif formName == "request":
+        fieldNames[len(fieldNames) + 1] = "migrantID"
+    data = {}
+    for ans in formAnswers:
+        data["submissionID"] = submissionID
+        if formName == "donate":
+            data["donorID"] = ans.donorID
+        elif formName == "request":
+            data["migrantID"] = ans.migrantID
+        data[fieldNames[ans.fieldID]] = ans.answer
+    if len(data) > 0:
+        return jsonify( 
+            {
+                "code": 200,
+                "columnHeaders": fieldNames,
+                "data": data
+            }
+        )
+    else:
+        return jsonify( 
+            {
+                "code": 404,
+                "message": "No form answers can be found for this submission ID."
+            }
+        )
+
+# edit donated (carousel) item in table
+@app.route("/updateFormAnswer/<formName>/<submissionID>", methods=["PUT"])
+def updateDonatedItem(formName, submissionID):
+    formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
+    formFields = FormBuilder.query.filter_by(formName=formName)
+    fieldNames = {}
+    for field in formFields:
+        fieldNames[field.fieldID] = field.fieldName
+    fieldNames[len(fieldNames) + 1] = "submissionID"
+    if formName == "donate":
+        fieldNames[len(fieldNames) + 1] = "donorID"
+    elif formName == "request":
+        fieldNames[len(fieldNames) + 1] = "migrantID"
+    data = request.get_json()
+    if (formAnswers is None):
+        return jsonify( 
+            {
+                "code": 404,
+                "message": "There is no submission for this submission ID in the database."
+            }
+        )
+    else:
+        dataDict = {}
+        for d in data:
+            dataDict[d] = data[d]
+        for ans in formAnswers:
+            fieldID = ans.fieldID
+            ans.answer = dataDict[str(fieldID)]
+            db.session.add(ans)
+            db.session.commit()
+        return jsonify(
+            {
+                "code": 200,
+                "message": "Data successfully updated.",
+            }
+        )
 
 
 if __name__ == "__main__":

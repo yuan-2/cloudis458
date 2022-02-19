@@ -153,10 +153,46 @@
                         columns: columns,
                         fixedHeader: true,
                     } );
+                    fields = data.data[0];
+                    fields["columnDetails"] = data.columnHeaders;
+                    getEditDetails(fields);
                 }
 
             })
         }
+
+        function getEditDetails(fields) {
+            columnDetails = fields["columnDetails"];
+            fieldArr = []
+            for (field in fields) {
+                fieldObj = {}
+                for (fieldID in columnDetails) {
+                    if (columnDetails[fieldID] == field) {
+                        fieldObj["fieldID"] = fieldID;
+                        fieldObj["fieldName"] = field;
+                        fieldObj["fieldType"] = typeof(fields[field])
+                        fieldObj["placeholder"] = field;
+                        fieldObj["formName"] = "edit-section";
+                    }
+                }
+                if (field == "submissionID") {
+                    fieldArr.unshift(fieldObj);
+                }
+                else {
+                    fieldArr.push(fieldObj);
+                }
+            }
+            for (i = 0; i < fieldArr.length - 1; i++) {
+                fieldInput = fieldArr[i];
+                if (fieldInput.fieldType == "string") {
+                    buildText(fieldInput);
+                }
+                else if (fieldInput.fieldType == "number") {
+                    buildNumber(fieldInput);
+                }
+            }
+        }
+
 
         $(document).ready(function() {
             getDT();
