@@ -67,8 +67,7 @@ CREATE TABLE IF NOT EXISTS `carousel` (
   `TimeSubmitted` DATETIME NOT NULL,
   `ItemStatus` TINYINT(1) NOT NULL,
   `FileName` varchar(200) NOT NULL,
-  PRIMARY KEY (`ID`),
-  FOREIGN KEY (`Category`) REFERENCES `category` (`categoryname`)
+  PRIMARY KEY (`ID`)
 ) ;
 
 INSERT INTO `carousel` (`name`, `description`, `donorname`, `donoradd`, `contactno`, `category`, `quantity`, `requiredelivery`, `region`, `timesubmitted`, `itemstatus`, `filename`) VALUES
@@ -83,10 +82,6 @@ INSERT INTO `carousel` (`name`, `description`, `donorname`, `donoradd`, `contact
 --   PRIMARY KEY (`id`)
 -- ) ;
 
-select * from carousel
-
-
-
--- select * from carousel;
+-- select * from carousel
 -- 
 

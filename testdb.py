@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
-import hashlib
+import bcrypt
 
 import os
 import sys
@@ -58,6 +58,30 @@ class CarouselItem(db.Model):
     def json(self):
         return {"id": self.id, "name": self.itemName, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
 
+class WishList(db.Model):
+    __tablename__ = 'wishlist'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    itemName = db.Column(db.String(50), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    remarks = db.Column(db.String(300))
+    category = db.Column(db.String(50), nullable=False)
+    timeSubmitted = db.Column(db.Date, nullable=False)
+    itemStatus = db.Column(db.String(50), nullable=False)
+    
+    def __inti__(self, id, itemName, quantity, remarks, category, timeSubmitted, itemStatus):
+        self.id = id
+        self.itemName = itemName
+        self.quantity = quantity
+        self.remarks = remarks
+        self.category = category
+        self.timeSubmitted = timeSubmitted
+        self.itemStatus = itemStatus
+        
+    def json(self):
+        return {"id": self.id, "itemName": self.itemName, "quantity": self.quantity, "remarks": self.remarks, "category": self.category, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
+        
+    
 
 # class Category(db.Model):
 #     __tablename__ = 'category'
@@ -89,17 +113,17 @@ class CategoryItem(db.Model):
 class User(db.Model):
     __tablename__ = 'user'
     
-    userName = db.Column(db.String, primary_key=True, nullable=False)
-    password = db.Column(db.String, nullable=False)
-    userType = db.Column(db.String, nullable=False)
+    username = db.Column(db.Integer, primary_key=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    userType = db.Column(db.String(20), nullable=False)
 
-    def __init__(self, userName, password, userType):
-        self.userName = userName
+    def __init__(self, username, password, userType):
+        self.username = username
         self.password = password
         self.userType = userType
 
     def json(self):
-        return {"userName": self.userName, "password": self.password, "userType": self.userType}
+        return {"username": self.username, "password": self.password, "userType": self.userType}
 
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
 
@@ -121,6 +145,26 @@ def getAllItems():
         {
             "code": 404,
             "message": "There are no donations at the moment."
+        }
+    ), 404
+    
+    
+@app.route("/getWL")
+def getWishListItems():
+    wishList = WishList.query.all()
+    if len(wishList):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "items": [wishListitem.json() for wishListitem in wishList]
+                }
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Wishlist is currently empty."
         }
     ), 404
 
@@ -146,12 +190,6 @@ def getItem(id):
             "message": "Item ID does not seem to exist."
         }
     ), 404
-
-
-# @app.route("/addItemToCarousel", methods=['POST'])
-# def addCarouselItem():
-#     formData = request.form
-#     formDict = formData.to_dict()
 
 
 # get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 and filtered by category (time logic not done)
@@ -269,7 +307,7 @@ def addCarouselItem():
             return jsonify(
                 {
                     "code": 500,
-                    "message": "An error occurred while adding material :" + str(e)
+                    "message": "An error occurred while adding donation, please try again later"
                 }
             ), 500
             
@@ -279,9 +317,9 @@ def register():
         formDict = formData.to_dict()
         username = formDict['userName']
         pw = formDict['pw']
-        pw = hashlib.md5(pw)
+        hashedpw = bcrypt.hashpw(str(pw).encode('utf-8'), bcrypt.gensalt())
 
-        addtodb = User(username, pw, "worker")
+        addtodb = User(username, hashedpw, "worker")
         
         try:
             db.session.add(addtodb)
@@ -300,6 +338,37 @@ def register():
                     "message": "An error occurred while registering user :" + str(e)
                 }
             ), 500
+            
+@app.route("/login", methods=['POST'])
+def checkLogin():
+    formData = request.form
+    formDict = formData.to_dict()
+    uName = formDict["username"]
+    pw = formDict["password"]
+    
+    user = User.query.filter_by(username=uName).first()
+    if (user != None):
+        if (bcrypt.checkpw(str(pw).encode('utf-8'), str(user.password).encode('utf-8'))):
+        
+            print("Password checks out")
+    
+        
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "message": "Authentication success!",
+                        "userType": user.json()
+                    }
+                }
+            )
+        return jsonify(
+        {
+            "code": 404,
+            "message": "User not found, please register and try again."
+        }
+    ), 404
+
 
 
 

@@ -96,36 +96,10 @@
         <div class="container">
             <div class="table-responsive">
                 <table id="inventory" class="table table-striped table-hover" style="width: 100%">
-                    <thead>
-                        <tr>
-                            <th>Item ID</th>
-                            <th>Item</th>
-                            <th>Description</th>
-                            <th>Donor Name</th>
-                            <th>Donor Address</th>
-                            <th>Contact No.</th>
-                            <th>Item Category</th>
-                            <th>Qty</th>
-                            <th>Need Delivery?</th>
-                            <th>Area</th>
-                            <th>Time Submitted</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                    <!-- <tfoot>
-                        <tr>
-                            <th>Form ID</th>
-                            <th>Requestor Name</th>
-                            <th>Contact No.</th>
-                            <th>Requested Item</th>
-                            <th>Item Category</th>
-                            <th>Date Submitted</th>
-                        </tr>
-                    </tfoot> -->
                 </table>
             </div>
             <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow()">Edit Specific Row</button>
+            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editPhoto()">Edit Photo Uploaded</button>
             <br><br>
             <hr>
             <br>
@@ -160,27 +134,40 @@
                 </div>
                 <div class="row">
                     <div class="col-4">
-                        <label for="itemCat">Item Category</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCat">
+                        <label for="category">Item Category</label>
+                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="category">
                     </div>
                     <div class="col-2">
                         <label for="quantity">Quantity</label>
                         <input class="form-control mb-2" type="number" placeholder="Quantity" id="quantity">
                     </div>
                     <div class="col-2">
-                        <label for="needDelivery">Need Delivery?</label>
-                        <input class="form-control mb-2" type="text" placeholder="Need Delivery?" id="needDelivery">
+                        <label for="requireDelivery">Require Delivery?</label>
+                        <input class="form-control mb-2" type="text" placeholder="Require Delivery?" id="requireDelivery">
                     </div>
                     <div class="col-2">
-                        <label for="area">Area</label>
-                        <input class="form-control mb-2" type="text" placeholder="Area" id="area">
+                        <label for="region">Region</label>
+                        <input class="form-control mb-2" type="text" placeholder="Region" id="region">
                     </div>
                     <div class="col-2">
-                        <label for="status">Item Status</label>
-                        <input class="form-control mb-2" type="text" placeholder="Status" id="status">
+                        <label for="itemStatus">Item Status</label>
+                        <input class="form-control mb-2" type="text" placeholder="Status" id="itemStatus">
                     </div>
                 </div>
+                <br>
                 <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editInventory()">Save Changes</button>
+            </div>
+            <div class="row" style="display: none" id="edit-photo">
+                <div class="col-2">
+                    <label for="itemID">Item ID</label>
+                    <input class="form-control mb-2" type="number" placeholder="Item ID" id="itemID">
+                </div>
+                <div class="col-4">
+                    <label for="itemPhoto">Upload Photo</label>
+                    <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto">
+                </div>
+                <br>
+                <button type="button" id="save-btn" class="btn btn-outline-secondary col-2" onclick="editPhotoFile()">Save Changes</button>
             </div>
         </div>
     </section>
@@ -190,6 +177,56 @@
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap5.min.js"></script>
+
+    <script>
+        var columns = [];
+
+        function getDT() {
+            $.ajax({
+                url: "http://127.0.0.1:5000/getAllItems",
+                success: function (data) {
+                    columnNames = Object.keys(data.data.items[0]);
+                    // items = data.data.items;
+                    // console.log(data.data.items)
+                    // editFields = "";
+                    for (var i in columnNames) {
+                        columns.push({data: columnNames[i], 
+                                    title: columnNames[i]});
+                    }
+                    var table = $('#inventory').DataTable( {
+                        data: data.data.items,
+                        columns: columns,
+                        fixedHeader: true,
+                    } );
+                    // console.log(columnNames);
+                    // inputType = "";
+                    // for (var j in items) {
+                    //     if ((typeof items[j].value) === 'string' || typeof items[j].value === 'file') {
+                    //         inputType = 'text';
+                    //     }
+                    //     else if ((typeof items[j].value) === 'number') {
+                    //         inputType = 'number';
+                    //     }
+                    //     if (j % 3 == 0) {
+                    //         editFields += "<div class='row'>" + 
+                    //                             "<div class='col-2'>" +
+                    //                                 "<label for='itemID'>Item ID</label>" +
+                    //                                 "<input class='form-control mb-2' type='number' placeholder='Item ID' id='itemID' onchange='fillInventoryDetails(this.value)'>" +
+                    //                         "</div>";
+
+                    //     }
+
+                    // }
+                }
+            });
+        }
+        
+        $(document).ready(function() {
+            getDT();
+        } );
+
+
+    </script>
     <script src="../assets/js/table.js"></script>
 
     </main><!-- End #main -->
@@ -206,6 +243,7 @@
 
     <!-- Template Main JS File -->
     <script src="../assets/js/main.js"></script>
+
 
 </body>
 

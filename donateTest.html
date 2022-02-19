@@ -31,6 +31,19 @@
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
 
+    <!-- jQuery & Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+
+    <!-- Custom Javascript -->
+    <script src="assets/js/form.js" type="text/javascript"></script>
+    <script src="assets/js/formprocessing.js" type="text/javascript"></script>
+
     <!-- =======================================================
   * Template Name: Medilab - v4.7.0
   * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
@@ -39,7 +52,7 @@
   ======================================================== -->
 </head>
 
-<body onload="checkLoginForReq()">
+<body onload="checkLogin()">
 
     <!-- ======= Top Bar ======= -->
     <div id="topbar" class="d-flex align-items-center fixed-top">
@@ -70,38 +83,45 @@
             <nav id="navbar" class="navbar order-last order-lg-0">
                 <ul>
                     <li><a class="nav-link scrollto" href="index.html">Home</a></li>
-                    <li><a class="nav-link scrollto" href="donateGeneral.html">Donate</a></li>
-                    <li><a class="nav-link scrollto active" href="requestWishList.html">Request</a></li>
+                    <li><a class="nav-link scrollto active" href="donateGeneral.html">Donate</a></li>
+                    <li><a class="nav-link scrollto" href="requestWishList.html">Request</a></li>
                     <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
+            </nav>
 
-            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;" class="appointment-btn scrollto">Login</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
 
-    <!-- ======= Image Banner Section ======= -->
     <section id="hero" class="d-flex align-items-center"></section>
 
     <main id="main">
 
-        <!-- Adaptive section to auto populate data carried over from carousel page click -->
-        <section id="pageTitle">
-            <div class="container" id="itemReqDisplay">
+
+        <section>
+            <div class="container">
+                <div class="section-title">
+                    <h2>Donate to us</h2>
+                </div>
             </div>
         </section>
 
-        <section>
-            <div style="max-width: 1000px; margin: auto;">
-                <form id="requestForm" enctype="multipart/form-data" class="row g-3">
-                    <div id="itemImage" class="col-md-6"></div>
-                    <div id="donorInfo" class="col-md-6"></div>
-                </form>
+        <div style="max-width: 1000px; margin: auto;">
+            <form id="donateForm" enctype="multipart/form-data">
+                <div class="row g-3" id='donate'>
+                </div>
                 <br>
-            </div>
-        </section>
+
+                <div class="col-12" style='text-align: center; color: #E3A587;'>
+                    <button type="button" onclick="submitForm('donate')" class="btn btn-outline-light"
+                        style="color:white; background-color: #E3A587;">Submit</button>
+                </div>
+            </form>
+            <br>
+        </div>
 
     </main><!-- End #main -->
 
@@ -148,7 +168,7 @@
                     <div class="col-lg-4 col-md-6 footer-newsletter">
                         <h4>Join Our Newsletter</h4>
                         <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
-                        <form action="" method="post">
+                        <form method="post">
                             <input type="email" name="email"><input type="submit" value="Subscribe">
                         </form>
                     </div>
@@ -196,116 +216,16 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        var user = ""
-        var itemId = ""
-        var itemReqDisplay = document.getElementById("itemReqDisplay")
-        var itemImage = document.getElementById("itemImage")
-        var donorInfo = document.getElementById("donorInfo")
+        retrieveForm('donate');
+        checkLogin();
 
-        function checkLoginForReq() {
-            if (sessionStorage.getItem("user") != null) {
-                user = JSON.parse(sessionStorage.getItem("user"))
-
-                document.getElementById("loginLogoutButton").innerText = "Logout"
-
-                const queryString = window.location.search;
-                const urlParams = new URLSearchParams(queryString);
-                itemId = urlParams.get('id')
-
-                loadItem().then(function retriveInfo(result) {
-                    var itemInfo = result
-                    // console.log(itemInfo)
-
-                    // item info API Works but request is not done up for dynamic work 
-                    var x = setInterval(function() {
-                        for (item of itemInfo) {
-                        itemReqDisplay.innerHTML = `
-                        <div class="row">
-                            <div class="col-sm-12 col-lg-6">
-                                <div class="pt-3">
-                                    <h2 id="itemName">${item.name}</h2>
-                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span></p>
-                                </div>
-                            </div>
-                        </div>
-                        `
-
-                        itemImage.innerHTML = `
-                        <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
-                        `
-
-                        date = new Date(item.timeSubmitted);
-                        lastDate = date.setDate(date.getDate() + 1);
-                        dateNow = Date.now();
-                        difference = lastDate - dateNow
-                        var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        var mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-                        var seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-                        if (item.requireDelivery == 1) {
-                            donorInfo.innerHTML = `
-                            <div class="pt-5">
-                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
-                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
-                                <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
-                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-outline-success" onclick="reqItem()">Request!</button>
-                            </div>
-                        `
-                        }
-                        else {
-                            donorInfo.innerHTML = `
-                            <div class="pt-5">
-                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
-                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
-                                <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
-                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-success" onclick="reqItem()">Request!</button>
-                            </div>
-                        `
-                        }
-                        // If the count down is over, show that item has expired and clear interval 
-                        if (difference < 0) {
-                            clearInterval(x);
-                            document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
-                        }
-                    }
-                    }, 1000)                    
-                })
-            }
-            else {
-                let confirmMsg = confirm("Only Migrant Workers who are logged in can request for items. Please try logging in again.")
-                if (confirmMsg == true) {
-                    window.location.href = "index.html"
-                }
-                else {
-                    window.location.href = "index.html"
-                }
-            }
-        }
-
-        async function loadItem() {
-            let response = await fetch("http://127.0.0.1:5004/getItemById/" + itemId)
-            let responseCode = await response.json()
-            if (responseCode.code == 200) {
-                return responseCode.data.itemDetail
-            }
-            else {
-                alert(responseCode.message)
-            }
-
-        }
-
-        // Request button to POST item request, set alert when timer = 0 to redirect to homepage
-        function reqItem() {
-
-        }
-
+        
+        // can move to a common folder if every page uses?
         function loginLogout() {
             if (document.getElementById("loginLogoutButton").innerText === "Login") {
                 window.location.href = "login.html"
             } else {
-                sessionStorage.removeItem("user")
+                window.sessionStorage.removeItem("userType")
                 window.location.reload()
             }
         }
