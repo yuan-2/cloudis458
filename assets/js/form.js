@@ -35,9 +35,9 @@ async function retrieveForm(formName) {
             }
 
             
-            // if admin page --> change as needed or check if admin is logged in
-            if (window.location.href.indexOf("admin") > -1) {
-                addIcons();
+            // if edit page --> change as needed
+            if($('body').is('.editForm')){
+                addIcons(formName);
             }
             
             // compulsory fields
@@ -163,8 +163,8 @@ function buildCheckbox(field) {
 }
 
 // add edit icons to each field
-function addIcons() {
-    $('#donate').find('input, select').each(function() {
+function addIcons(formName) {
+    $(`#${formName}`).find('input, select').each(function() {
         var fieldID = $(this).attr("name");
         if (fieldID === undefined) {
             fieldID = $(this).attr("id");
@@ -268,7 +268,7 @@ function removeOption(elem){
 }
 //#endregion
 
-// FORM CUD
+// FIELD CUD
 //#region 
 async function addField(formName, fieldID="") {
     var fieldName = $('#fieldName').val();
@@ -353,12 +353,12 @@ async function editField(fieldID) {
                                         <button type="button" class="btn btn-danger float-end" id="deleteFieldBtn">Delete Field</button>
                                     </div>`);
                 $('#addFieldBtn').text("Save Changes");
-                $('#createHeader').html("Edit Field");
+                $('#editField').html("Edit Field");
             }
             
             $('#deleteFieldBtn').attr("onclick", `deleteField(${field.fieldID})`);
             $('#addFieldBtn').attr("onclick", `addField('${field.formName}', '/${field.fieldID}')`);
-            window.location.href = "#createHeader";
+            document.getElementById('editField').scrollIntoView();
         }
     } catch (error) {
         // Errors when calling the service; such as network error, 

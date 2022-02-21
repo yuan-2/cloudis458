@@ -1,3 +1,4 @@
+// Posting data to backend
 function submitForm(formName) {
     var donateFormElements = document.forms[0].elements
 
@@ -25,11 +26,12 @@ function submitForm(formName) {
     }
 
 
-    addDonation(formData, 'http://127.0.0.1:5005/formanswers')
+    addDonation(formData, 'http://127.0.0.1:5003/formanswers')
     alert("Item has been posted successfully")
+    window.location = window.location;
 }
 
-// Example POST method implementation:
+// POST request:
 async function addDonation(data, url) {
     // Default options are marked with *
     // console.log(data)
