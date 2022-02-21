@@ -149,13 +149,36 @@ DROP TABLE IF EXISTS `formanswers`;
 CREATE TABLE IF NOT EXISTS `formanswers` (
   `answerID` int NOT NULL AUTO_INCREMENT,
   `submissionID` varchar(30) NOT NULL,
-  `migrantID` int,
-  `donorID` int,
   `formName` varchar(15) NOT NULL,
   `fieldID` int NOT NULL,
   `answer` varchar(50) NOT NULL,
   PRIMARY KEY (`answerID`),
-  FOREIGN KEY (`migrantID`) references migrantworker (`contactNo`)
+  FOREIGN KEY (`fieldID`) references formbuilder (`fieldID`)
+) ;
+
+DROP TABLE IF EXISTS `newcarousel`;
+CREATE TABLE IF NOT EXISTS `newcarousel` (
+  `carouselID` int NOT NULL AUTO_INCREMENT,
+  `donorID` int NOT NULL,
+  `submissionID` varchar(30) NOT NULL,
+  `itemName` varchar(50) NOT NULL,
+  `itemCategory` varchar(20) NOT NULL,
+  `timeSubmitted` DATETIME NOT NULL,
+  `itemStatus` varchar(50) NOT NULL,
+  PRIMARY KEY (`carouselID`)
+) ;
+
+DROP TABLE IF EXISTS `newwishlist`;
+CREATE TABLE IF NOT EXISTS `newwishlist` (
+  `wishlistID` int NOT NULL AUTO_INCREMENT,
+  `migrantID` int NOT NULL,
+  `submissionID` varchar(30) NOT NULL,
+  `itemName` varchar(50) NOT NULL,
+  `itemCategory` varchar(20) NOT NULL,
+  `timeSubmitted` datetime NOT NULL,
+  `itemStatus` varchar(50) NOT NULL,
+  PRIMARY KEY (`wishlistID`),
+  FOREIGN KEY (`migrantID`) references user (`username`)
 ) ;
 
 
@@ -223,29 +246,43 @@ INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I drive?', 'Ju
 
 -- for formbuilder table
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
-('donate', 'Name', 'text', 'Enter Name');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
-('donate', 'Address', 'text', 'Enter Address');
+('donate', 'Name', 'text', 'Your name or the Organization you are representing');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('donate', 'Address', 'text');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Area', 'radio', 'North;South;East;West;Central');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
-('donate', 'Upload Photo', 'file');
+('donate', 'Item Photo', 'file');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
+('donate', 'Item Description', 'text', 'Brief description of the item you are donating');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('donate', 'Quantity', 'number');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
-('donate', 'Require delivery from home?', 'dropdown', 'Yes;No');
+('donate', 'Delivery Method', 'dropdown', 'Delivery required;Arranged by donor');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
+('request', 'Name', 'text', 'Enter Name');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
+('request', 'Address', 'text', 'Enter Address');
+INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
+('request', 'Quantity', 'number');
 
 
 
 -- for formanswers table
-INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '1', 'yew wei');
-INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '2', 'pasir ris grove');
-INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '3', 'East');
-INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '4', 'toothbrush.png');
-INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '5', '3');
-INSERT INTO formanswers (`submissionID`, `donorID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 92251521, 'donate', '6', 'No');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '1', 'yew wei');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '2', 'pasir ris grove');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '3', 'East');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '4', 'toothbrush.png');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '5', 'can make teeth sparkle sparkle');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '6', '3');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '7', 'Arranged by donor');
+-- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'request', '8', 'nic');
+-- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'request', '9', 'pasir ris');
+-- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'request', '10', '1');
 
-
+-- for newcarousel table
+INSERT INTO newcarousel (`donorID`, `submissionID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES
+(92251521, '2022-02-15 21:35:42 92251521', 'Toothbrush', 'Toiletries', '2022-02-15 21:35:42', 'available');
 
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES
