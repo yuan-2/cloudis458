@@ -161,6 +161,9 @@
                         // scrollY: true,
                         // scrollX: true,
                     } );
+                    fields = data.data[0];
+                    fields["columnDetails"] = data.columnHeaders;
+                    getEditDetails(fields);
                 },
                 error: function () {
                     document.getElementById("edit-btn").style.display = "none";

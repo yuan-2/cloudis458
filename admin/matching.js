@@ -33,7 +33,6 @@ function matchItem(item) {
 }
 
 
-
 function updateEligibility(migrantContactNo) {
     var data = {};
     data["reqid"] = document.getElementById("reqID").value;

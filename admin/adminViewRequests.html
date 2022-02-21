@@ -137,9 +137,9 @@
         var columns = [];
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getRequests",
+                url: "http://127.0.0.1:5000/getFormAnswers/request",
                 success: function (data) {
-                    columnNames = Object.keys(data.data[0]);
+                    columnNames = Object.values(data.columnHeaders);
                     // items = data.data.items;
                     // console.log(data.data.items)
                     // editFields = "";
@@ -147,6 +147,7 @@
                         columns.push({data: columnNames[i], 
                                     title: columnNames[i]});
                     }
+                    console.log(columns);
                     var table = $('#requests').DataTable( {
                         data: data.data,
                         columns: columns,
@@ -165,6 +166,15 @@
         $(document).ready(function() {
             getDT();
         } );
+
+        function editSpecificRow() {
+            // console.log(document.getElementById("7"));
+            document.getElementById("edit-section").innerHTML += "<br>" + 
+                                                                    "<button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='editInventory()'>Save Changes</button>" 
+            document.getElementById("edit-section").style.display = "block";
+            document.getElementById("7").setAttribute("onchange", "fillInventoryDetails(this.value)");
+            document.getElementById("edit-photo").style.display = "none";
+        }
 
     </script>
     <script src="../assets/js/table.js"></script>
