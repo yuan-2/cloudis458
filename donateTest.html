@@ -112,6 +112,8 @@
         <div style="max-width: 1000px; margin: auto;">
             <form id="donateForm" enctype="multipart/form-data">
                 <div class="row g-3" id='donate'>
+                    <div id="contactField" class="col-md-6">
+                    </div>
                 </div>
                 <br>
 
@@ -217,8 +219,6 @@
 
     <script>
         retrieveForm('donate');
-        checkLogin();
-
         
         // can move to a common folder if every page uses?
         function loginLogout() {
