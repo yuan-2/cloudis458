@@ -58,23 +58,23 @@ CREATE TABLE IF NOT EXISTS `migrantworker` (
 
 DROP TABLE IF EXISTS `request`;
 CREATE TABLE IF NOT EXISTS `request` (
-  `reqid` int NOT NULL AUTO_INCREMENT,
+  `reqID` int NOT NULL AUTO_INCREMENT,
   `requestorContactNo` int NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
   `itemCategory` varchar(300) NOT NULL,
   `requestQty` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
-  PRIMARY KEY (`reqid`),
+  PRIMARY KEY (`reqID`),
   FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`)
 ) ;
 
 DROP TABLE IF EXISTS `delivery`;
 CREATE TABLE IF NOT EXISTS `delivery` (
-  `dreqid` int NOT NULL AUTO_INCREMENT,
+  `deliveryReqID` int NOT NULL AUTO_INCREMENT,
   `accepted` varchar(50) NOT NULL,
-  `reqid` int NOT NULL,
-  PRIMARY KEY (`dreqid`),
-  FOREIGN KEY (`reqid`) references request (`reqid`)
+  `reqID` int NOT NULL,
+  PRIMARY KEY (`deliveryReqID`),
+  FOREIGN KEY (`reqID`) references request (`reqID`)
 ) ;
 
 -- DROP TABLE IF EXISTS `category`;
@@ -86,16 +86,16 @@ CREATE TABLE IF NOT EXISTS `delivery` (
 
 DROP TABLE IF EXISTS `matches`;
 CREATE TABLE IF NOT EXISTS `matches` (
-  `matchid` int NOT NULL AUTO_INCREMENT,
-  `reqid` int NOT NULL,
+  `matchID` int NOT NULL AUTO_INCREMENT,
+  `reqID` int NOT NULL,
 --   `requestorName` varchar(50) NOT NULL,
   `requestorContactNo` int NOT NULL,
   `donorName` varchar(50) NOT NULL,
   `donorContactNo` int NOT NULL,
   `requestedItem` varchar(50) NOT NULL,
   `itemCategory` varchar(50) NOT NULL,
-  `dateSubmitted` varchar(50) NOT NULL,
-  PRIMARY KEY (`matchid`)
+  `matchDate` datetime NOT NULL,
+  PRIMARY KEY (`matchID`)
 ) ;
 
 
@@ -135,15 +135,15 @@ CREATE TABLE IF NOT EXISTS `formbuilder` (
   PRIMARY KEY (`fieldID`)
 ) ;
 
-DROP TABLE IF EXISTS `criteria`;
-CREATE TABLE IF NOT EXISTS `criteria` (
-  `migrantid` int NOT NULL,
-  `successMatchCount` varchar(15) NOT NULL,
-  `failMatchCount` varchar(15) NOT NULL,
-  `daysFromLastItem` varchar(50) NOT NULL,
-  PRIMARY KEY (`migrantid`),
-  FOREIGN KEY (`migrantid`) references migrantworker (`contactNo`)
-) ;
+-- DROP TABLE IF EXISTS `criteria`;
+-- CREATE TABLE IF NOT EXISTS `criteria` (
+--   `migrantID` int NOT NULL,
+--   `successMatchCount` varchar(15) NOT NULL,
+--   `failMatchCount` varchar(15) NOT NULL,
+--   `daysFromLastItem` varchar(50) NOT NULL,
+--   PRIMARY KEY (`migrantID`),
+--   FOREIGN KEY (`migrantID`) references migrantworker (`contactNo`)
+-- ) ;
 
 DROP TABLE IF EXISTS `formanswers`;
 CREATE TABLE IF NOT EXISTS `formanswers` (

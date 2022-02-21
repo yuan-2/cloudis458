@@ -1,9 +1,11 @@
 from distutils.command.upload import upload
+from pdb import lasti2lineno
 from urllib import response
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from sqlalchemy import func
+from datetime import datetime
 
 import os
 import sys
@@ -198,15 +200,17 @@ def updatePhoto(itemID):
 class Request(db.Model):
     __tablename__ = 'request'
 
-    reqid = db.Column(db.Integer, primary_key=True, nullable=False)
+    reqID = db.Column(db.Integer, primary_key=True, nullable=False)
+    itemID = db.Column(db.Integer, nullable=False)
     requestorContactNo = db.Column(db.String(50), nullable=False)
     deliveryLocation = db.Column(db.String(300), nullable=False)
     itemCategory = db.Column(db.String(50), nullable=False)
-    requestQty = db.Column(db.String(50), nullable=False)
+    requestQty = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
 
-    def __init__(self, reqid, requestorContactNo, deliveryLocation, itemCategory, requestQty, timeSubmitted):
-        self.reqid = reqid
+    def __init__(self, reqID, itemID, requestorContactNo, deliveryLocation, itemCategory, requestQty, timeSubmitted):
+        self.reqID = reqID
+        self.itemID = itemID
         self.requestorContactNo = requestorContactNo
         self.deliveryLocation = deliveryLocation
         self.itemCategory = itemCategory
@@ -214,7 +218,7 @@ class Request(db.Model):
         self.timeSubmitted = timeSubmitted
 
     def json(self):
-        return {"reqid": self.reqid, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, "itemCategory": self.itemCategory, 
+        return {"reqID": self.reqID, "itemID": self.itemID, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, "itemCategory": self.itemCategory, 
                 "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
 
 # get all requests submitted by migrant workers
@@ -254,20 +258,41 @@ def getRequestByID(id):
     ), 404
 
 # get requests submitted for specific item
-@app.route("/getRequests/<item>")
-def getRequestByItem(item):
-    request = Request.query.filter_by(reqid=id).first()
-    if request:
+@app.route("/getRequestsByItem/<itemID>")
+def getRequestByItemID(itemID):
+    requests = Request.query.filter_by(itemID=itemID)
+    if requests:
         return jsonify(
             {
                 "code": 200,
-                "data": request.json()
+                "data": [request.json() for request in requests]
             }
         )
     return jsonify(
         {
             "code": 404,
-            "message": "Request cannot be found for this ID."
+            "message": "Requests cannot be found for this item ID."
+        }
+    ), 404
+
+# get list of migrant workers that requested specific item
+@app.route("/getMigrantWorkersListByItem/<itemID>")
+def getMigrantWorkersListByItemID(itemID):
+    requests = Request.query.filter_by(itemID=itemID)
+    mwList = []
+    if requests:
+        for req in requests:
+            mwList.append(req.requestorContactNo)
+        return jsonify(
+            {
+                "code": 200,
+                "data": mwList
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "No migrant workers requested for this item ID."
         }
     ), 404
 
@@ -297,6 +322,89 @@ def updateRequest(id):
             }
         )
 
+class MigrantWorker(db.Model):
+    __tablename__ = 'migrantworker'
+
+    contactNo = db.Column(db.Integer, primary_key=True, nullable=False)
+    address = db.Column(db.String(300), nullable=False)
+    reqHistory = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, contactNo, address, reqHistory):
+        self.contactNo = contactNo
+        self.address = address
+        self.reqHistory = reqHistory
+
+    def json(self):
+        return {"contactNo": self.contactNo, "address": self.address, "reqHistory": self.reqHistory}
+
+# get all migrant workers details
+@app.route("/getAllMigrantWorkers")
+def getAllMigrantWorkers():
+    migrantWorkers = MigrantWorker.query.all()
+    if migrantWorkers:
+        return jsonify(
+            {
+                "code": 200,
+                "data": [mw.json() for mw in migrantWorkers]
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "No migrant workers requested for this item ID."
+        }
+    ), 404
+
+# get reqHistory for specific migrant worker
+@app.route("/getReqHistory/<contactNo>")
+def getReqHistory(contactNo):
+    migrantWorker = MigrantWorker.query.filter_by(contactNo=contactNo).first()
+    if migrantWorker:
+        return jsonify(
+            {
+                "code": 200,
+                "data": { migrantWorker.contactNo: migrantWorker.reqHistory }
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "No migrant workers requested for this item ID."
+        }
+    ), 404
+
+
+# check for the list of MWs, how long since each of them have gotten an item
+@app.route("/getMWLastItemWeeks/<itemID>")
+def getMWLastItemWeeks(itemID):
+    requests = Request.query.filter_by(itemID=itemID)
+    if requests:
+        mwList = []
+        reqHist = {}
+        for req in requests:
+            mwList.append(req.requestorContactNo)
+        for num in mwList:
+            migrantWorker = MigrantWorker.query.filter_by(contactNo=num).first()
+            if migrantWorker.reqHistory in reqHist.keys():
+                reqHist[migrantWorker.reqHistory] += [migrantWorker.contactNo]
+            else:
+                reqHist[migrantWorker.reqHistory] = [migrantWorker.contactNo]
+        allKeys = reqHist.keys()
+        minValue = min(allKeys)
+        priorityMW = reqHist[minValue]
+        return jsonify(
+            {
+                "code": 200,
+                "data": priorityMW,
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "No migrant workers requested for this item ID."
+        }
+    ), 404
+
 
 class Wishlist(db.Model):
     __tablename__ = 'wishlist'
@@ -320,7 +428,7 @@ class Wishlist(db.Model):
         return {"id": self.id, "itemName": self.itemName, "remarks": self.remarks, "category": self.category, 
                 "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
 
-# get all requests submitted by migrant workers
+# get all wishlist submitted by migrant workers
 @app.route("/getWishlist")
 def getWishlist():
     wishlist = Wishlist.query.all()
@@ -386,28 +494,28 @@ def updateWishlist(id):
 class Matches(db.Model):
     __tablename__ = 'matches'
 
-    matchid = db.Column(db.Integer, primary_key=True, nullable=False)
-    reqid = db.Column(db.Integer, nullable=False)
+    matchID = db.Column(db.Integer, primary_key=True, nullable=False)
+    reqID = db.Column(db.Integer, nullable=False)
     requestorContactNo = db.Column(db.String(50), nullable=False)
     donorName = db.Column(db.String(50), nullable=False)
     donorContactNo = db.Column(db.String(50), nullable=False)
     requestedItem = db.Column(db.String(50), nullable=False)
     itemCategory = db.Column(db.String(50), nullable=False)
-    dateSubmitted = db.Column(db.String(50), nullable=False)
+    matchDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, matchid, reqid, requestorContactNo, donorName, donorContactNo, requestedItem, itemCategory, dateSubmitted):
-        self.matchid = matchid
-        self.reqid = reqid
+    def __init__(self, matchID, reqID, requestorContactNo, donorName, donorContactNo, requestedItem, itemCategory, matchDate):
+        self.matchID = matchID
+        self.reqID = reqID
         self.requestorContactNo = requestorContactNo
         self.donorName = donorName
         self.donorContactNo = donorContactNo
         self.requestedItem = requestedItem
         self.itemCategory = itemCategory
-        self.dateSubmitted = dateSubmitted
+        self.matchDate = matchDate
 
     def json(self):
-        return { "matchid": self.matchid, "reqid": self.reqid, "requestorContactNo": self.requestorContactNo, "donorName": self.donorName, 
-                "donorContactNo": self.donorContactNo, "requestedItem": self.requestedItem, "itemCategory": self.itemCategory, "dateSubmitted": self.dateSubmitted }
+        return { "matchID": self.matchID, "reqID": self.reqID, "requestorContactNo": self.requestorContactNo, "donorName": self.donorName, 
+                "donorContactNo": self.donorContactNo, "requestedItem": self.requestedItem, "itemCategory": self.itemCategory, "matchDate": self.matchDate }
 
 # get all successful matches
 @app.route("/getSuccessfulMatches")
@@ -445,7 +553,7 @@ def getSuccessfulMatch(id):
         }
     ), 404
 
-# edit wishlist in table
+# edit SuccessfulMatch in table
 @app.route("/updateSuccessfulMatches/<int:id>", methods=["PUT"])
 def updateSuccessfulMatches(id):
     match = Matches.query.filter_by(reqid=id).first()
@@ -473,30 +581,6 @@ def updateSuccessfulMatches(id):
             }
         )
 
-
-# get consolidated criteria of migrant worker
-@app.route("/getCriteria/<migrantworker>")
-def getMigrantWorkerCriteria(migrantworker):
-    # get total no. of successful matches for specific migrant worker
-    successMatchCount = Matches.query.filter_by(requestorContactNo=migrantworker).count()
-    failMatchCount = Request.query.filter_by(requestor=migrantworker).count() - successMatchCount
-    # Matches.query.with_entities(Matches.requestorContactNo, func.count(Matches.requestorContactNo)).group_by(Matches.requestorContactNo).all()
-    if successMatchCount and failMatchCount:
-        return jsonify(
-            {
-                "code": 200,
-                "data": { 
-                    "successMatchCount": successMatchCount, 
-                    "failMatchCount": failMatchCount
-                }
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no successful matches at the moment."
-        }
-    ), 404
 
 
 class FormBuilder(db.Model):
@@ -676,6 +760,50 @@ def updateDonatedItem(formName, submissionID):
                 "message": "Data successfully updated.",
             }
         )
+# from sqlalchemy.sql.functions import func
+# number = session.query(func.count(table.id).label('number').first().number
+
+# rank migrant workers according to reqHistory, get list of MWs who are prioritised
+@app.route("/getRankByReqHistory/<itemID>")
+def getRankByReqHistory(itemID):
+    requests = Request.query.filter_by(itemID=itemID)
+    if requests:
+        reqHist = {}
+        for req in requests:
+            migrantWorkerCount = Matches.query.filter_by(requestorContactNo=req.requestorContactNo).count()
+            if migrantWorkerCount in reqHist.keys():
+                reqHist[migrantWorkerCount] += [req.requestorContactNo]
+            else:
+                reqHist[migrantWorkerCount] = [req.requestorContactNo]
+        allKeys = reqHist.keys()
+        minValue = min(allKeys)
+        priorityMW = reqHist[minValue]
+        lastItem = {}
+        # check for the list of MWs, how long since each of them have gotten an item            
+        for mwNum in priorityMW:
+            mw = Matches.query.filter_by(contactNo=mwNum).first()
+            # if mw.lastItemTime in lastItem.keys():
+            #     lastItem[mw.lastItemTime] += [mw.contactNo]
+            # else:
+            #     lastItem[mw.lastItemTime] = [mw.contactNo]
+        allKeys = lastItem.keys()
+        minValue = min(allKeys)
+        priorityMW = lastItem[minValue]
+        return jsonify(
+            {
+                "code": 200,
+                "data": priorityMW
+                # "requests": [req.json() for req in requests],
+                # "lastItem": lastItem
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "No migrant workers requested for this item ID."
+        }
+    ), 404
+
 
 
 if __name__ == "__main__":
