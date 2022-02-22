@@ -1,6 +1,5 @@
 // get column headers
 
-
 $(document).ready(function() {
     $('#example').DataTable( {
         ajax: {
@@ -20,6 +19,16 @@ $(document).ready(function() {
 
 } );    
 
+function editSpecificRow(form) {
+    document.getElementById("edit-section").innerHTML += "<br>" + 
+                                                            "<button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='edit" + form + "()'>Save Changes</button>" 
+    document.getElementById("edit-section").style.display = "block";
+    document.querySelector('[placeholder="submissionID"]').setAttribute("onchange", "fill" + form + "Details(this.value)");
+    if (form == "Inventory") {
+        document.getElementById("edit-photo").style.display = "none";
+    }
+}
+
 function getEditDetails(fields) {
     columnDetails = fields["columnDetails"];
     fieldArr = []
@@ -37,7 +46,7 @@ function getEditDetails(fields) {
         if (field == "submissionID") {
             fieldArr.unshift(fieldObj);
         }
-        else {
+        else if (field != "timeSubmitted") {
             fieldArr.push(fieldObj);
         }
     }
@@ -51,80 +60,6 @@ function getEditDetails(fields) {
         }
     }
 }
-
-function fillWishlistDetails(val) {
-    $(async () => {
-        var serviceURL = "http://127.0.0.1:5000/getWishlist/" + val;
-        try {
-            const response =
-            await fetch(
-                serviceURL, { 
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json'},
-            });
-            const result = await response.json();
-            if (response.status == 200) {
-                // success case
-                for (var i in result.data) {
-                    if (i != "timeSubmitted") {
-                        document.getElementById(i).value = result.data[i];
-                        console.log(document.getElementById(i).value, result.data[i]);
-                    }
-                }
-            }
-            if (response.status == 404) {
-                alert('There is no such request ID in the database, please enter a valid ID.')
-            }
-        }
-        catch (error) {
-            // Errors when calling the service; such as network error, 
-            // service offline, etc
-            alert('There is a problem retrieving the data, please try again later.');
-        } // error
-    });
-}
-
-function editWishlist() {
-    var data = {};
-    var inputFields = document.getElementById("edit-section").children;
-    for (var i in inputFields) {
-        input = inputFields[i];
-        inputChildrenCount = input.childElementCount;
-        inputChildren = inputFields[i].children;
-        if (inputChildrenCount > 0) {
-            for (j = 0; j < inputChildrenCount; j++) {
-                inputChildElement = inputChildren[j].children[1];
-                data[inputChildElement.id] = inputChildElement.value;
-            }
-        }
-    }
-
-    var jsondata = JSON.stringify(data);
-    $(async () => {
-        var serviceURL = "http://127.0.0.1:5000/updateWishlist/" + data.id;
-        try {
-            const response =
-            await fetch(
-                serviceURL, { 
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json'},
-                body: jsondata,
-            });
-            const result = await response.json();
-            if (response.status == 200) {
-                // success case
-                alert('Successfully updated data in database. Please refresh to view changes.')
-                window.location.reload();
-            }
-            }
-        catch (error) {
-            // Errors when calling the service; such as network error, 
-            // service offline, etc
-            alert('There is a problem updating the data, please try again later.');
-        } // error
-    });
-}
-
 
 function fillRequestDetails(val) {
     $(async () => {

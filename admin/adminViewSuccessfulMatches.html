@@ -167,7 +167,8 @@
                 },
                 error: function () {
                     document.getElementById("edit-btn").style.display = "none";
-                    alert("There are currently no successful matches to be found.")
+                    document.getElementById("edit-section").innerHTML = "There are currently no successful matches to be found."
+                    document.getElementById("edit-section").style.display = "block";
                 }
 
             })
