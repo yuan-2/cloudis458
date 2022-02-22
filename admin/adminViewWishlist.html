@@ -96,36 +96,11 @@
         <div class="container">
             <table id="wishlist" class="table table-striped table-hover" style="width: 100%">
             </table>
-            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow()">Edit Specific Row</button>
+            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow('Wishlist')">Edit Specific Row</button>
             <br><br>
             <hr>
             <br>
             <div id="edit-section" style="display: none">
-                <div class="row">
-                    <div class="col-2">
-                        <label for="id">ID</label>
-                        <input class="form-control mb-2" type="number" placeholder="ID" id="id" onchange="fillWishlistDetails(this.value)">
-                    </div>
-                    <div class="col-4">
-                        <label for="itemName">Item Name</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Name" id="itemName">
-                    </div>
-                    <div class="col-6">
-                        <label for="remarks">Remarks</label>
-                        <input class="form-control mb-2" type="text" placeholder="Remarks" id="remarks">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <label for="category">Item Category</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="category">
-                    </div>
-                    <div class="col-2">
-                        <label for="itemStatus">Item Status</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Status" id="itemStatus">
-                    </div>
-                </div>
-                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editWishlist()">Save Changes</button>
             </div>
         </div>
     </section>
@@ -133,12 +108,13 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+    <script src="../assets/js/form.js"></script>
     <script src="../assets/js/table.js"></script>
     <script>
         var columns = [];
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getWishlist",
+                url: "http://127.0.0.1:5000/getFormAnswers/wishlist",
                 success: function (data) {
                     columnNames = Object.keys(data.data[0]);
                     // items = data.data.items;
@@ -156,47 +132,97 @@
                     fields = data.data[0];
                     fields["columnDetails"] = data.columnHeaders;
                     getEditDetails(fields);
+                },
+                error: function () {
+                    document.getElementById("edit-btn").style.display = "none";
+                    document.getElementById("edit-section").innerHTML = "There are currently no wishlist items to be found."
+                    document.getElementById("edit-section").style.display = "block";
                 }
 
             })
         }
 
-        function getEditDetails(fields) {
-            columnDetails = fields["columnDetails"];
-            fieldArr = []
-            for (field in fields) {
-                fieldObj = {}
-                for (fieldID in columnDetails) {
-                    if (columnDetails[fieldID] == field) {
-                        fieldObj["fieldID"] = fieldID;
-                        fieldObj["fieldName"] = field;
-                        fieldObj["fieldType"] = typeof(fields[field])
-                        fieldObj["placeholder"] = field;
-                        fieldObj["formName"] = "edit-section";
-                    }
-                }
-                if (field == "submissionID") {
-                    fieldArr.unshift(fieldObj);
-                }
-                else {
-                    fieldArr.push(fieldObj);
-                }
-            }
-            for (i = 0; i < fieldArr.length - 1; i++) {
-                fieldInput = fieldArr[i];
-                if (fieldInput.fieldType == "string") {
-                    buildText(fieldInput);
-                }
-                else if (fieldInput.fieldType == "number") {
-                    buildNumber(fieldInput);
-                }
-            }
-        }
-
-
         $(document).ready(function() {
             getDT();
         } );
+
+        function fillWishlistDetails(val) {
+            $(async () => {
+                var serviceURL = "http://127.0.0.1:5000/getFormAnswers/wishlist/" + val;
+                try {
+                    const response =
+                    await fetch(
+                        serviceURL, { 
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json'},
+                    });
+                    const result = await response.json();
+                    if (response.status == 200) {
+                        // success case
+                        for (var i in result.data) {
+                            // field = result.data[i];
+                            for (id in result.columnHeaders) {
+                                // console.log(id, result.columnHeaders[id]);
+                                if (result.columnHeaders[id] == i) {
+                                    document.getElementById(id).value = result.data[i];
+                                }
+                            }
+                        }
+                    }
+                    if (response.status == 404) {
+                        alert('There is no such request ID in the database, please enter a valid ID.')
+                    }
+                }
+                catch (error) {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    alert('There is a problem retrieving the data, please try again later.');
+                } // error
+            });
+        }
+
+        function editWishlist() {
+            var data = {};
+            var inputFields = document.getElementById("edit-section").children;
+            var submissionID = document.querySelector('[placeholder="submissionID"]').value;
+            for (var i in inputFields) {
+                input = inputFields[i];
+                inputChildrenCount = input.childElementCount;
+                inputChildren = inputFields[i].children;
+                if (inputChildrenCount > 0) {
+                    inputChildElement = inputChildren[1];
+                    inputLabelElement = inputChildren[0];
+                    data[inputChildElement.id] = inputChildElement.value;
+                    data[inputLabelElement.innerHTML] = inputChildElement.value;
+                }
+            }
+
+            var jsondata = JSON.stringify(data);
+            $(async () => {
+                var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/wishlist/" + submissionID;
+                try {
+                    const response =
+                    await fetch(
+                        serviceURL, { 
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json'},
+                        body: jsondata,
+                    });
+                    const result = await response.json();
+                    if (response.status == 200) {
+                        // success case
+                        alert('Successfully updated data in database. Please refresh to view changes.')
+                        window.location.reload();
+                    }
+                    }
+                catch (error) {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    alert('There is a problem updating the data, please try again later.');
+                } // error
+            });
+        }
+
 
     </script>
 
