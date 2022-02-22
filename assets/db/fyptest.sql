@@ -170,14 +170,13 @@ CREATE TABLE IF NOT EXISTS `newcarousel` (
 
 DROP TABLE IF EXISTS `newwishlist`;
 CREATE TABLE IF NOT EXISTS `newwishlist` (
-  `wishlistID` int NOT NULL AUTO_INCREMENT,
-  `migrantID` int NOT NULL,
   `submissionID` varchar(30) NOT NULL,
+  `migrantID` int NOT NULL,
   `itemName` varchar(50) NOT NULL,
   `itemCategory` varchar(20) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   `itemStatus` varchar(50) NOT NULL,
-  PRIMARY KEY (`wishlistID`),
+  PRIMARY KEY (`submissionID`),
   FOREIGN KEY (`migrantID`) references user (`username`)
 ) ;
 
@@ -260,12 +259,9 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('donate', 'Delivery Method', 'dropdown', 'Delivery required;Arranged by donor');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
-('request', 'Name', 'text', 'Enter Name');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
-('request', 'Address', 'text', 'Enter Address');
+('wishlist', 'Address', 'text', 'Enter Address');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
-('request', 'Quantity', 'number');
-
+('wishlist', 'Quantity', 'number');
 
 
 -- for formanswers table
@@ -276,9 +272,8 @@ INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '5', 'can make teeth sparkle sparkle');
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '6', '3');
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '7', 'Arranged by donor');
--- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'request', '8', 'nic');
--- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'request', '9', 'pasir ris');
--- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'request', '10', '1');
+-- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'wishlist', '8', 'pasir ris');
+-- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'wishlist', '9', '1');
 
 -- for newcarousel table
 INSERT INTO newcarousel (`donorID`, `submissionID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES
