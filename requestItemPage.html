@@ -152,7 +152,6 @@
                             <input type="email" name="email"><input type="submit" value="Subscribe">
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -201,10 +200,13 @@
         var itemReqDisplay = document.getElementById("itemReqDisplay")
         var itemImage = document.getElementById("itemImage")
         var donorInfo = document.getElementById("donorInfo")
+        var itemInfo = ""
 
         function checkLoginForReq() {
             if (sessionStorage.getItem("user") != null) {
                 user = JSON.parse(sessionStorage.getItem("user"))
+
+                console.log(user)
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
 
@@ -213,7 +215,7 @@
                 itemId = urlParams.get('id')
 
                 loadItem().then(function retriveInfo(result) {
-                    var itemInfo = result
+                    itemInfo = result
                     // console.log(itemInfo)
 
                     // item info API Works but request is not done up for dynamic work 
@@ -223,8 +225,8 @@
                         <div class="row">
                             <div class="col-sm-12 col-lg-6">
                                 <div class="pt-3">
-                                    <h2 id="itemName">${item.name}</h2>
-                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span></p>
+                                    <h2 id="itemName">${item.itemName}</h2>
+                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span>, &nbsp Sub-Category: <span id="itemSubCat">${item.subcat}</span></p>
                                 </div>
                             </div>
                         </div>
@@ -234,10 +236,10 @@
                         <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
                         `
 
-                        date = new Date(item.timeSubmitted);
-                        lastDate = date.setDate(date.getDate() + 1);
-                        dateNow = Date.now();
-                        difference = lastDate - dateNow
+                        var date = new Date(item.timeSubmitted);
+                        var lastDate = date.setDate(date.getDate() + 1);
+                        var dateNow = Date.now();
+                        var difference = lastDate - dateNow
                         var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                         var mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
                         var seconds = Math.floor((difference % (1000 * 60)) / 1000);
@@ -298,7 +300,13 @@
 
         // Request button to POST item request, set alert when timer = 0 to redirect to homepage
         function reqItem() {
-
+            if (difference < 0) {
+                alert("Item has expired, you will be redirected back to the homepage")
+                window.location.href = "index.html"
+            }
+            else {
+                
+            }
         }
 
         function loginLogout() {
