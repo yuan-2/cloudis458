@@ -6,8 +6,6 @@ DROP TABLE IF EXISTS `carousel`;
 CREATE TABLE IF NOT EXISTS `carousel` (
   `id` int NOT NULL AUTO_INCREMENT,
   `itemName` varchar(50) NOT NULL,
-  `description` varchar(300) NOT NULL,
-  `donorName` varchar(50) NOT NULL,
   `donorAddr` varchar(300) NOT NULL,
   `contactNo` int NOT NULL,
   `category` varchar(20) NOT NULL,
@@ -62,11 +60,12 @@ CREATE TABLE IF NOT EXISTS `request` (
   `reqID` int NOT NULL AUTO_INCREMENT,
   `requestorContactNo` int NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
-  `itemCategory` varchar(300) NOT NULL,
+  `itemId` int NOT NULL,
   `requestQty` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   PRIMARY KEY (`reqID`),
-  FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`)
+  FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
+  FOREIGN KEY (`itemId`) REFERENCES carousel (`id`)
 ) ;
 
 DROP TABLE IF EXISTS `delivery`;
@@ -158,29 +157,31 @@ CREATE TABLE IF NOT EXISTS `formanswers` (
   FOREIGN KEY (`fieldID`) references formbuilder (`fieldID`)
 ) ;
 
-DROP TABLE IF EXISTS `newcarousel`;
-CREATE TABLE IF NOT EXISTS `newcarousel` (
-  `carouselID` int NOT NULL AUTO_INCREMENT,
-  `donorID` int NOT NULL,
-  `submissionID` varchar(30) NOT NULL,
-  `itemName` varchar(50) NOT NULL,
-  `itemCategory` varchar(20) NOT NULL,
-  `timeSubmitted` DATETIME NOT NULL,
-  `itemStatus` varchar(50) NOT NULL,
-  PRIMARY KEY (`carouselID`)
-) ;
+-- DROP TABLE IF EXISTS `carousel`;
+-- CREATE TABLE IF NOT EXISTS `carousel` (
+--   `carouselID` int NOT NULL AUTO_INCREMENT,
+--   `donorID` int NOT NULL,
+--   `submissionID` varchar(30) NOT NULL,
+--   `itemName` varchar(50) NOT NULL,
+--   `itemCategory` varchar(20) NOT NULL,
+--   `itemSubCat` varchar(30) NOT NULL,
+--   `timeSubmitted` DATETIME NOT NULL,
+--   `itemStatus` varchar(50) NOT NULL,
+--   PRIMARY KEY (`carouselID`)
+-- ) ;
 
-DROP TABLE IF EXISTS `newwishlist`;
-CREATE TABLE IF NOT EXISTS `newwishlist` (
-  `submissionID` varchar(30) NOT NULL,
-  `migrantID` int NOT NULL,
-  `itemName` varchar(50) NOT NULL,
-  `itemCategory` varchar(20) NOT NULL,
-  `timeSubmitted` datetime NOT NULL,
-  `itemStatus` varchar(50) NOT NULL,
-  PRIMARY KEY (`submissionID`),
-  FOREIGN KEY (`migrantID`) references user (`username`)
-) ;
+-- DROP TABLE IF EXISTS `wishlist`;
+-- CREATE TABLE IF NOT EXISTS `wishlist` (
+--   `submissionID` varchar(30) NOT NULL,
+--   `migrantID` int NOT NULL,
+--   `itemName` varchar(50) NOT NULL,
+--   `itemCategory` varchar(20) NOT NULL,
+--   `itemSubCat` varchar(30) NOT NULL,
+--   `timeSubmitted` datetime NOT NULL,
+--   `itemStatus` varchar(50) NOT NULL,
+--   PRIMARY KEY (`submissionID`),
+--   FOREIGN KEY (`migrantID`) references user (`username`)
+-- ) ;
 
 
 -- INSERT values
@@ -278,8 +279,8 @@ INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('
 -- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'wishlist', '9', '1');
 
 -- for newcarousel table
-INSERT INTO newcarousel (`donorID`, `submissionID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES
-(92251521, '2022-02-15 21:35:42 92251521', 'Toothbrush', 'Toiletries', '2022-02-15 21:35:42', 'available');
+-- INSERT INTO newcarousel (`donorID`, `submissionID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES
+-- (92251521, '2022-02-15 21:35:42 92251521', 'Toothbrush', 'Toiletries', '2022-02-15 21:35:42', 'available');
 
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
@@ -472,4 +473,4 @@ INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
 ('Sim Card', 'Others', 'Others'),
 ('Care Pack', 'Others', 'Others');
 
-select * from categoryitem;
+select * from carousel;

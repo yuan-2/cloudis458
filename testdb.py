@@ -9,6 +9,7 @@ import bcrypt
 import os
 import sys
 from os import environ
+from sqlalchemy import ForeignKey
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -28,8 +29,6 @@ class CarouselItem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     itemName = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.String(300), nullable=False)
-    donorName = db.Column(db.String(50), nullable=False)
     donorAddr = db.Column(db.String(300), nullable=False)
     contactNo = db.Column(db.String(20), nullable=False)
     category = db.Column(db.String(20), nullable=False)
@@ -41,11 +40,9 @@ class CarouselItem(db.Model):
     itemStatus = db.Column(db.String(50), nullable=False)
     fileName = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, id, itemName, description, donorName, donorAddr, contactNo, category, subCat, quantity, requireDelivery, region, timeSubmitted, itemStatus, fileName):
+    def __init__(self, id, itemName, donorAddr, contactNo, category, subCat, quantity, requireDelivery, region, timeSubmitted, itemStatus, fileName):
         self.id = id
         self.itemName = itemName
-        self.description = description
-        self.donorName = donorName
         self.donorAddr = donorAddr
         self.contactNo = contactNo
         self.category = category
@@ -58,7 +55,7 @@ class CarouselItem(db.Model):
         self.fileName = fileName
 
     def json(self):
-        return {"id": self.id, "itemName": self.itemName, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "subcat": self.subCat, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
+        return {"id": self.id, "itemName": self.itemName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "subcat": self.subCat, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
 
 class WishList(db.Model):
     __tablename__ = 'wishlist'
@@ -130,7 +127,26 @@ class User(db.Model):
     def json(self):
         return {"username": self.username, "password": self.password, "userType": self.userType}
 
-# get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
+class Request(db.Model):
+    __table__ = 'request'
+    
+    reqId = db.Column(db.Integer, primary_key=True, nullable=False)
+    requestorContactNo = db.Column(db.Integer, nullable=False)
+    deliveryLocation = db.Column(db.String(300), nullable=False)
+    itemId = db.Column(db.Integer, nullable=False)
+    requestQty = db.Column(db.Integer, nullable=False)
+    timeSubmitted = db.Column(db.Date, nullable=False)
+    
+    def __init__(self, reqId, requestorContactNo, deliveryLocation, itemId, requestQty, timeSubmitted):
+        self.reqId = reqId
+        self.requestorContactNo = requestorContactNo
+        self.deliveryLocation = deliveryLocation
+        self.itemId = itemId
+        self.requestQty = requestQty
+        self.timeSubmitted = timeSubmitted
+        
+    def json(self):
+        return {"reqId": self.reqId, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, "itemId": self.itemId, "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
 
 
 @app.route("/getItems")
@@ -312,8 +328,6 @@ def addCarouselItem():
         formDict = formData.to_dict()
         imgFile = request.files['file']
         itemName = formDict['itemName'].capitalize()
-        itemDesc = formDict['itemDesc'].capitalize()
-        donorName = formDict['dName'].capitalize()
         donorAddr = formDict['dAddress'].capitalize()
         contactNo = formDict['dContact']
         category = formDict['category'].capitalize()
@@ -333,7 +347,41 @@ def addCarouselItem():
         # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
         file = formDict['itemImg']
 
-        addtodb = CarouselItem(0, itemName, itemDesc, donorName, donorAddr, contactNo, category, subCat, quantity, requireDelivery, region, timeSubmitted, "open", file)
+        addtodb = CarouselItem(0, itemName, donorAddr, contactNo, category, subCat, quantity, requireDelivery, region, timeSubmitted, "open", file)
+        
+        try:
+            db.session.add(addtodb)
+            db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Item Successfully added into Donation Listing"
+                }
+            )
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while adding donation, please try again later"
+                }
+            ), 500
+            
+@app.route("/addRequest", methods=['POST'])
+def addNewRequest():
+        formData = request.form
+        formDict = formData.to_dict()
+        id = formDict['id']
+        destination = formDict['destination'].capitalize()
+        contact = formDict['contact']
+        iQuantity = formDict['iQuantity']
+
+        # Get datetime of donation posting
+        now = datetime.now()
+        currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
+        timeSubmitted = currentDT
+
+        addtodb = Request(0, contact, destination, id, iQuantity, timeSubmitted)
         
         try:
             db.session.add(addtodb)
