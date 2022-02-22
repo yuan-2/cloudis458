@@ -88,14 +88,16 @@ DROP TABLE IF EXISTS `matches`;
 CREATE TABLE IF NOT EXISTS `matches` (
   `matchID` int NOT NULL AUTO_INCREMENT,
   `reqID` int NOT NULL,
---   `requestorName` varchar(50) NOT NULL,
   `requestorContactNo` int NOT NULL,
-  `donorName` varchar(50) NOT NULL,
   `donorContactNo` int NOT NULL,
   `requestedItem` varchar(50) NOT NULL,
   `itemCategory` varchar(50) NOT NULL,
   `matchDate` datetime NOT NULL,
-  PRIMARY KEY (`matchID`)
+  PRIMARY KEY (`matchID`),
+  FOREIGN KEY fk_1 (`reqID`) references request (`reqID`)
+  FOREIGN KEY fk_2 (`requestorContactNo`) references user (`username`)
+  FOREIGN KEY fk_3 (`donorContactNo`) references newcarousel (`donorID`),
+  FOREIGN KEY fk_4 (`itemCategory`) references categoryitem (`attachedCategory)
 ) ;
 
 
@@ -218,6 +220,8 @@ INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmit
 -- for user table
 -- INSERT INTO user(`username`, `password`, `userType`) VALUES 
 -- (93261073, ENCRYPT('cheah1124'), 'admin');
+INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('12345678', 'test', 'migrantworker');
+INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('87654321', 'test2', 'migrantworker');
 
 -- for category table 
 -- INSERT INTO category(`categoryName`) VALUES ('Food');
@@ -272,16 +276,21 @@ INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '5', 'can make teeth sparkle sparkle');
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '6', '3');
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'donate', '7', 'Arranged by donor');
--- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'wishlist', '8', 'pasir ris');
--- INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 93213234', 'wishlist', '9', '1');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '8', 'pasir ris');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '9', '1');
 
 -- for newcarousel table
 INSERT INTO newcarousel (`donorID`, `submissionID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES
 (92251521, '2022-02-15 21:35:42 92251521', 'Toothbrush', 'Toiletries', '2022-02-15 21:35:42', 'available');
 
+-- for newwishlist table
+INSERT INTO newwishlist (`submissionID`, `migrantID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES 
+('test', 12345678, 'shirt', 'clothing', now(), 'available');
+
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `attachedcategory`) VALUES
-('Toothbrush', 'Toiletries'), ('Blender', 'Electronics'), ('Television', 'Electronics'), ('T-Shirt', 'Clothes')
-;
+('Toothbrush', 'Toiletries'), ('Blender', 'Electronics'), ('Television', 'Electronics'), ('T-Shirt', 'Clothes');
+
+
 
 select * from user;

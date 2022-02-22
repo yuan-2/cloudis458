@@ -1,5 +1,47 @@
-// get requests for specific item, then get each eligibility of migrant worker, then compare their eligibilities
+// 1. get list of migrant workers who wants the item (from request table) & have the highest priority
+// first criteria is the no. of times migrant worker gotten an item before
+function getAllMWReqForItem(itemID) {
+    $(async () => {
+        var serviceURL = "http://127.0.0.1:5000/getRankByReqHistory/" + itemID;
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json'},
+            });
+            const result = await response.json();
+            if (response.status == 200) {
+                // success case
+                // document.getElementById("quantity").value = result.data.requestQty;
+                listofMW = result.data;
+            }
+            if (response.status == 404) {
+                alert('There is no such request ID in the database, please enter a valid ID.')
+            }
+        }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem retrieving the data, please try again later.');
+        } // error
+    })
+}
 
+// 2. afterwards, check each MW whether if anyone opted for self pick-up & prioritise them first
+// else, continue with the current list of MWs
+
+// 3. check for the list of MWs, how long since each of them have gotten an item
+
+// 4. check how far is MW away from delivery driver
+
+
+// 2. for each migrant worker, check their eligibility (get their no.)
+
+
+// 3. find the highest prioritised migrant worker and match the mw to the item/donor
+
+// get requests for specific item, then get each eligibility of migrant worker, then compare their eligibilities
 function matchItem(item) {
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/getRequests/" + item;
