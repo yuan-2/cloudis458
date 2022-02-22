@@ -104,58 +104,6 @@
             <hr>
             <br>
             <div id="edit-section" style="display: none">
-                <div class="row">
-                    <div class="col-2">
-                        <label for="itemID">Item ID</label>
-                        <input class="form-control mb-2" type="number" placeholder="Item ID" id="itemID" onchange="fillInventoryDetails(this.value)">
-                    </div>
-                    <div class="col-4">
-                        <label for="itemName">Item Name</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Name" id="itemName">
-                    </div>
-                    <div class="col-6">
-                        <label for="description">Description</label>
-                        <input class="form-control mb-2" type="text" placeholder="Description" id="description">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <label for="donorName">Donor Name</label>
-                        <input class="form-control mb-2" type="text" placeholder="Donor Name" id="donorName">
-                    </div>
-                    <div class="col-4">
-                        <label for="donorAddr">Donor Address</label>
-                        <input class="form-control mb-2" type="text" placeholder="Donor Address" id="donorAddr">
-                    </div>
-                    <div class="col-4">
-                        <label for="contactNo">Contact No.</label>
-                        <input class="form-control mb-2" type="text" placeholder="Contact No." id="contactNo">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-4">
-                        <label for="category">Item Category</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="category">
-                    </div>
-                    <div class="col-2">
-                        <label for="quantity">Quantity</label>
-                        <input class="form-control mb-2" type="number" placeholder="Quantity" id="quantity">
-                    </div>
-                    <div class="col-2">
-                        <label for="requireDelivery">Require Delivery?</label>
-                        <input class="form-control mb-2" type="text" placeholder="Require Delivery?" id="requireDelivery">
-                    </div>
-                    <div class="col-2">
-                        <label for="region">Region</label>
-                        <input class="form-control mb-2" type="text" placeholder="Region" id="region">
-                    </div>
-                    <div class="col-2">
-                        <label for="itemStatus">Item Status</label>
-                        <input class="form-control mb-2" type="text" placeholder="Status" id="itemStatus">
-                    </div>
-                </div>
-                <br>
-                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editInventory()">Save Changes</button>
             </div>
             <div class="row" style="display: none" id="edit-photo">
                 <div class="col-2">
@@ -167,7 +115,7 @@
                     <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto">
                 </div>
                 <br>
-                <button type="button" id="save-btn" class="btn btn-outline-secondary col-2" onclick="editPhotoFile()">Save Changes</button>
+                <button type='button' id='save-btn' class='btn btn-outline-secondary col-2' onclick='editPhotoFile()'>Save Changes</button>
             </div>
         </div>
     </section>
@@ -177,46 +125,28 @@
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap5.min.js"></script>
+    <script src="../assets/js/form.js"></script>
 
     <script>
         var columns = [];
 
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getAllItems",
+                url: "http://127.0.0.1:5000/getFormAnswers/donate",
                 success: function (data) {
-                    columnNames = Object.keys(data.data.items[0]);
-                    // items = data.data.items;
-                    // console.log(data.data.items)
-                    // editFields = "";
+                    columnNames = Object.values(data.columnHeaders);
                     for (var i in columnNames) {
                         columns.push({data: columnNames[i], 
                                     title: columnNames[i]});
                     }
                     var table = $('#inventory').DataTable( {
-                        data: data.data.items,
+                        data: data.data,
                         columns: columns,
                         fixedHeader: true,
                     } );
-                    // console.log(columnNames);
-                    // inputType = "";
-                    // for (var j in items) {
-                    //     if ((typeof items[j].value) === 'string' || typeof items[j].value === 'file') {
-                    //         inputType = 'text';
-                    //     }
-                    //     else if ((typeof items[j].value) === 'number') {
-                    //         inputType = 'number';
-                    //     }
-                    //     if (j % 3 == 0) {
-                    //         editFields += "<div class='row'>" + 
-                    //                             "<div class='col-2'>" +
-                    //                                 "<label for='itemID'>Item ID</label>" +
-                    //                                 "<input class='form-control mb-2' type='number' placeholder='Item ID' id='itemID' onchange='fillInventoryDetails(this.value)'>" +
-                    //                         "</div>";
-
-                    //     }
-
-                    // }
+                    fields = data.data[0];
+                    fields["columnDetails"] = data.columnHeaders;
+                    getEditDetails(fields);
                 }
             });
         }
@@ -224,6 +154,146 @@
         $(document).ready(function() {
             getDT();
         } );
+
+        function editSpecificRow() {
+            // console.log(document.getElementById("7"));
+            document.getElementById("edit-section").innerHTML += "<br>" + 
+                                                                    "<button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='editInventory()'>Save Changes</button>" 
+            document.getElementById("edit-section").style.display = "block";
+            document.getElementById("7").setAttribute("onchange", "fillInventoryDetails(this.value)");
+            document.getElementById("edit-photo").style.display = "none";
+        }
+
+        function fillInventoryDetails(val) {
+            $(async () => {
+                var serviceURL = "http://127.0.0.1:5000/getFormAnswers/donate/" + val;
+                try {
+                    const response =
+                    await fetch(
+                        serviceURL, { 
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json'},
+                    });
+                    const result = await response.json();
+                    if (response.status == 200) {
+                        // success case
+                        for (var i in result.data) {
+                            // field = result.data[i];
+                            for (id in result.columnHeaders) {
+                                if (result.columnHeaders[id] == i) {
+                                    document.getElementById(id).value = result.data[i];
+                                }
+                            }
+                            // if (i != "fileName" && i != "id" && i != "timeSubmitted") {
+                            //     document.getElementById(i).value = result.data[i];
+                            // }
+                        }
+                    }
+                    if (response.status == 404) {
+                        alert('There is no such request ID in the database, please enter a valid ID.')
+                    }
+                }
+                catch (error) {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    alert('There is a problem retrieving the data, please try again later.');
+                } // error
+            });
+
+        }
+
+        function editInventory() {
+            var inputFields = document.getElementById("edit-section").children;
+            var data = {}
+            var submissionID = document.querySelector('[placeholder="submissionID"]').value;
+            for (var i in inputFields) {
+                input = inputFields[i];
+                inputChildrenCount = input.childElementCount;
+                inputChildren = inputFields[i].children;
+                if (inputChildrenCount > 0) {
+                    inputChildElement = inputChildren[1]
+                    data[inputChildElement.id] = inputChildElement.value
+                }
+            }
+            var jsondata = JSON.stringify(data);
+            $(async () => {
+                var serviceURL = "http://127.0.0.1:5000/updateFormAnswer/donate/" + submissionID;
+                try {
+                    const response =
+                    await fetch(
+                        serviceURL, { 
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json'},
+                        body: jsondata,
+                    });
+                    const result = await response.json();
+                    if (response.status == 200) {
+                        // success case
+                        alert('Successfully updated data in database. Please refresh to view changes.')
+                        window.location.reload();
+                    }
+                }
+                catch (error) {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    alert('There is a problem updating the data, please try again later.');
+                } // error
+            });    
+
+        }
+
+        function editPhoto() {
+            document.getElementById("edit-section").style.display = "none";
+            document.getElementById("edit-photo").style.display = "block";
+        }
+
+        function editPhotoFile() {
+            var data = {};
+            var editElements = document.getElementById("edit-photo").children;
+            for (child in editElements) {
+                // console.log(editElements[child].children);
+                childElement = editElements[child].children;
+                if (childElement != undefined) {
+                    for (innerChild in childElement) {
+                        if (childElement[innerChild].type == 'number') {
+                            data['id'] = childElement[innerChild].value;
+                        }
+                        else if (childElement[innerChild].type == 'file') {
+                            data[childElement[innerChild].name] = childElement[innerChild].files[0].name;
+                            data['file'] = childElement[innerChild].files[0];
+                        }
+                    }
+                }
+            }
+            var jsondata = JSON.stringify(data);
+            $(async () => {
+                var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + data.id;
+                try {
+                    const response =
+                    await fetch(
+                        serviceURL, { 
+                        method: 'POST',
+                        mode: 'no-cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: jsondata,
+                    });
+                    const result = await response.json();
+                    if (response.status == 200) {
+                        // success case
+                        alert('Successfully updated photo in database. Please refresh to view changes.')
+                        window.location.reload();
+                    }
+                }
+                catch (error) {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    alert('There is a problem updating the data, please try again later.');
+                } // error
+            });
+        }
 
 
     </script>

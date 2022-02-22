@@ -33,11 +33,34 @@ async function retrieveForm(formName) {
                     buildNumber(field);
                 }
             }
+
             
-            // if admin page --> change as needed or check if admin is logged in
-            if (window.location.href.indexOf("admin") > -1) {
-                addIcons();
+            // if edit page --> change as needed
+            if($('body').is('.editForm')){
+                addIcons(formName);
             }
+            
+            // compulsory fields
+            var contactField = `<label for="contactNo" class="form-label">Contact Number</label>
+                                <input required type="number" class="form-control" id="contactNo">`
+
+            var itemFields = `<!--On change of this dropdown, auto get item names listed under this category-->
+                            <div class="col-6">
+                                <label for="itemCategoryOptions" class="form-label">Item Category</label>
+                                <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions" required>
+                                    <!--Dynamically dropdown categories listed in existing db-->
+                                </select>
+                            </div>
+                            <!--Option value for item name needs to be dynamic, based on category-->
+                            <div class="col-6">
+                                <label for="itemNameOptions" class="form-label">Item Name</label>
+                                <select class="form-select" id="itemNameOptions" required>
+                                    <!--Dynamically update item names-->
+                                </select>
+                            </div>`;
+
+            document.getElementById('contactField').innerHTML += contactField;
+            document.getElementById(formName).innerHTML += itemFields;
         }
     } catch (error) {
         // Errors when calling the service; such as network error, 
@@ -59,7 +82,7 @@ function buildRadio(field) {
     for (var option of options) {
         radioField +=
             `<label class="radio-inline" style="padding-right: 7px;" >
-                        <input class="form-check-input" type="radio" name="${field.fieldID}" value="${option}"> ${option}
+                        <input required class="form-check-input" type="radio" name="${field.fieldID}" value="${option}"> ${option}
                     </label>`;
     }
 
@@ -71,7 +94,7 @@ function buildRadio(field) {
 function buildText(field) {
     var textField = `<div class="col-md-6">
                         <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
-                        <input type="text" class="form-control" id="${field.fieldID}" placeholder="${field.placeholder}">
+                        <input required type="text" class="form-control" id="${field.fieldID}" placeholder="${field.placeholder}">
                     </div>`;
 
 
@@ -81,7 +104,7 @@ function buildText(field) {
 function buildNumber(field) {
     var numField = `<div class="col-md-6">
                         <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
-                        <input type="number" class="form-control" id="${field.fieldID}">
+                        <input required type="number" class="form-control" id="${field.fieldID}">
                     </div>`;
 
 
@@ -92,7 +115,7 @@ function buildFile(field) {
     var fileField = `<div class="col-6">
                         <div class="form-group">
                             <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
-                            <input type="file" class="form-control-file" id="${field.fieldID}" style="display:block">
+                            <input required type="file" class="form-control-file" id="${field.fieldID}" style="display:block">
                         </div>
                     </div>`;
 
@@ -103,7 +126,7 @@ function buildDropdown(field) {
     var dropdownField = `
             <div class="col-6">
               <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
-              <select class="form-select" id="${field.fieldID}">`;
+              <select required class="form-select" id="${field.fieldID}">`;
 
     if (field.options !== null) {
         var options = field.options.split(";");
@@ -140,8 +163,8 @@ function buildCheckbox(field) {
 }
 
 // add edit icons to each field
-function addIcons() {
-    $('#donate').find('input, select').each(function() {
+function addIcons(formName) {
+    $(`#${formName}`).find('input, select').each(function() {
         var fieldID = $(this).attr("name");
         if (fieldID === undefined) {
             fieldID = $(this).attr("id");
@@ -156,7 +179,7 @@ function addIcons() {
 //#endregion
 
 // POPULATING ITEM CATEGORIES AND NAMES DROPDOWN LISTS
-//#region 
+//#region
 function checkLogin() {
 
     getDropDownCat().then(function autoPopCategories(result) {
@@ -245,7 +268,7 @@ function removeOption(elem){
 }
 //#endregion
 
-// FORM CRUD
+// FIELD CUD
 //#region 
 async function addField(formName, fieldID="") {
     var fieldName = $('#fieldName').val();
@@ -325,12 +348,17 @@ async function editField(fieldID) {
             }
 
             showFieldType();
+            if ($('#deleteFieldBtn').length == 0) {
+                $('#editHeader').append(`<div class="col-md-6">
+                                        <button type="button" class="btn btn-danger float-end" id="deleteFieldBtn">Delete Field</button>
+                                    </div>`);
+                $('#addFieldBtn').text("Save Changes");
+                $('#editField').html("Edit Field");
+            }
             
-            $('#editHeader').append(`<div class="col-md-6">
-                                        <button type="button" class="btn btn-danger float-end" onclick="deleteField(${field.fieldID})" id="deleteFieldBtn">Delete Field</button>
-                                    </div>`)
+            $('#deleteFieldBtn').attr("onclick", `deleteField(${field.fieldID})`);
             $('#addFieldBtn').attr("onclick", `addField('${field.formName}', '/${field.fieldID}')`);
-            $('#addFieldBtn').text("Save Changes");
+            document.getElementById('editField').scrollIntoView();
         }
     } catch (error) {
         // Errors when calling the service; such as network error, 
