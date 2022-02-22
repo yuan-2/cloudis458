@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `matches` (
   FOREIGN KEY fk_1 (`reqID`) references request (`reqID`)
   FOREIGN KEY fk_2 (`requestorContactNo`) references user (`username`)
   FOREIGN KEY fk_3 (`donorContactNo`) references newcarousel (`donorID`),
-  FOREIGN KEY fk_4 (`itemCategory`) references categoryitem (`attachedCategory)
+  FOREIGN KEY fk_4 (`itemCategory`) references categoryitem (`attachedCategory`)
 ) ;
 
 
