@@ -48,14 +48,14 @@ CREATE TABLE IF NOT EXISTS `driver` (
   FOREIGN KEY (`contactNo`) references user (`username`)
 ) ;
 
-DROP TABLE IF EXISTS `migrantworker`;
-CREATE TABLE IF NOT EXISTS `migrantworker` (
-  `contactNo` int NOT NULL,
-  `address` varchar(300) NOT NULL,
-  `reqHistory` varchar(50) NOT NULL,
-  PRIMARY KEY (`contactNo`),
-  FOREIGN KEY (`contactNo`) REFERENCES user (`username`)
-) ;
+-- DROP TABLE IF EXISTS `migrantworker`;
+-- CREATE TABLE IF NOT EXISTS `migrantworker` (
+--   `contactNo` int NOT NULL,
+--   `address` varchar(300) NOT NULL,
+--   `reqHistory` varchar(50) NOT NULL,
+--   PRIMARY KEY (`contactNo`),
+--   FOREIGN KEY (`contactNo`) REFERENCES user (`username`)
+-- ) ;
 
 DROP TABLE IF EXISTS `request`;
 CREATE TABLE IF NOT EXISTS `request` (
@@ -85,23 +85,6 @@ CREATE TABLE IF NOT EXISTS `delivery` (
 --   PRIMARY KEY (`categoryid`)
 -- ) ;
 
-DROP TABLE IF EXISTS `matches`;
-CREATE TABLE IF NOT EXISTS `matches` (
-  `matchID` int NOT NULL AUTO_INCREMENT,
-  `reqID` int NOT NULL,
-  `requestorContactNo` int NOT NULL,
-  `donorContactNo` int NOT NULL,
-  `requestedItem` varchar(50) NOT NULL,
-  `itemCategory` varchar(50) NOT NULL,
-  `matchDate` datetime NOT NULL,
-  PRIMARY KEY (`matchID`),
-  FOREIGN KEY fk_1 (`reqID`) references request (`reqID`),
-  FOREIGN KEY fk_2 (`requestorContactNo`) references user (`username`),
-  FOREIGN KEY fk_3 (`donorContactNo`) references newcarousel (`donorID`),
-  FOREIGN KEY fk_4 (`itemCategory`) references categoryitem (`attachedCategory`)
-) ;
-
-
 -- DROP TABLE IF EXISTS `fixedItem`;
 -- CREATE TABLE IF NOT EXISTS `fixedItem` (
 --   `itemID` int NOT NULL AUTO_INCREMENT,
@@ -112,10 +95,10 @@ CREATE TABLE IF NOT EXISTS `matches` (
 
 DROP TABLE IF EXISTS `categoryitem`;
 CREATE TABLE IF NOT EXISTS `categoryitem` (
-  `itemid` int NOT NULL AUTO_INCREMENT,
-  `itemname` varchar(50) NOT NULL,
+  `itemID` int NOT NULL AUTO_INCREMENT,
+  `itemName` varchar(50) NOT NULL,
   `category` varchar(50) NOT NULL,
-  `subcat` varchar(50) NOT NULL,
+  `subCat` varchar(50) NOT NULL,
   PRIMARY KEY (`itemid`)
 ) ;
 
@@ -138,16 +121,6 @@ CREATE TABLE IF NOT EXISTS `formbuilder` (
   `options` varchar(200),
   PRIMARY KEY (`fieldID`)
 ) ;
-
--- DROP TABLE IF EXISTS `criteria`;
--- CREATE TABLE IF NOT EXISTS `criteria` (
---   `migrantID` int NOT NULL,
---   `successMatchCount` varchar(15) NOT NULL,
---   `failMatchCount` varchar(15) NOT NULL,
---   `daysFromLastItem` varchar(50) NOT NULL,
---   PRIMARY KEY (`migrantID`),
---   FOREIGN KEY (`migrantID`) references migrantworker (`contactNo`)
--- ) ;
 
 DROP TABLE IF EXISTS `formanswers`;
 CREATE TABLE IF NOT EXISTS `formanswers` (
@@ -184,6 +157,18 @@ CREATE TABLE IF NOT EXISTS `newwishlist` (
   FOREIGN KEY (`migrantID`) references user (`username`)
 ) ;
 
+DROP TABLE IF EXISTS `matches`;
+CREATE TABLE IF NOT EXISTS `matches` (
+  `matchID` int NOT NULL AUTO_INCREMENT,
+  `reqID` int NOT NULL,
+  `requestorContactNo` int NOT NULL,
+  `donorContactNo` int NOT NULL,
+  `requestedItem` varchar(50) NOT NULL,
+  `matchDate` datetime NOT NULL,
+  PRIMARY KEY (`matchID`),
+  FOREIGN KEY fk_1 (`reqID`) references request (`reqID`),
+  FOREIGN KEY fk_2 (`requestorContactNo`) references user (`username`)
+) ;
 
 -- INSERT values
 
