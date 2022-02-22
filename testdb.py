@@ -33,6 +33,7 @@ class CarouselItem(db.Model):
     donorAddr = db.Column(db.String(300), nullable=False)
     contactNo = db.Column(db.String(20), nullable=False)
     category = db.Column(db.String(20), nullable=False)
+    subCat = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     requireDelivery = db.Column(db.Integer, nullable=False)
     region = db.Column(db.String(20), nullable=False)
@@ -40,7 +41,7 @@ class CarouselItem(db.Model):
     itemStatus = db.Column(db.String(50), nullable=False)
     fileName = db.Column(db.String(200), nullable=False)
 
-    def __init__(self, id, itemName, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, fileName):
+    def __init__(self, id, itemName, description, donorName, donorAddr, contactNo, category, subCat, quantity, requireDelivery, region, timeSubmitted, itemStatus, fileName):
         self.id = id
         self.itemName = itemName
         self.description = description
@@ -48,6 +49,7 @@ class CarouselItem(db.Model):
         self.donorAddr = donorAddr
         self.contactNo = contactNo
         self.category = category
+        self.subCat = subCat
         self.quantity = quantity
         self.requireDelivery = requireDelivery
         self.region = region
@@ -56,7 +58,7 @@ class CarouselItem(db.Model):
         self.fileName = fileName
 
     def json(self):
-        return {"id": self.id, "name": self.itemName, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
+        return {"id": self.id, "itemName": self.itemName, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "subcat": self.subCat, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
 
 class WishList(db.Model):
     __tablename__ = 'wishlist'
@@ -69,7 +71,7 @@ class WishList(db.Model):
     timeSubmitted = db.Column(db.Date, nullable=False)
     itemStatus = db.Column(db.String(50), nullable=False)
     
-    def __inti__(self, id, itemName, quantity, remarks, category, timeSubmitted, itemStatus):
+    def __init__(self, id, itemName, quantity, remarks, category, timeSubmitted, itemStatus):
         self.id = id
         self.itemName = itemName
         self.quantity = quantity
@@ -99,16 +101,19 @@ class WishList(db.Model):
 class CategoryItem(db.Model):
     __tablename__ = 'categoryitem'
 
-    itemId = db.Column(db.Integer, nullable=False)
-    itemName = db.Column(db.String, primary_key=True)
-    attachedCategory = db.Column(db.String, primary_key=True)
+    itemId = db.Column(db.Integer, nullable=False, primary_key=True)
+    itemName = db.Column(db.String, nullable=False)
+    category = db.Column(db.String, nullable=False)
+    subCat = db.Column(db.String, nullable=False)
 
-    def __init__(self, itemName, attachedCategory):
+    def __init__(self, itemId, itemName, category, subCat):
+        self.itemId = itemId
         self.itemName = itemName
-        self.attachedCategory = attachedCategory
+        self.category = category
+        self.subCat = subCat
 
     def json(self):
-        return {"itemId": self.itemId, "itemName": self.itemName, "attachedCategory": self.attachedCategory}
+        return {"itemId": self.itemId, "itemName": self.itemName, "category": self.category, "subCat": self.subCat}
     
 class User(db.Model):
     __tablename__ = 'user'
@@ -148,6 +153,26 @@ def getAllItems():
         }
     ), 404
     
+@app.route("/getItemsBySubCat/<subcat>")
+def filterItems(subcat):
+    carouselList = CarouselItem.query.filter_by(subCat=subcat)
+    # print(carouselList)
+    if (carouselList or len(carouselList)):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "items": [carouselItem.json() for carouselItem in carouselList]
+                }
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "There are no items donated under this Sub-category"
+        }
+    ), 404
+    
     
 @app.route("/getWL")
 def getWishListItems():
@@ -174,7 +199,6 @@ def getWishListItems():
 @app.route("/getItemById/<id>")
 def getItem(id):
     itemInfo = CarouselItem.query.filter_by(id=id)
-    # print(carouselList)
     if (itemInfo):
         return jsonify(
             {
@@ -190,9 +214,7 @@ def getItem(id):
             "message": "Item ID does not seem to exist."
         }
     ), 404
-
-
-# get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 and filtered by category (time logic not done)
+# API for search function
 @app.route("/getItem/<Cat>")
 def getItemsByCategory(Cat):
     itemList = CarouselItem.query.filter_by(category=Cat)
@@ -218,7 +240,7 @@ def getItemsByCategory(Cat):
 @app.route("/getCat")
 def getAllCat():
     categoryList = CategoryItem.query.with_entities(
-        CategoryItem.attachedCategory).distinct()
+        CategoryItem.category).distinct()
     # print(categoryList)
     if (categoryList):
         return jsonify(
@@ -239,10 +261,29 @@ def getAllCat():
 
 # get all exisitng categories to be displayed in drop down fields
 
+@app.route("/getSubCat/<cat>")
+def getSubCat(cat):
+    subCats = CategoryItem.query.filter_by(category=cat)
+    
+    if (subCats):
+        return jsonify(
+            {
+                "code": 200,
+                "data": {
+                    "subcats": [subcat.json() for subcat in subCats]
+                }
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Error retrieving Subcatogories."
+        }
+    ), 404
 
-@app.route("/getItemsInCat/<cat>")
-def getItemsInCategory(cat):
-    itemsInCategory = CategoryItem.query.filter_by(attachedCategory=cat)
+@app.route("/getItemsInSubCat/<subcat>")
+def getItemsInSubCat(subcat):
+    itemsInCategory = CategoryItem.query.filter_by(subCat=subcat)
     # print(itemsInCategory)
 
     if (itemsInCategory):
@@ -257,9 +298,10 @@ def getItemsInCategory(cat):
     return jsonify(
         {
             "code": 404,
-            "message": "Please make sure the py file is running to view items in each category."
+            "message": "Error retreiving Items in Subcategories."
         }
     ), 404
+
 
 # API to add item into carousel table from donor form
 
@@ -269,13 +311,13 @@ def addCarouselItem():
         formData = request.form
         formDict = formData.to_dict()
         imgFile = request.files['file']
-        # print(imgFile)
         itemName = formDict['itemName'].capitalize()
         itemDesc = formDict['itemDesc'].capitalize()
         donorName = formDict['dName'].capitalize()
         donorAddr = formDict['dAddress'].capitalize()
         contactNo = formDict['dContact']
         category = formDict['category'].capitalize()
+        subCat = formDict['subcat'].capitalize()
         quantity = formDict['quantity']
         requireDelivery = formDict['r_Delivery']
         region = formDict['region'].capitalize()
@@ -285,13 +327,13 @@ def addCarouselItem():
         currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
         timeSubmitted = currentDT
         # save file
-        fileName = secure_filename(imgFile.filename)
+        fileName = secure_filename(imgFile.filename.replace(" ", ""))
         # print(formDict)
         imgFile.save(os.path.join(uploads_dir, fileName))
         # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
         file = formDict['itemImg']
 
-        addtodb = CarouselItem(0, itemName, itemDesc, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, "open", file)
+        addtodb = CarouselItem(0, itemName, itemDesc, donorName, donorAddr, contactNo, category, subCat, quantity, requireDelivery, region, timeSubmitted, "open", file)
         
         try:
             db.session.add(addtodb)

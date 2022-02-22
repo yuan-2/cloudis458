@@ -159,9 +159,25 @@
                 <!--On change of this dropdown, auto get item names listed under this category-->
                 <div class="col-6">
                     <label for="itemCategoryOptions" class="form-label">Item Category</label>
-                    <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions"
+                    <select onchange="populateSubCat(this)" class="form-select" id="itemCategoryOptions"
                         name="category" required>
                         <!--Dynamically dropdown categories listed in existing db-->
+                    </select>
+                </div>
+
+                <div class="col-6">
+                    <label for="subCatOptions" class="form-label">Sub-Category</label>
+                    <select onchange="populateItemNames(this)" class="form-select" id="subCatOptions"
+                        name="subcat" required>
+                        <!--Dynamically dropdown subcats listed in existing db-->
+                    </select>
+                </div>
+
+                <!--Option value for item name needs to be dynamic, based on category-->
+                <div class="col-6">
+                    <label for="itemNameOptions" class="form-label">Item Name</label>
+                    <select class="form-select" id="itemNameOptions" name="itemName" required>
+                        <!--Dynamically update item names-->
                     </select>
                 </div>
 
@@ -174,13 +190,6 @@
                     </div>
                 </div>
 
-                <!--Option value for item name needs to be dynamic, based on category-->
-                <div class="col-6">
-                    <label for="itemNameOptions" class="form-label">Item Name</label>
-                    <select class="form-select" id="itemNameOptions" name="itemName" required>
-                        <!--Dynamically update item names-->
-                    </select>
-                </div>
                 <div class="col-6">
                     <label for="itemDescription" class="form-label">Description</label>
                     <input type="text" class="form-control" id="itemDescription" name="itemDesc"
@@ -308,6 +317,8 @@
 
         var itemNameOptions = document.getElementById("itemNameOptions")
 
+        var subCatOptions = document.getElementById('subCatOptions')
+
         function checkLogin() {
             if (sessionStorage.getItem("user") != null) {
                 user = JSON.parse(sessionStorage.getItem("user"))
@@ -321,6 +332,8 @@
                     itemCategoryOptions.innerHTML = ""
 
                     itemNameOptions.innerHTML = ""
+
+                    subCatOptions.innerHTML = ""
 
                     // Start off with an empty selected option for category
                     itemCategoryOptions.innerHTML += `<option selected> </option>`
@@ -346,10 +359,31 @@
             }
         }
 
+        async function populateSubCat(cat) {
+            itemNameOptions.innerHTML = ""
+            subCatOptions.innerHTML = ""
+            cat = cat.value
+            let response = await fetch("http://127.0.0.1:5004/getSubCat/" + cat)
+            let responseCode = await response.json()
+
+            if (responseCode.code == 200) {
+                subCatOptions.innerHTML += "<option selected> </option>"
+                let subCatArr = []
+                for (subcat of responseCode.data.subcats) {
+                    if (!subCatArr.includes(subcat.subCat)) {
+                        subCatArr.push(subcat.subCat)
+                    }
+                }
+                for (sub of subCatArr) {
+                    subCatOptions.innerHTML += `<option value="${sub}">${sub}</option>`
+                }
+            }
+        }
+
         async function populateItemNames(cat) {
             itemNameOptions.innerHTML = ""
             cat = cat.value
-            let response = await fetch("http://127.0.0.1:5004/getItemsInCat/" + cat)
+            let response = await fetch("http://127.0.0.1:5004/getItemsInSubCat/" + cat)
             let responseCode = await response.json()
 
             if (responseCode.code == 200) {
@@ -375,7 +409,10 @@
                         "']:checked").value)
                     // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
                 } else if (donateFormElements[ele].type == "file") {
-                    formData.append(donateFormElements[ele].name, donateFormElements[ele].files[0].name)
+                    fileName = donateFormElements[ele].files[0].name
+                    // Replace empty spaces for filename
+                    fileName = fileName.replace(/\s+/g, '')
+                    formData.append(donateFormElements[ele].name, fileName)
                     formData.append("file", donateFormElements[ele].files[0])
                 } else {
                     formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
