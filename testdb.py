@@ -1,4 +1,5 @@
 from distutils.command.upload import upload
+import json
 from urllib import response
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -56,7 +57,7 @@ class CarouselItem(db.Model):
 
     def json(self):
         return {"id": self.id, "itemName": self.itemName, "donorAddr": self.donorAddr, "contactNo": self.contactNo, "category": self.category, "subcat": self.subCat, "quantity": self.quantity, "requireDelivery": self.requireDelivery, "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
-
+    
 class WishList(db.Model):
     __tablename__ = 'wishlist'
     
@@ -127,13 +128,13 @@ class User(db.Model):
     def json(self):
         return {"username": self.username, "password": self.password, "userType": self.userType}
 
-class Request(db.Model):
-    __table__ = 'request'
+class Worker_Request(db.Model):
+    __tablename__ = 'request'
     
     reqId = db.Column(db.Integer, primary_key=True, nullable=False)
-    requestorContactNo = db.Column(db.Integer, nullable=False)
-    deliveryLocation = db.Column(db.String(300), nullable=False)
-    itemId = db.Column(db.Integer, nullable=False)
+    requestorContactNo = db.Column(db.Integer, ForeignKey('user.username'), nullable=False)
+    deliveryLocation = db.Column(db.Integer, nullable=False)
+    itemId = db.Column(db.Integer, ForeignKey('carousel.id'), nullable=False)
     requestQty = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
     
@@ -250,8 +251,26 @@ def getItemsByCategory(Cat):
         }
     ), 404
 
-# get all exisitng categories to be displayed in drop down fields
+@app.route("/getCatalog")
+def retrieveCatalog():
+    catalog = CategoryItem.query.all()
+    
+    if (catalog):
+        return jsonify(
+            {
+                "code": 200,
+                "items": [catalogitem.json() for catalogitem in catalog]
+            }
+        )
+    else:
+        return jsonify(
+            {
+                "code": 404,
+                "message": "Catalog seems to be empty or the API file is not running"
+            }
+        )
 
+# get all exisitng categories to be displayed in drop down fields
 
 @app.route("/getCat")
 def getAllCat():
@@ -372,7 +391,7 @@ def addNewRequest():
         formData = request.form
         formDict = formData.to_dict()
         id = formDict['id']
-        destination = formDict['destination'].capitalize()
+        destination = formDict['destination']
         contact = formDict['contact']
         iQuantity = formDict['iQuantity']
 
@@ -381,7 +400,7 @@ def addNewRequest():
         currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
         timeSubmitted = currentDT
 
-        addtodb = Request(0, contact, destination, id, iQuantity, timeSubmitted)
+        addtodb = Worker_Request(0, contact, destination, id, iQuantity, timeSubmitted)
         
         try:
             db.session.add(addtodb)
@@ -389,7 +408,7 @@ def addNewRequest():
             return jsonify (
                 {
                     "code": 200,
-                    "message": "Item Successfully added into Donation Listing"
+                    "message": "Request registered successfully!"
                 }
             )
         except Exception as e:
@@ -397,9 +416,66 @@ def addNewRequest():
             return jsonify(
                 {
                     "code": 500,
-                    "message": "An error occurred while adding donation, please try again later"
+                    "message": "An error occurred while registering your request, please try again later"
                 }
             ), 500
+            
+@app.route("/updateItemQuantity", methods=["POST"])
+def updateQuantity():
+    formData = request.form
+    formDict = formData.to_dict()
+    id = formDict['id']
+    reqQty = int(formDict['iQuantity'])
+    
+    cItem = CarouselItem.query\
+        .filter(CarouselItem.id == id).first()
+    cItemJson = cItem.json()
+    cItemQty = int(cItemJson['quantity'])
+    
+    # print(reqQty, cItemQty)
+    
+    if (reqQty > cItemQty):
+        
+        return jsonify(
+            {
+                "code": 500,
+                "message": "Quantity being requested for is more than what is available"
+            }
+        )
+    
+    elif (reqQty < cItemQty and cItemQty - reqQty > 0):
+        
+        currentQty = CarouselItem.query.filter_by(id=id).first()
+        currentQty.quantity = cItemQty - reqQty
+        db.session.commit()
+        
+        return jsonify(
+            {
+                "code": 200,
+                "message": "Carousel has been updated to reflect new quantity"
+            }
+        )
+        
+    elif (cItemQty - reqQty == 0):
+        currentQty = CarouselItem.query.filter_by(id=id).first()
+        currentQty.itemStatus = "closed"
+        db.session.commit()
+        
+        return jsonify(
+            {
+                "code": 201,
+                "message": "Item status has been updated"
+            }
+        )
+    else:
+        return jsonify(
+            {
+                "code": 404,
+                "message": "An error has occured when checking the Carousel table"
+            }
+        )
+    
+            
             
 @app.route("/registermw", methods=['POST'])
 def register():
