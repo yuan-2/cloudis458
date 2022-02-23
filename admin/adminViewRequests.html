@@ -137,7 +137,7 @@
         var columns = [];
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getFormAnswers/request",
+                url: "http://127.0.0.1:5000/getRequests",
                 success: function (data) {
                     columnNames = Object.values(data.columnHeaders);
                     // items = data.data.items;
@@ -157,7 +157,8 @@
                 },
                 error: function () {
                     document.getElementById("edit-btn").style.display = "none";
-                    alert("There are currently no requests to be found.")
+                    document.getElementById("edit-section").innerHTML = "There are currently no requests to be found."
+                    document.getElementById("edit-section").style.display = "block";
                 }
 
             })
