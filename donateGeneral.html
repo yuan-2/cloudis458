@@ -116,11 +116,6 @@
         <div style="max-width: 1000px; margin: auto;">
             <form id="donateForm" class="row g-3" enctype="multipart/form-data">
                 <div class="col-md-6">
-                    <label for="donorFullName" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="donorFullName"
-                        placeholder="Your name or the Organization you are representing" name="dName" required>
-                </div>
-                <div class="col-md-6">
                     <label for="donorContact" class="form-label">Contact Number</label>
                     <input type="text" class="form-control" id="donorContact" placeholder="Enter a valid contact number"
                         name="dContact" required>
@@ -130,7 +125,6 @@
                     <input type="text" class="form-control" id="donorAddress" placeholder="Enter a valid address"
                         name="dAddress" required>
                 </div>
-
                 <div class="col-6">
                     <label class="form-label">Area</label>
                     <br>
@@ -190,11 +184,6 @@
                     </div>
                 </div>
 
-                <div class="col-6">
-                    <label for="itemDescription" class="form-label">Description</label>
-                    <input type="text" class="form-control" id="itemDescription" name="itemDesc"
-                        placeholder="Brief description of the item you are donating">
-                </div>
                 <div class="col-6">
                     <label for="itemQty" class="form-label">Quantity</label>
                     <input type="number" class="form-control" name="quantity" id="itemQty">
@@ -393,8 +382,6 @@
                 }
             }
         }
-
-        const form = document.getElementById("donateForm")
 
         function submitDonation() {
             var donateFormElements = document.forms[0].elements

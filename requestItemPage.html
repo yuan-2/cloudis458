@@ -77,7 +77,8 @@
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
 
-            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;" class="appointment-btn scrollto">Login</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
@@ -95,13 +96,42 @@
 
         <section>
             <div style="max-width: 1000px; margin: auto;">
-                <form id="requestForm" enctype="multipart/form-data" class="row g-3">
+                <div class="row g-3">
                     <div id="itemImage" class="col-md-6"></div>
                     <div id="donorInfo" class="col-md-6"></div>
-                </form>
+                </div>
                 <br>
             </div>
         </section>
+
+        <section id="formDisplay" class="d-none">
+            <div style="max-width: 1000px; margin: auto;">
+                <h2 class="m-4 text-center">Please fill in the following details</h2>
+                <form id="requestForm" class="row g-3">
+                    <div class="col-4">
+                        <label for="contactNo">Requestor Contact:</label>
+                        <input style="width: 300px;" type="text" name="contact" id="contactNo" disabled>
+                    </div>
+                    <div class="col-4">
+                        <label for="dAddress">Delivery Address:</label>
+                        <input style="width: 300px;" type="text" name="destination" id="dAddress">
+                    </div>
+                    <div class="col-4">
+                        <label for="quantity">Required Quantity:</label>
+                        <input style="width: 300px;" type="number" name="iQuantity" id="quantity">
+                    </div>
+                    <div class="col-6">
+                        <input type="hidden" name="id" id="itemid">
+                    </div>
+                    <div class="col-12" style='text-align: center'>
+                        <button type="button" onclick="submitReq()" class="btn btn-outline-light"
+                            style="color:white; background-color: #E3A587;">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+
 
     </main><!-- End #main -->
 
@@ -200,13 +230,12 @@
         var itemReqDisplay = document.getElementById("itemReqDisplay")
         var itemImage = document.getElementById("itemImage")
         var donorInfo = document.getElementById("donorInfo")
-        var itemInfo = ""
+        var formDisplay = document.getElementById('formDisplay')
+        var difference = ""
 
         function checkLoginForReq() {
             if (sessionStorage.getItem("user") != null) {
                 user = JSON.parse(sessionStorage.getItem("user"))
-
-                console.log(user)
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
 
@@ -215,13 +244,12 @@
                 itemId = urlParams.get('id')
 
                 loadItem().then(function retriveInfo(result) {
-                    itemInfo = result
-                    // console.log(itemInfo)
+                    var itemInfo = result
 
                     // item info API Works but request is not done up for dynamic work 
-                    var x = setInterval(function() {
+                    var x = setInterval(function () {
                         for (item of itemInfo) {
-                        itemReqDisplay.innerHTML = `
+                            itemReqDisplay.innerHTML = `
                         <div class="row">
                             <div class="col-sm-12 col-lg-6">
                                 <div class="pt-3">
@@ -232,55 +260,51 @@
                         </div>
                         `
 
-                        itemImage.innerHTML = `
+                            itemImage.innerHTML = `
                         <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
                         `
 
-                        var date = new Date(item.timeSubmitted);
-                        var lastDate = date.setDate(date.getDate() + 1);
-                        var dateNow = Date.now();
-                        var difference = lastDate - dateNow
-                        var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        var mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-                        var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+                            var date = new Date(item.timeSubmitted);
+                            var lastDate = date.setDate(date.getDate() + 1);
+                            var dateNow = Date.now();
+                            difference = lastDate - dateNow
+                            hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                            seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-                        if (item.requireDelivery == 1) {
-                            donorInfo.innerHTML = `
+                            if (item.requireDelivery == 1) {
+                                donorInfo.innerHTML = `
                             <div class="pt-5">
-                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
-                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
                                 <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
+                                <p>Quantity Remaining: <span id="itemQuantity">${item.quantity}</span></p>
                                 <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-outline-success" onclick="reqItem()">Request!</button>
+                                <button class="btn btn-outline-success" onclick="showReqForm()">Request!</button>
                             </div>
                         `
-                        }
-                        else {
-                            donorInfo.innerHTML = `
+                            } else {
+                                donorInfo.innerHTML = `
                             <div class="pt-5">
-                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
-                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
                                 <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
+                                <p>Quantity Remaining: <span id="itemQuantity">${item.quantity}</span></p>
                                 <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-success" onclick="reqItem()">Request!</button>
+                                <button class="btn btn-success" onclick="showReqForm()">Request!</button>
                             </div>
                         `
+                            }
+                            // If the count down is over, show that item has expired and clear interval 
+                            if (difference < 0) {
+                                clearInterval(x);
+                                document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
+                            }
                         }
-                        // If the count down is over, show that item has expired and clear interval 
-                        if (difference < 0) {
-                            clearInterval(x);
-                            document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
-                        }
-                    }
-                    }, 1000)                    
+                    }, 1000)
                 })
-            }
-            else {
-                let confirmMsg = confirm("Only Migrant Workers who are logged in can request for items. Please try logging in again.")
+            } else {
+                let confirmMsg = confirm(
+                    "Only Migrant Workers who are logged in can request for items. Please try logging in again.")
                 if (confirmMsg == true) {
                     window.location.href = "index.html"
-                }
-                else {
+                } else {
                     window.location.href = "index.html"
                 }
             }
@@ -291,21 +315,70 @@
             let responseCode = await response.json()
             if (responseCode.code == 200) {
                 return responseCode.data.itemDetail
-            }
-            else {
+            } else {
                 alert(responseCode.message)
             }
 
         }
-
+        var contactNo = document.getElementById('contactNo')
+        var itemid = document.getElementById('itemid')
+        var timeSubmitted = document.getElementById('timeSubmitted')
         // Request button to POST item request, set alert when timer = 0 to redirect to homepage
-        function reqItem() {
+        function showReqForm() {
             if (difference < 0) {
                 alert("Item has expired, you will be redirected back to the homepage")
                 window.location.href = "index.html"
+            } else {
+                formDisplay.classList.remove('d-none')
+                contactNo.value = user.username
+                itemid.value = itemId
             }
-            else {
-                
+        }
+        const form = document.getElementById('requestForm')
+
+        function submitReq() {
+            reqFormElements = document.forms[0].elements
+
+            var formData = new FormData()
+
+            for (ele in reqFormElements) {
+                eleName = reqFormElements[ele].name
+                eleVal = reqFormElements[ele].value
+
+                formData.append(eleName, eleVal)
+            }
+            addReq(formData, "http://127.0.0.1:5004/addRequest")
+        }
+
+        async function addReq(data, url) {
+
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: data // body data type must match "Content-Type" header
+            });
+
+            if (response.status >= 200 && response.status < 300) {
+                data = await response.json()
+                if (data.code == "200") {
+                    let res = confirm(
+                        "Item has been posted successfully, Click 'cancel' to make another donation or ok to return to the home page"
+                    )
+
+                    if (res) {
+                        window.location.href = "index.html"
+                    } else {
+                        form.reset()
+                    }
+                }
+            } else {
+                data = await response.json()
+                alert(data.message)
+                form.reset()
             }
         }
 
