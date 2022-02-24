@@ -105,17 +105,19 @@
             <br>
             <div id="edit-section" style="display: none">
             </div>
-            <div class="row" style="display: none" id="edit-photo">
-                <div class="col-2">
-                    <label for="itemID">Item ID</label>
-                    <input class="form-control mb-2" type="number" placeholder="Item ID" id="itemID">
-                </div>
-                <div class="col-4">
-                    <label for="itemPhoto">Upload Photo</label>
-                    <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto">
+            <div style="display: none" id="edit-photo">
+                <div class="row">
+                    <div class="col-6">
+                        <label for="submissionID">submissionID</label>
+                        <input class="form-control mb-2" type="text" placeholder="submissionID" id="submissionID">
+                    </div>
+                    <div class="col-4">
+                        <label for="itemPhoto">Upload Photo</label>
+                        <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto">
+                    </div>
                 </div>
                 <br>
-                <button type='button' id='save-btn' class='btn btn-outline-secondary col-2' onclick='editPhotoFile()'>Save Changes</button>
+                <button type='button' id='save-btn' class='btn btn-outline-secondary col-3' onclick='editPhotoFile()'>Save Changes</button>
             </div>
         </div>
     </section>
@@ -249,42 +251,32 @@
         }
 
         function editPhotoFile() {
-            var data = {};
+            var data = new FormData();
             var editElements = document.getElementById("edit-photo").children;
-            for (child in editElements) {
-                // console.log(editElements[child].children);
-                childElement = editElements[child].children;
-                if (childElement != undefined) {
-                    for (innerChild in childElement) {
-                        if (childElement[innerChild].type == 'number') {
-                            data['id'] = childElement[innerChild].value;
-                        }
-                        else if (childElement[innerChild].type == 'file') {
-                            data[childElement[innerChild].name] = childElement[innerChild].files[0].name;
-                            data['file'] = childElement[innerChild].files[0];
-                        }
-                    }
-                }
-            }
-            var jsondata = JSON.stringify(data);
+            var submissionID = document.getElementById("submissionID").value;
+            var file = document.getElementById("itemPhoto").files;
+            var fileName = file[0].name;
+            fileName = fileName.replace(/\s+/g, '');
+            data.append(document.getElementById("itemPhoto").name, fileName);
+            data.append("file", file[0]);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + data.id;
+                var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + submissionID;
                 try {
                     const response =
                     await fetch(
                         serviceURL, { 
                         method: 'POST',
-                        mode: 'no-cors', // no-cors, *cors, same-origin
+                        mode: 'cors', // no-cors, *cors, same-origin
                         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
                         credentials: 'same-origin', // include, *same-origin, omit
                         redirect: 'follow', // manual, *follow, error
                         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                        body: jsondata,
+                        body: data,
                     });
                     const result = await response.json();
                     if (response.status == 200) {
                         // success case
-                        alert('Successfully updated photo in database. Please refresh to view changes.')
+                        alert('Successfully updated data in database. Please refresh to view changes.')
                         window.location.reload();
                     }
                 }
@@ -293,7 +285,7 @@
                     // service offline, etc
                     alert('There is a problem updating the data, please try again later.');
                 } // error
-            });
+            });    
         }
 
 
