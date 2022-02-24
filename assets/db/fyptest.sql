@@ -2,29 +2,30 @@ DROP Database IF EXISTS `fyptest`;
 Create DATABASE `fyptest`;
 USE `fyptest`;
 
--- DROP TABLE IF EXISTS `carousel`;
--- CREATE TABLE IF NOT EXISTS `carousel` (
---   `id` int NOT NULL AUTO_INCREMENT,
---   `itemName` varchar(50) NOT NULL,
---   `donorAddr` varchar(300) NOT NULL,
---   `contactNo` int NOT NULL,
---   `category` varchar(20) NOT NULL,
---   `subcat` varchar(30) NOT NULL,
---   `quantity` INT(4) NOT NULL,
---   `requireDelivery` varchar(50) NOT NULL,
---   `region` varchar(20) NOT NULL,
---   `timeSubmitted` DATETIME NOT NULL,
---   `itemStatus` varchar(50) NOT NULL,
---   `fileName` varchar(200) NOT NULL,
---   PRIMARY KEY (`id`)
--- ) ;
+DROP TABLE IF EXISTS `carousel`;
+CREATE TABLE IF NOT EXISTS `carousel` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `itemName` varchar(50) NOT NULL,
+  `donorAddr` varchar(300) NOT NULL,
+  `contactNo` int NOT NULL,
+  `category` varchar(20) NOT NULL,
+  `subcat` varchar(30) NOT NULL,
+  `quantity` INT(4) NOT NULL,
+  `requireDelivery` varchar(50) NOT NULL,
+  `region` varchar(20) NOT NULL,
+  `timeSubmitted` DATETIME NOT NULL,
+  `itemStatus` varchar(50) NOT NULL,
+  `fileName` varchar(200) NOT NULL,
+  PRIMARY KEY (`id`)
+) ;
 
 DROP TABLE IF EXISTS `wishlist`;
 CREATE TABLE IF NOT EXISTS `wishlist` (
   `id` int NOT NULL AUTO_INCREMENT,
   `itemName` varchar(50) NOT NULL,
   `quantity` int NOT NULL,
-  `category` varchar(50) NOT NULL,
+  `category` varchar(20) NOT NULL,
+  `subCat` varchar(30) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   `itemStatus` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
@@ -72,8 +73,8 @@ CREATE TABLE IF NOT EXISTS `driver` (
 --   FOREIGN KEY (`contactNo`) REFERENCES user (`username`)
 -- ) ;
 
-DROP TABLE IF EXISTS `carousel`;
-CREATE TABLE IF NOT EXISTS `carousel` (
+DROP TABLE IF EXISTS `newcarousel`;
+CREATE TABLE IF NOT EXISTS `newcarousel` (
   `submissionID` varchar(30) NOT NULL,
   `donorID` int NOT NULL,
   `itemID` int NOT NULL,
@@ -83,8 +84,8 @@ CREATE TABLE IF NOT EXISTS `carousel` (
   FOREIGN KEY (`itemID`) references categoryitem (`itemID`)
 ) ;
 
-DROP TABLE IF EXISTS `wishlist`;
-CREATE TABLE IF NOT EXISTS `wishlist` (
+DROP TABLE IF EXISTS `newwishlist`;
+CREATE TABLE IF NOT EXISTS `newwishlist` (
   `submissionID` varchar(30) NOT NULL,
   `migrantID` int NOT NULL,
   `itemID` int NOT NULL,
@@ -94,31 +95,31 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
   FOREIGN KEY (`migrantID`) references user (`username`)
 ) ;
 
--- DROP TABLE IF EXISTS `request`;
--- CREATE TABLE IF NOT EXISTS `request` (
---   `reqID` int NOT NULL AUTO_INCREMENT,
---   `requestorContactNo` int NOT NULL,
---   `deliveryLocation` varchar(300) NOT NULL,
---   `itemId` int NOT NULL,
---   `requestQty` varchar(50) NOT NULL,
---   `timeSubmitted` datetime NOT NULL,
---   PRIMARY KEY (`reqID`),
---   FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
---   FOREIGN KEY (`itemId`) REFERENCES carousel (`id`)
--- ) ;
-
 DROP TABLE IF EXISTS `request`;
 CREATE TABLE IF NOT EXISTS `request` (
   `reqID` int NOT NULL AUTO_INCREMENT,
   `requestorContactNo` int NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
-  `submissionID` varchar(30) NOT NULL,
+  `itemId` int NOT NULL,
   `requestQty` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   PRIMARY KEY (`reqID`),
   FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
-  FOREIGN KEY (`submissionID`) REFERENCES carousel (`submissionID`)
+  FOREIGN KEY (`itemId`) REFERENCES carousel (`id`)
 ) ;
+
+-- DROP TABLE IF EXISTS `request`;
+-- CREATE TABLE IF NOT EXISTS `request` (
+--   `reqID` int NOT NULL AUTO_INCREMENT,
+--   `requestorContactNo` int NOT NULL,
+--   `deliveryLocation` varchar(300) NOT NULL,
+--   `submissionID` varchar(30) NOT NULL,
+--   `requestQty` varchar(50) NOT NULL,
+--   `timeSubmitted` datetime NOT NULL,
+--   PRIMARY KEY (`reqID`),
+--   FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
+--   FOREIGN KEY (`submissionID`) REFERENCES carousel (`submissionID`)
+-- );
 
 DROP TABLE IF EXISTS `delivery`;
 CREATE TABLE IF NOT EXISTS `delivery` (
@@ -208,27 +209,17 @@ CREATE TABLE IF NOT EXISTS `matches` (
 
 
 -- for wishlist table
-INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('backpack', 1, 'my backpack broke, need a new one', 'others', now(), 'available');
-INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('stool', 2, 'need a small chair to sit on', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('chair', 1, 'chair broke, need a new one', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('table', 1, 'a small table for dining and other purposes', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('shoes', 2, 'shoes for work', 'clothing', now(), 'available');
-INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('wardrobe', 1, 'wardrobe to store my clothes', 'home furniture', now(), 'available');
-INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmitted`, `itemStatus`) VALUES
-('drawers', 1, 'drawers to store things', 'home furniture', now(), 'available');
+INSERT INTO wishlist (`itemName`, `quantity`, `category`, `subCat`, `timeSubmitted`, `itemStatus`) VALUES
+('Large Blender', 1,'Kitchen', 'Small Appliances', now(), 'available'),
+('TV', 2, 'Electronics', 'TVs', now(), 'available');
+
 
 
 -- for user table
 -- INSERT INTO user(`username`, `password`, `userType`) VALUES 
 -- (93261073, ENCRYPT('cheah1124'), 'admin');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('12345678', 'test', 'worker');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('87654321', 'test2', 'worker');
+INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (12345678, 'test', 'worker');
+INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (87654321, 'test2', 'worker');
 
 -- for category table 
 -- INSERT INTO category(`categoryName`) VALUES ('Food');
@@ -290,9 +281,9 @@ INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('
 -- INSERT INTO newcarousel (`donorID`, `submissionID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES
 -- (92251521, '2022-02-15 21:35:42 92251521', 'Toothbrush', 'Toiletries', '2022-02-15 21:35:42', 'available');
 
-for newwishlist table
-INSERT INTO newwishlist (`submissionID`, `migrantID`, `itemName`, `itemCategory`, `itemSubCat`, `timeSubmitted`, `itemStatus`) VALUES 
-('test', 91225117, 'Mattress', 'Beddings', 'Beddings', now(), 'available');
+-- for newwishlist table
+-- INSERT INTO newwishlist (`submissionID`, `migrantID`, `itemName`, `itemCategory`, `itemSubCat`, `timeSubmitted`, `itemStatus`) VALUES 
+-- ('test', 12345678, 'Mattress', 'Beddings', 'Beddings', now(), 'available');
 
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
