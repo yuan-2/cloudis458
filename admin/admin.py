@@ -188,29 +188,29 @@ def updateItem(itemID):
         )
 
 # edit donated (carousel) photo in table
-@app.route("/updatePhoto/<int:itemID>", methods=["POST"])
-def updatePhoto(itemID):
-    item = CarouselItem.query.filter_by(id=itemID).first()
-    data = request.to_dict()
-    if (item is None):
-        return jsonify( 
-            {
-                "code": 404,
-                "message": "This item ID is not found in the database."
-            }
-        )
-    else:
-        imgFile = request.files['file']
-        fileName = secure_filename(imgFile.filename)
-        imgFile.save(os.path.join(uploads_dir, fileName))
-        item.fileName = data['itemImg']
-        db.session.commit()
-        return jsonify(
-            {
-                "code": 200,
-                "message": "Item successfully updated."
-            }
-        )
+# @app.route("/updatePhoto/<int:itemID>", methods=["POST"])
+# def updatePhoto(itemID):
+#     item = CarouselItem.query.filter_by(id=itemID).first()
+#     data = request.to_dict()
+#     if (item is None):
+#         return jsonify( 
+#             {
+#                 "code": 404,
+#                 "message": "This item ID is not found in the database."
+#             }
+#         )
+#     else:
+#         imgFile = request.files['file']
+#         fileName = secure_filename(imgFile.filename)
+#         imgFile.save(os.path.join(uploads_dir, fileName))
+#         item.fileName = data['itemImg']
+#         db.session.commit()
+#         return jsonify(
+#             {
+#                 "code": 200,
+#                 "message": "Item successfully updated."
+#             }
+#         )
 
 
 class Request(db.Model):
@@ -728,7 +728,7 @@ def getFormAnswersDonate(formName):
         )
 
 
-# get all form answers for specific forms (carousel & wishlist items) (without timeSubmitted)
+# get all form answers for specific forms (carousel & wishlist items) (without timeSubmitted & Item Photo)
 @app.route("/getFormAnswers/<formName>/<submissionID>")
 def getSpecificFormAnswers(formName, submissionID):
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
@@ -745,7 +745,8 @@ def getSpecificFormAnswers(formName, submissionID):
     data = {}
     for ans in formAnswers:
         data["submissionID"] = submissionID
-        data[fieldNames[ans.fieldID]] = ans.answer
+        if fieldNames[ans.fieldID] != "Item Photo":
+            data[fieldNames[ans.fieldID]] = ans.answer
         if formName == "donate":
             item = NewCarousel.query.filter_by(submissionID=submissionID).first()
         elif formName == "wishlist":
@@ -817,6 +818,46 @@ def updateDonatedItem(formName, submissionID):
                 "otherFormFields": otherFormFields.json()
             }
         )
+
+# edit uploaded photo
+@app.route("/updatePhoto/<submissionID>", methods=['POST'])
+def updatePhoto(submissionID):
+        formData = request.form
+        formDict = formData.to_dict()
+        imgFile = request.files['file']
+        formField = FormBuilder.query.filter_by(formName="donate").filter_by(fieldName="Item Photo").first()
+        fieldID = formField.fieldID
+        formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
+        # delete current file
+        oldFile = formAnswer.answer
+        os.remove(os.path.join(uploads_dir, oldFile))
+        # save file
+        fileName = secure_filename(imgFile.filename.replace(" ", ""))
+        # print(formDict)
+        imgFile.save(os.path.join(uploads_dir, fileName))
+        # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
+        file = formDict['itemImg']
+        
+        try:
+            formAnswer.answer = file
+            print(formAnswer.answer)
+            db.session.add(formAnswer)
+            db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Photo Successfully Updated"
+                }
+            )
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while updating the item photo, please try again later"
+                }
+            ), 500
+
 
 # rank migrant workers according to reqHistory, get list of MWs who are prioritised
 @app.route("/getRankByReqHistory/<itemID>")
