@@ -13,18 +13,31 @@ function submitForm(formName) {
         // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
         if (eleType == "radio") {
             var eleName = donateFormElements[ele].name;
-            formData.append(eleName, document.querySelector(`input[name='${eleName}']:checked`).value)
-            // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
+            if (!formData.has(eleName)) {
+                formData.append(eleName, document.querySelector(`input[name='${eleName}']:checked`).value);
+                // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
+            }
+        }
+        else if (eleType == "checkbox") {
+            // store all values as a single string, values separated by ;
+            var eleName = donateFormElements[ele].name;
+            if (!formData.has(eleName)) {
+                checkedBoxes = document.querySelectorAll(`input[name='${eleName}']:checked`);
+                values = "";
+                for ( let box of checkedBoxes) {
+                    values += box.value + ";"
+                }
+                formData.append(eleName, values.slice(0,-1));
+            }
         }
         else if (eleType == "file") {
-            formData.append(eleId, donateFormElements[ele].files[0].name)
-            formData.append("file" + eleId, donateFormElements[ele].files[0])
+            formData.append(eleId, donateFormElements[ele].files[0].name);
+            formData.append("file" + eleId, donateFormElements[ele].files[0]);
         }
         else {
-            formData.append(eleId, donateFormElements[ele].value)
+            formData.append(eleId, donateFormElements[ele].value);
         }
     }
-
 
     addDonation(formData, 'http://127.0.0.1:5003/formanswers')
     alert("Item has been posted successfully")

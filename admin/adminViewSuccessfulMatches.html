@@ -96,40 +96,11 @@
         <div class="container">
             <table id="successMatches" class="table table-striped table-hover" style="width: 100%">
             </table>
-            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow()">Edit Specific Row</button>
+            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow('SuccessfulMatches')">Edit Specific Row</button>
             <br><br>
             <hr>
             <br>
             <div id="edit-section" style="display: none">
-                <div class="row">
-                    <div class="col-2">
-                        <label for="reqid">Request ID</label>
-                        <input class="form-control mb-2" type="number" placeholder="Request ID" id="reqid" onchange="fillMatchDetails(this.value)">
-                    </div>
-                    <div class="col-3">
-                        <label for="requestorContactNo">Requestor Contact No.</label>
-                        <input class="form-control mb-2" type="text" placeholder="Requestor Contact No." id="requestorContactNo">
-                    </div>
-                    <div class="col-3">
-                        <label for="donorName">Donor Name</label>
-                        <input class="form-control mb-2" type="text" placeholder="Donor Name" id="donorName">
-                    </div>
-                    <div class="col-3">
-                        <label for="donorContactNo">Donor Contact No.</label>
-                        <input class="form-control mb-2" type="text" placeholder="Donor Contact No." id="donorContactNo">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-3">
-                        <label for="requestedItem">Requested Item</label>
-                        <input class="form-control mb-2" type="text" placeholder="Requested Item" id="requestedItem">
-                    </div>
-                    <div class="col-3">
-                        <label for="itemCategory">Item Category</label>
-                        <input class="form-control mb-2" type="text" placeholder="Item Category" id="itemCategory">
-                    </div>
-                </div>
-                <button type="button" id="save-btn" class="btn btn-outline-secondary" onclick="editSuccessfulMatches()">Save Changes</button>
             </div>
         </div>
     </section>
@@ -140,6 +111,7 @@
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap5.min.js"></script>
     <script src="../assets/js/table.js"></script>
+    <script src="../assets/js/form.js"></script>
     <script>
         var columns = [];
         function getDT() {

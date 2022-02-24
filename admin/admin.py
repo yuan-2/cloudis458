@@ -1,6 +1,6 @@
 from distutils.command.upload import upload
 from pdb import lasti2lineno
-from typing import ItemsView
+from typing import ItemsView, Match
 from urllib import response
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -217,16 +217,14 @@ class Request(db.Model):
     __tablename__ = 'request'
 
     reqID = db.Column(db.Integer, primary_key=True, nullable=False)
-    itemID = db.Column(db.Integer, nullable=False)
     requestorContactNo = db.Column(db.String(50), nullable=False)
     deliveryLocation = db.Column(db.String(300), nullable=False)
     itemCategory = db.Column(db.String(50), nullable=False)
     requestQty = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
 
-    def __init__(self, reqID, itemID, requestorContactNo, deliveryLocation, itemCategory, requestQty, timeSubmitted):
+    def __init__(self, reqID, requestorContactNo, deliveryLocation, itemCategory, requestQty, timeSubmitted):
         self.reqID = reqID
-        self.itemID = itemID
         self.requestorContactNo = requestorContactNo
         self.deliveryLocation = deliveryLocation
         self.itemCategory = itemCategory
@@ -234,8 +232,8 @@ class Request(db.Model):
         self.timeSubmitted = timeSubmitted
 
     def json(self):
-        return {"reqID": self.reqID, "itemID": self.itemID, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, "itemCategory": self.itemCategory, 
-                "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
+        return {"reqID": self.reqID, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, 
+                "itemCategory": self.itemCategory, "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
 
 # get all requests submitted by migrant workers
 @app.route("/getRequests")
@@ -245,6 +243,7 @@ def getAllRequests():
         return jsonify(
             {
                 "code": 200,
+                "columnHeaders": Request.metadata.tables["request"].columns.keys(),
                 "data": [request.json() for request in requestList]
             }
         )
@@ -263,6 +262,7 @@ def getRequestByID(id):
         return jsonify(
             {
                 "code": 200,
+                "columnHeaders": Request.metadata.tables["request"].columns.keys(),
                 "data": request.json()
             }
         )
@@ -281,6 +281,7 @@ def getRequestByItemID(itemID):
         return jsonify(
             {
                 "code": 200,
+                "columnHeaders": Request.metadata.tables["request"].columns.keys(),
                 "data": [request.json() for request in requests]
             }
         )
@@ -513,27 +514,23 @@ class Matches(db.Model):
     matchID = db.Column(db.Integer, primary_key=True, nullable=False)
     reqID = db.Column(db.Integer, nullable=False)
     requestorContactNo = db.Column(db.String(50), nullable=False)
-    donorName = db.Column(db.String(50), nullable=False)
     donorContactNo = db.Column(db.String(50), nullable=False)
     requestedItem = db.Column(db.String(50), nullable=False)
-    itemCategory = db.Column(db.String(50), nullable=False)
     matchDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, matchID, reqID, requestorContactNo, donorName, donorContactNo, requestedItem, itemCategory, matchDate):
+    def __init__(self, matchID, reqID, requestorContactNo, donorContactNo, requestedItem, matchDate):
         self.matchID = matchID
         self.reqID = reqID
         self.requestorContactNo = requestorContactNo
-        self.donorName = donorName
         self.donorContactNo = donorContactNo
         self.requestedItem = requestedItem
-        self.itemCategory = itemCategory
         self.matchDate = matchDate
 
     def json(self):
-        return { "matchID": self.matchID, "reqID": self.reqID, "requestorContactNo": self.requestorContactNo, "donorName": self.donorName, 
-                "donorContactNo": self.donorContactNo, "requestedItem": self.requestedItem, "itemCategory": self.itemCategory, "matchDate": self.matchDate }
+        return { "matchID": self.matchID, "reqID": self.reqID, "requestorContactNo": self.requestorContactNo, 
+                "donorContactNo": self.donorContactNo, "requestedItem": self.requestedItem, "matchDate": self.matchDate }
 
-# get all successful matches
+# get all successful matches 
 @app.route("/getSuccessfulMatches")
 def getAllSuccessfulMatches():
     matches = Matches.query.all()
@@ -541,7 +538,8 @@ def getAllSuccessfulMatches():
         return jsonify(
             {
                 "code": 200,
-                "data": [match.json() for match in matches]
+                "data": [match.json() for match in matches], 
+                "columnHeaders": Matches.metadata.tables["matches"].columns.keys()
             }
         )
     return jsonify(
@@ -551,15 +549,17 @@ def getAllSuccessfulMatches():
         }
     ), 404
 
-# get specific successful match
-@app.route("/getSuccessfulMatches/<int:id>")
-def getSuccessfulMatch(id):
-    match = Matches.query.filter_by(reqid=id).first()
+# get specific successful match (without matchDate)
+@app.route("/getSuccessfulMatches/<matchID>")
+def getSuccessfulMatch(matchID):
+    match = Matches.query.filter_by(matchID=matchID).first().json()
+    match.pop('matchDate')
     if match:
         return jsonify(
             {
                 "code": 200,
-                "data": match.json() 
+                "columnHeaders": Matches.metadata.tables["matches"].columns.keys(),
+                "data": match
             }
         )
     return jsonify(
@@ -570,30 +570,33 @@ def getSuccessfulMatch(id):
     ), 404
 
 # edit SuccessfulMatch in table
-@app.route("/updateSuccessfulMatches/<int:id>", methods=["PUT"])
-def updateSuccessfulMatches(id):
-    match = Matches.query.filter_by(reqid=id).first()
+@app.route("/updateSuccessfulMatches/<matchID>", methods=["PUT"])
+def updateSuccessfulMatches(matchID):
+    match = Matches.query.filter_by(matchID=matchID).first()
     data = request.get_json()
+    olddata = data
     if (match is None):
         return jsonify( 
             {
                 "code": 404,
-                "message": "This ReqID is not found in the database."
+                "message": "This matchID is not found in the database."
             }
         )
     else:
-        match.reqid = data['reqid']
+        match.matchID = data['matchID']
+        match.reqID = data['reqID']
         match.requestorContactNo = data['requestorContactNo']
-        match.donorName = data['donorName']
         match.donorContactNo = data['donorContactNo']
         match.requestedItem = data['requestedItem']
-        match.itemCategory = data['itemCategory']
         db.session.add(match)
         db.session.commit()
         return jsonify(
             {
                 "code": 200,
-                "message": "Match successfully updated."
+                "message": "Match successfully updated.",
+                "match": match.json(),
+                "data": data,
+                "olddata": data
             }
         )
 

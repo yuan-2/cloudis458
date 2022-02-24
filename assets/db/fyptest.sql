@@ -2,22 +2,22 @@ DROP Database IF EXISTS `fyptest`;
 Create DATABASE `fyptest`;
 USE `fyptest`;
 
-DROP TABLE IF EXISTS `carousel`;
-CREATE TABLE IF NOT EXISTS `carousel` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `itemName` varchar(50) NOT NULL,
-  `donorAddr` varchar(300) NOT NULL,
-  `contactNo` int NOT NULL,
-  `category` varchar(20) NOT NULL,
-  `subcat` varchar(30) NOT NULL,
-  `quantity` INT(4) NOT NULL,
-  `requireDelivery` varchar(50) NOT NULL,
-  `region` varchar(20) NOT NULL,
-  `timeSubmitted` DATETIME NOT NULL,
-  `itemStatus` varchar(50) NOT NULL,
-  `fileName` varchar(200) NOT NULL,
-  PRIMARY KEY (`id`)
-) ;
+-- DROP TABLE IF EXISTS `carousel`;
+-- CREATE TABLE IF NOT EXISTS `carousel` (
+--   `id` int NOT NULL AUTO_INCREMENT,
+--   `itemName` varchar(50) NOT NULL,
+--   `donorAddr` varchar(300) NOT NULL,
+--   `contactNo` int NOT NULL,
+--   `category` varchar(20) NOT NULL,
+--   `subcat` varchar(30) NOT NULL,
+--   `quantity` INT(4) NOT NULL,
+--   `requireDelivery` varchar(50) NOT NULL,
+--   `region` varchar(20) NOT NULL,
+--   `timeSubmitted` DATETIME NOT NULL,
+--   `itemStatus` varchar(50) NOT NULL,
+--   `fileName` varchar(200) NOT NULL,
+--   PRIMARY KEY (`id`)
+-- ) ;
 
 DROP TABLE IF EXISTS `wishlist`;
 CREATE TABLE IF NOT EXISTS `wishlist` (
@@ -38,59 +38,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`username`)
 ) ;
 
-DROP TABLE IF EXISTS `driver`;
-CREATE TABLE IF NOT EXISTS `driver` (
-  `contactNo` int NOT NULL,
-  PRIMARY KEY (`contactNo`),
-  FOREIGN KEY (`contactNo`) references user (`username`)
-) ;
-
--- DROP TABLE IF EXISTS `migrantworker`;
--- CREATE TABLE IF NOT EXISTS `migrantworker` (
---   `contactNo` int NOT NULL,
---   `address` varchar(300) NOT NULL,
---   `reqHistory` varchar(50) NOT NULL,
---   PRIMARY KEY (`contactNo`),
---   FOREIGN KEY (`contactNo`) REFERENCES user (`username`)
--- ) ;
-
-DROP TABLE IF EXISTS `request`;
-CREATE TABLE IF NOT EXISTS `request` (
-  `reqID` int NOT NULL AUTO_INCREMENT,
-  `requestorContactNo` int NOT NULL,
-  `deliveryLocation` varchar(300) NOT NULL,
-  `itemId` int NOT NULL,
-  `requestQty` varchar(50) NOT NULL,
-  `timeSubmitted` datetime NOT NULL,
-  PRIMARY KEY (`reqID`),
-  FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
-  FOREIGN KEY (`itemId`) REFERENCES carousel (`id`)
-) ;
-
-DROP TABLE IF EXISTS `delivery`;
-CREATE TABLE IF NOT EXISTS `delivery` (
-  `deliveryReqID` int NOT NULL AUTO_INCREMENT,
-  `accepted` varchar(50) NOT NULL,
-  `reqID` int NOT NULL,
-  PRIMARY KEY (`deliveryReqID`),
-  FOREIGN KEY (`reqID`) references request (`reqID`)
-) ;
-
--- DROP TABLE IF EXISTS `category`;
--- CREATE TABLE IF NOT EXISTS `category` (
---   `categoryid` int NOT NULL AUTO_INCREMENT,
---   `categoryName` varchar(50) NOT NULL,
---   PRIMARY KEY (`categoryid`)
--- ) ;
-
--- DROP TABLE IF EXISTS `fixedItem`;
--- CREATE TABLE IF NOT EXISTS `fixedItem` (
---   `itemID` int NOT NULL AUTO_INCREMENT,
---   `itemName` varchar(50) NOT NULL,
---   PRIMARY KEY (`itemID`)
--- ) ;
--- 
-
 DROP TABLE IF EXISTS `categoryitem`;
 CREATE TABLE IF NOT EXISTS `categoryitem` (
   `itemID` int NOT NULL AUTO_INCREMENT,
@@ -107,6 +54,79 @@ CREATE TABLE IF NOT EXISTS `faq` (
   `answer` varchar(300) NOT NULL,
   `section` varchar(10) NOT NULL,
   PRIMARY KEY (`faqID`)
+) ;
+
+DROP TABLE IF EXISTS `driver`;
+CREATE TABLE IF NOT EXISTS `driver` (
+  `contactNo` int NOT NULL,
+  PRIMARY KEY (`contactNo`),
+  FOREIGN KEY (`contactNo`) references user (`username`)
+) ;
+
+-- DROP TABLE IF EXISTS `migrantworker`;
+-- CREATE TABLE IF NOT EXISTS `migrantworker` (
+--   `contactNo` int NOT NULL,
+--   `address` varchar(300) NOT NULL,
+--   `reqHistory` varchar(50) NOT NULL,
+--   PRIMARY KEY (`contactNo`),
+--   FOREIGN KEY (`contactNo`) REFERENCES user (`username`)
+-- ) ;
+
+DROP TABLE IF EXISTS `carousel`;
+CREATE TABLE IF NOT EXISTS `carousel` (
+  `submissionID` varchar(30) NOT NULL,
+  `donorID` int NOT NULL,
+  `itemID` int NOT NULL,
+  `timeSubmitted` DATETIME NOT NULL,
+  `itemStatus` varchar(50) NOT NULL,
+  PRIMARY KEY (`submissionID`),
+  FOREIGN KEY (`itemID`) references categoryitem (`itemID`)
+) ;
+
+DROP TABLE IF EXISTS `wishlist`;
+CREATE TABLE IF NOT EXISTS `wishlist` (
+  `submissionID` varchar(30) NOT NULL,
+  `migrantID` int NOT NULL,
+  `itemID` int NOT NULL,
+  `timeSubmitted` datetime NOT NULL,
+  `itemStatus` varchar(50) NOT NULL,
+  PRIMARY KEY (`submissionID`),
+  FOREIGN KEY (`migrantID`) references user (`username`)
+) ;
+
+-- DROP TABLE IF EXISTS `request`;
+-- CREATE TABLE IF NOT EXISTS `request` (
+--   `reqID` int NOT NULL AUTO_INCREMENT,
+--   `requestorContactNo` int NOT NULL,
+--   `deliveryLocation` varchar(300) NOT NULL,
+--   `itemId` int NOT NULL,
+--   `requestQty` varchar(50) NOT NULL,
+--   `timeSubmitted` datetime NOT NULL,
+--   PRIMARY KEY (`reqID`),
+--   FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
+--   FOREIGN KEY (`itemId`) REFERENCES carousel (`id`)
+-- ) ;
+
+DROP TABLE IF EXISTS `request`;
+CREATE TABLE IF NOT EXISTS `request` (
+  `reqID` int NOT NULL AUTO_INCREMENT,
+  `requestorContactNo` int NOT NULL,
+  `deliveryLocation` varchar(300) NOT NULL,
+  `submissionID` varchar(30) NOT NULL,
+  `requestQty` varchar(50) NOT NULL,
+  `timeSubmitted` datetime NOT NULL,
+  PRIMARY KEY (`reqID`),
+  FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
+  FOREIGN KEY (`submissionID`) REFERENCES carousel (`submissionID`)
+) ;
+
+DROP TABLE IF EXISTS `delivery`;
+CREATE TABLE IF NOT EXISTS `delivery` (
+  `deliveryReqID` int NOT NULL AUTO_INCREMENT,
+  `accepted` varchar(50) NOT NULL,
+  `reqID` int NOT NULL,
+  PRIMARY KEY (`deliveryReqID`),
+  FOREIGN KEY (`reqID`) references request (`reqID`)
 ) ;
 
 DROP TABLE IF EXISTS `formbuilder`;
