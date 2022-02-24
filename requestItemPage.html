@@ -277,8 +277,9 @@
                         <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
                         `
 
-                            var date = new Date(item.timeSubmitted);
-                            var lastDate = date.setDate(date.getDate() + 1);
+                            var date = new Date(item.timeSubmitted).toUTCString();
+                            var finalDate = new Date(date.slice(0, -4));
+                            var lastDate = finalDate.setDate(finalDate.getDate() + 1);
                             var dateNow = Date.now();
                             difference = lastDate - dateNow
                             hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
