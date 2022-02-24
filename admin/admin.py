@@ -828,15 +828,15 @@ def updatePhoto(submissionID):
         formField = FormBuilder.query.filter_by(formName="donate").filter_by(fieldName="Item Photo").first()
         fieldID = formField.fieldID
         formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
-
+        # delete current file
+        oldFile = formAnswer.answer
+        os.remove(os.path.join(uploads_dir, oldFile))
         # save file
         fileName = secure_filename(imgFile.filename.replace(" ", ""))
         # print(formDict)
         imgFile.save(os.path.join(uploads_dir, fileName))
         # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
         file = formDict['itemImg']
-
-        # addtodb = CarouselItem(0, itemName, donorAddr, contactNo, category, subCat, quantity, requireDelivery, region, timeSubmitted, "open", file)
         
         try:
             formAnswer.answer = file
