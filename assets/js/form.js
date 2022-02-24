@@ -94,7 +94,7 @@ function buildRadio(field) {
 function buildText(field) {
     var textField = `<div class="col-md-6">
                         <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
-                        <input required type="text" class="form-control" id="${field.fieldID}" placeholder="${field.placeholder}">
+                        <input required type="text" class="form-control" id="${field.fieldID}" placeholder="${field.placeholder ?? ""}">
                     </div>`;
 
 
@@ -369,7 +369,7 @@ async function editField(fieldID) {
 }
 
 async function deleteField(fieldID) {
-    if (confirm("Are you sure you want to delete the field?")){
+    if (confirm("Are you sure you want to delete this field? This will also delete all data related to the field.")){
         var serviceURL = "http://127.0.0.1:5003/formbuilder/" + fieldID;
 
         try {

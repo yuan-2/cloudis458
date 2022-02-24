@@ -13,9 +13,6 @@
     <link href="assets/img/favicon.png" rel="icon">
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
     <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
@@ -42,7 +39,7 @@
   ======================================================== -->
 </head>
 
-<body>
+<body onload="checkLoginForReq()">
 
     <!-- ======= Top Bar ======= -->
     <div id="topbar" class="d-flex align-items-center fixed-top">
@@ -74,75 +71,37 @@
                 <ul>
                     <li><a class="nav-link scrollto" href="index.html">Home</a></li>
                     <li><a class="nav-link scrollto" href="donateGeneral.html">Donate</a></li>
-                    <li><a class="nav-link scrollto" href="requestWishList.html">Request</a></li>
-                    <li><a class="nav-link scrollto active" href="faq.html">Help</a></li>
-                    <!-- <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
-            </ul>
-          </li> -->
+                    <li><a class="nav-link scrollto active" href="requestWishList.html">Request</a></li>
+                    <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
 
-            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
-                class="appointment-btn scrollto">Login</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;" class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
 
+    <!-- ======= Image Banner Section ======= -->
     <section id="hero" class="d-flex align-items-center"></section>
 
     <main id="main">
-        <section></section>
-        <section id="services" class="services">
-            <div class="container">
-                <div class="section-title">
-                    <h2>Frequently Asked Questions</h2>
-                    <div class="d-flex flex-row justify-content-center" style="font-style: italic;">
-                        <p>Got a question?<br>
-                            Here are our non-exhaustive list of answers. You can contact us if you are unable to find
-                            the answers here.<br>
-                            Quick navigation: &nbsp;
-                            <a href="#worker">Migrant Worker</a> |
-                            <a href="#donor">Donor</a> |
-                            <a href="#driver">Driver</a>
-                        </p>
-                    </div>
-                </div>
+
+        <!-- Adaptive section to auto populate data carried over from carousel page click -->
+        <section id="pageTitle">
+            <div class="container" id="itemReqDisplay">
             </div>
         </section>
 
-        <div style="max-width: 1000px; margin: auto;">
-            <section id="faq" class="faq section-bg">
-                <div class="container">
-
-                    <div id="worker" class="faq-list">
-                        <h4>Migrant Worker</h4>
-                    </div>
-
-                    <div id="donor" class="faq-list">
-                        <h4>Donor</h4>
-                    </div>
-
-                    <div id="driver" class="faq-list">
-                        <h4>Driver</h4>
-                    </div>
-                </div>
-            </section>
-        </div>
+        <section>
+            <div style="max-width: 1000px; margin: auto;">
+                <form id="requestForm" enctype="multipart/form-data" class="row g-3">
+                    <div id="itemImage" class="col-md-6"></div>
+                    <div id="donorInfo" class="col-md-6"></div>
+                </form>
+                <br>
+            </div>
+        </section>
 
     </main><!-- End #main -->
 
@@ -193,7 +152,6 @@
                             <input type="email" name="email"><input type="submit" value="Subscribe">
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -237,11 +195,117 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        function checkLogin() {
-            if (window.sessionStorage.getItem("userType") != null) {
-                userType = window.sessionStorage.getItem("userType")
+        var user = ""
+        var itemId = ""
+        var itemReqDisplay = document.getElementById("itemReqDisplay")
+        var itemImage = document.getElementById("itemImage")
+        var donorInfo = document.getElementById("donorInfo")
+        var itemInfo = ""
+
+        function checkLoginForReq() {
+            if (sessionStorage.getItem("user") != null) {
+                user = JSON.parse(sessionStorage.getItem("user"))
+
+                console.log(user)
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
+
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                itemId = urlParams.get('id')
+
+                loadItem().then(function retriveInfo(result) {
+                    itemInfo = result
+                    // console.log(itemInfo)
+
+                    // item info API Works but request is not done up for dynamic work 
+                    var x = setInterval(function() {
+                        for (item of itemInfo) {
+                        itemReqDisplay.innerHTML = `
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-6">
+                                <div class="pt-3">
+                                    <h2 id="itemName">${item.itemName}</h2>
+                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span>, &nbsp Sub-Category: <span id="itemSubCat">${item.subcat}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        `
+
+                        itemImage.innerHTML = `
+                        <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
+                        `
+
+                        var date = new Date(item.timeSubmitted);
+                        var lastDate = date.setDate(date.getDate() + 1);
+                        var dateNow = Date.now();
+                        var difference = lastDate - dateNow
+                        var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        var mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                        if (item.requireDelivery == 1) {
+                            donorInfo.innerHTML = `
+                            <div class="pt-5">
+                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
+                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
+                                <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
+                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
+                                <button class="btn btn-outline-success" onclick="reqItem()">Request!</button>
+                            </div>
+                        `
+                        }
+                        else {
+                            donorInfo.innerHTML = `
+                            <div class="pt-5">
+                                <p>Donated By: <span id="donorName">${item.donorName}</span></p>
+                                <p>Item Description: <span id="itemDesc">${item.description}</span></p>
+                                <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
+                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
+                                <button class="btn btn-success" onclick="reqItem()">Request!</button>
+                            </div>
+                        `
+                        }
+                        // If the count down is over, show that item has expired and clear interval 
+                        if (difference < 0) {
+                            clearInterval(x);
+                            document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
+                        }
+                    }
+                    }, 1000)                    
+                })
+            }
+            else {
+                let confirmMsg = confirm("Only Migrant Workers who are logged in can request for items. Please try logging in again.")
+                if (confirmMsg == true) {
+                    window.location.href = "index.html"
+                }
+                else {
+                    window.location.href = "index.html"
+                }
+            }
+        }
+
+        async function loadItem() {
+            let response = await fetch("http://127.0.0.1:5004/getItemById/" + itemId)
+            let responseCode = await response.json()
+            if (responseCode.code == 200) {
+                return responseCode.data.itemDetail
+            }
+            else {
+                alert(responseCode.message)
+            }
+
+        }
+
+        // Request button to POST item request, set alert when timer = 0 to redirect to homepage
+        function reqItem() {
+            if (difference < 0) {
+                alert("Item has expired, you will be redirected back to the homepage")
+                window.location.href = "index.html"
+            }
+            else {
+                
             }
         }
 
@@ -249,57 +313,10 @@
             if (document.getElementById("loginLogoutButton").innerText === "Login") {
                 window.location.href = "login.html"
             } else {
-                window.sessionStorage.removeItem("userType")
+                sessionStorage.removeItem("user")
                 window.location.reload()
             }
         }
-        $(async() => {            
-            var serviceURL = "http://127.0.0.1:5001/faq";
-
-            try {
-                // Retrieve list of all FAQ
-                const response =
-                await fetch(
-                   serviceURL, { method: 'GET' }
-                );
-                const result = await response.json();
-                if (response.ok) {
-                    // success case
-                    var allFaq = result.data.items;
-                    var worker = "<ul>";
-                    var donor = "<ul>";
-                    var driver = "<ul>";
-                    for (faq of allFaq) {
-                        item = `<li data-aos="fade-up">
-                                    <i class="bx bx-help-circle icon-help"></i><a data-bs-toggle="collapse" class="collapsed" data-bs-target="#id` + faq.faqID + `">` + faq.question + ` <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
-                                    <div id="id` + faq.faqID + `" class="collapse">
-                                    <p>` + faq.answer + `</p>
-                                    </div>
-                                </li>`
-                        if (faq.section == "worker") {
-                            worker += item
-                        } else if (faq.section == "donor") {
-                            donor += item
-                        } else if (faq.section == "driver") {
-                            driver += item
-                        }
-                    }
-
-                    worker += "</ul>";
-                    donor += "</ul>";
-                    driver += "</ul>";
-
-                    $('#worker').append(worker);
-                    $('#donor').append(donor);
-                    $('#driver').append(driver);
-                }
-            } catch (error) {
-                // Errors when calling the service; such as network error, 
-                // service offline, etc
-                console.log(error)
-                alert('There is a problem retrieving data, please refresh the page or try again later.');
-            } // error
-        });
     </script>
 
 </body>
