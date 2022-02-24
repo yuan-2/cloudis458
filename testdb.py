@@ -31,7 +31,7 @@ class CarouselItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     itemName = db.Column(db.String(50), nullable=False)
     donorAddr = db.Column(db.String(300), nullable=False)
-    contactNo = db.Column(db.String(20), nullable=False)
+    contactNo = db.Column(db.Integer, nullable=False)
     category = db.Column(db.String(20), nullable=False)
     subCat = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
@@ -64,22 +64,22 @@ class WishList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     itemName = db.Column(db.String(50), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    remarks = db.Column(db.String(300))
-    category = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(20), nullable=False)
+    subCat = db.Column(db.String(30), nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
     itemStatus = db.Column(db.String(50), nullable=False)
     
-    def __init__(self, id, itemName, quantity, remarks, category, timeSubmitted, itemStatus):
+    def __init__(self, id, itemName, quantity, category, subCat, timeSubmitted, itemStatus):
         self.id = id
         self.itemName = itemName
         self.quantity = quantity
-        self.remarks = remarks
         self.category = category
+        self.subCat = subCat
         self.timeSubmitted = timeSubmitted
         self.itemStatus = itemStatus
         
     def json(self):
-        return {"id": self.id, "itemName": self.itemName, "quantity": self.quantity, "remarks": self.remarks, "category": self.category, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
+        return {"id": self.id, "itemName": self.itemName, "quantity": self.quantity, "category": self.category, "subCat": self.subCat, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
         
     
 
@@ -128,7 +128,7 @@ class User(db.Model):
     def json(self):
         return {"username": self.username, "password": self.password, "userType": self.userType}
 
-class Worker_Request(db.Model):
+class Request(db.Model):
     __tablename__ = 'request'
     
     reqId = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -400,7 +400,7 @@ def addNewRequest():
         currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
         timeSubmitted = currentDT
 
-        addtodb = Worker_Request(0, contact, destination, id, iQuantity, timeSubmitted)
+        addtodb = Request(0, contact, destination, id, iQuantity, timeSubmitted)
         
         try:
             db.session.add(addtodb)
