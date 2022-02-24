@@ -25,226 +25,76 @@ CORS(app)
 uploads_dir = os.path.join('../assets/img/donations')
 
 
-class CarouselItem(db.Model):
-    __tablename__ = 'carousel'
-
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    itemName = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.String(300), nullable=False)
-    donorName = db.Column(db.String(50), nullable=False)
-    donorAddr = db.Column(db.String(300), nullable=False)
-    contactNo = db.Column(db.String(20), nullable=False)
-    category = db.Column(db.String(20), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    requireDelivery = db.Column(db.Integer, nullable=False)
-    region = db.Column(db.String(20), nullable=False)
-    timeSubmitted = db.Column(db.Date, nullable=False)
-    itemStatus = db.Column(db.Integer, nullable=False)
-    fileName = db.Column(db.String(200), nullable=False)
-
-    def __init__(self, id, itemName, description, donorName, donorAddr, contactNo, category, quantity, requireDelivery, region, timeSubmitted, itemStatus, fileName):
-        self.id = id
-        self.itemName = itemName
-        self.description = description
-        self.donorName = donorName
-        self.donorAddr = donorAddr
-        self.contactNo = contactNo
-        self.category = category
-        self.quantity = quantity
-        self.requireDelivery = requireDelivery
-        self.region = region
-        self.timeSubmitted = timeSubmitted
-        self.itemStatus = itemStatus
-        self.fileName = fileName
-
-    def json(self):
-        return {"id": self.id, "itemName": self.itemName, "description": self.description, "donorName": self.donorName, "donorAddr": self.donorAddr, 
-                "contactNo": self.contactNo, "category": self.category, "quantity": self.quantity, "requireDelivery": self.requireDelivery, 
-                "region": self.region, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus, "fileName": self.fileName}
-
 class NewCarousel(db.Model):
     __tablename__ = 'newcarousel'
     
-    carouselID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    donorID = db.Column(db.Integer)
-    submissionID = db.Column(db.String(30), nullable=False)
-    itemName = db.Column(db.String(50), nullable=False)
-    itemCategory = db.Column(db.String(50), nullable=False)
+    donorID = db.Column(db.Integer, primary_key=True)
+    carouselID = db.Column(db.String(30), nullable=False)
+    itemID = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
     itemStatus = db.Column(db.String(50), nullable=False)
         
     def json(self):
-        return {"carouselID": self.carouselID, "donorID": self.donorID, "submissionID": self.submissionID, "itemName": self.itemName, "itemCategory": self.itemCategory, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
+        return {"donorID": self.donorID, "carouselID": self.carouselID, "itemID": self.itemID, 
+                "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
 
+class CategoryItem(db.Model):
+    __tablename__ = 'categoryitem'
+    
+    itemID = db.Column(db.Integer, primary_key=True)
+    itemName = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    subCat = db.Column(db.String(50), nullable=False)
+        
+    def json(self):
+        return {"itemID": self.itemID, "itemName": self.itemName, "category": self.category, "subCat": self.subCat}
 
-# get column headers
-@app.route("/getCarouselItemColumns")
-def getCarouselItemColumns():
-    return jsonify(
-        {
-            "code": 200,
-            "data": {
-                "columns": CarouselItem.metadata.tables["carousel"].columns.keys()
-            }
-        }
-    )
-
-# get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 (time logic not done)
-@app.route("/getAllItems")
-def getAllItems():
-    carouselList = CarouselItem.query.all()
-    if len(carouselList):
-        # result = []
-        # columnNames = dir(CarouselItem)
-        # print(type(columnNames))
-        # for item in carouselList:
-        #     for colName in columnNames:
-        #         result.append({ colName: item[colName] })
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "items": [carouselItem.json() for carouselItem in carouselList]
-                }
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no donations at the moment."
-        }
-    ), 404
-
-# get all items submitted by donors where timeSubmitted > 0 and timeSubmitted <= 24 and filtered by category (time logic not done)
-@app.route("/getItem/<Cat>")
-def getItemsByCategory(Cat):
-    itemList = CarouselItem.query.filter_by(category=Cat)
-    if len(itemList):
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "itemsByCat": [carouselItem.json() for carouselItem in itemList]
-                }
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no items listed under this category."
-        }
-    ), 404
-
-# get specific item in carousel
-@app.route("/getItem/<int:id>")
-def getItemByID(id):
-    carouselItem = CarouselItem.query.filter_by(id=id).first()
-    if carouselItem:
-        return jsonify(
-            {
-                "code": 200,
-                "data": carouselItem.json()
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "Item cannot be found for this ID."
-        }
-    ), 404
-
-# edit donated (carousel) item in table
-@app.route("/updateItem/<int:itemID>", methods=["PUT"])
-def updateItem(itemID):
-    item = CarouselItem.query.filter_by(id=itemID).first()
-    data = request.get_json()
-    if (item is None):
-        return jsonify( 
-            {
-                "code": 404,
-                "message": "This item ID is not found in the database."
-            }
-        )
-    else:
-        # for col in data:
-        #     item.col = data[col]
-        item.itemName = data['itemName']
-        item.description = data['description']
-        item.donorName = data['donorName']
-        item.donorAddr = data['donorAddr']
-        item.contactNo = data['contactNo']
-        item.category = data['category']
-        item.quantity = data['quantity']
-        item.requireDelivery = data['requireDelivery']
-        item.region = data['region']
-        item.itemStatus = data['itemStatus']
-        db.session.add(item)
-        db.session.commit()
-        return jsonify(
-            {
-                "code": 200,
-                "message": "Item successfully updated."
-            }
-        )
-
-# edit donated (carousel) photo in table
-# @app.route("/updatePhoto/<int:itemID>", methods=["POST"])
-# def updatePhoto(itemID):
-#     item = CarouselItem.query.filter_by(id=itemID).first()
-#     data = request.to_dict()
-#     if (item is None):
-#         return jsonify( 
-#             {
-#                 "code": 404,
-#                 "message": "This item ID is not found in the database."
-#             }
-#         )
-#     else:
-#         imgFile = request.files['file']
-#         fileName = secure_filename(imgFile.filename)
-#         imgFile.save(os.path.join(uploads_dir, fileName))
-#         item.fileName = data['itemImg']
-#         db.session.commit()
-#         return jsonify(
-#             {
-#                 "code": 200,
-#                 "message": "Item successfully updated."
-#             }
-#         )
-
-
-class Request(db.Model):
-    __tablename__ = 'request'
+class NewRequest(db.Model):
+    __tablename__ = 'newrequest'
 
     reqID = db.Column(db.Integer, primary_key=True, nullable=False)
-    requestorContactNo = db.Column(db.String(50), nullable=False)
+    requestorContactNo = db.Column(db.Integer, nullable=False)
     deliveryLocation = db.Column(db.String(300), nullable=False)
-    itemCategory = db.Column(db.String(50), nullable=False)
+    carouselID = db.Column(db.String(50), nullable=False)
     requestQty = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
 
-    def __init__(self, reqID, requestorContactNo, deliveryLocation, itemCategory, requestQty, timeSubmitted):
+    def __init__(self, reqID, requestorContactNo, deliveryLocation, carouselID, requestQty, timeSubmitted):
         self.reqID = reqID
         self.requestorContactNo = requestorContactNo
         self.deliveryLocation = deliveryLocation
-        self.itemCategory = itemCategory
+        self.carouselID = carouselID
         self.requestyQty = requestQty
         self.timeSubmitted = timeSubmitted
 
     def json(self):
         return {"reqID": self.reqID, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, 
-                "itemCategory": self.itemCategory, "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
+                "carouselID": self.carouselID, "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
 
 # get all requests submitted by migrant workers
 @app.route("/getRequests")
 def getAllRequests():
-    requestList = Request.query.all()
+    requestList = NewRequest.query.all()
+    data = []
+    row = {}
+    for request in requestList:
+        carouselID = request.carouselID
+        carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
+        itemID = carouselItem.itemID
+        itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
+        row["itemName"] = itemName
+        row.update(carouselItem.json())
+        row.update(request.json())
+        row.pop('itemID')
+        row.pop('carouselID')
+        data.append(row)
+    columns = list(data[0].keys())
     if len(requestList):
         return jsonify(
             {
                 "code": 200,
-                "columnHeaders": Request.metadata.tables["request"].columns.keys(),
-                "data": [request.json() for request in requestList]
+                "columnHeaders": columns,
+                "data": data
             }
         )
     return jsonify(
@@ -254,16 +104,32 @@ def getAllRequests():
         }
     ), 404
 
-# get specific request submitted by migrant workers
-@app.route("/getRequests/<int:id>")
-def getRequestByID(id):
-    request = Request.query.filter_by(reqid=id).first()
+# get specific request by reqID
+@app.route("/getRequests/<reqID>")
+def getRequestByID(reqID):
+    request = NewRequest.query.filter_by(reqID=reqID).first()
+    carouselID = request.carouselID
+    carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
+    itemID = carouselItem.itemID
+    itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
+    data = {}
+    data["itemName"] = itemName
+    data.update(request.json())
+    data.update(carouselItem.json())
+    data.pop("itemID")
+    data.pop("carouselID")
+    fieldNames = {}
+    columns = sorted(list(data.keys()))
+    for i in range(len(columns)):
+        fieldNames[i] = columns[i]
     if request:
         return jsonify(
             {
                 "code": 200,
-                "columnHeaders": Request.metadata.tables["request"].columns.keys(),
-                "data": request.json()
+                "columnHeaders": fieldNames,
+                "data": data
+                # "columnHeaders": NewRequest.metadata.tables["newrequest"].columns.keys(),
+                # "data": request
             }
         )
     return jsonify(
@@ -274,62 +140,40 @@ def getRequestByID(id):
     ), 404
 
 # get requests submitted for specific item
-@app.route("/getRequestsByItem/<itemID>")
-def getRequestByItemID(itemID):
-    requests = Request.query.filter_by(itemID=itemID)
-    if requests:
-        return jsonify(
-            {
-                "code": 200,
-                "columnHeaders": Request.metadata.tables["request"].columns.keys(),
-                "data": [request.json() for request in requests]
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "Requests cannot be found for this item ID."
-        }
-    ), 404
-
-# get list of migrant workers that requested specific item
-@app.route("/getMigrantWorkersListByItem/<itemID>")
-def getMigrantWorkersListByItemID(itemID):
-    requests = Request.query.filter_by(itemID=itemID)
-    mwList = []
-    if requests:
-        for req in requests:
-            mwList.append(req.requestorContactNo)
-        return jsonify(
-            {
-                "code": 200,
-                "data": mwList
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "No migrant workers requested for this item ID."
-        }
-    ), 404
-
+# @app.route("/getRequestsByItem/<reqID>")
+# def getRequestByItemID(reqID):
+#     requests = NewRequest.query.filter_by(reqID=reqID)
+#     if requests:
+#         return jsonify(
+#             {
+#                 "code": 200,
+#                 "columnHeaders": NewRequest.metadata.tables["newrequest"].columns.keys(),
+#                 "data": [request.json() for request in requests]
+#             }
+#         )
+#     return jsonify(
+#         {
+#             "code": 404,
+#             "message": "Requests cannot be found for this item ID."
+#         }
+#     ), 404
 
 # edit request in table
-@app.route("/updateRequest/<int:id>", methods=["PUT"])
-def updateRequest(id):
-    requested = Request.query.filter_by(reqid=id).first()
+@app.route("/updateRequest/<reqID>", methods=["PUT"])
+def updateRequest(reqID):
+    requested = NewRequest.query.filter_by(reqID=reqID).first()
     data = request.get_json()
     if (requested is None):
         return jsonify( 
             {
                 "code": 404,
-                "message": "This ID is not found in the database."
+                "message": "This reqID is not found in the database."
             }
         )
     else:
         requested.deliveryLocation = data['deliveryLocation']
-        requested.itemCategory = data['itemCategory']
         requested.requestQty = data['requestQty']
+        requested.requestorContactNo = data['requestorContactNo']
         db.session.add(requested)
         db.session.commit()
         return jsonify(
@@ -339,207 +183,56 @@ def updateRequest(id):
             }
         )
 
-class MigrantWorker(db.Model):
-    __tablename__ = 'migrantworker'
-
-    contactNo = db.Column(db.Integer, primary_key=True, nullable=False)
-    address = db.Column(db.String(300), nullable=False)
-    reqHistory = db.Column(db.Integer, nullable=False)
-
-    def __init__(self, contactNo, address, reqHistory):
-        self.contactNo = contactNo
-        self.address = address
-        self.reqHistory = reqHistory
-
-    def json(self):
-        return {"contactNo": self.contactNo, "address": self.address, "reqHistory": self.reqHistory}
-
-# get all migrant workers details
-@app.route("/getAllMigrantWorkers")
-def getAllMigrantWorkers():
-    migrantWorkers = MigrantWorker.query.all()
-    if migrantWorkers:
-        return jsonify(
-            {
-                "code": 200,
-                "data": [mw.json() for mw in migrantWorkers]
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "No migrant workers requested for this item ID."
-        }
-    ), 404
-
-# get reqHistory for specific migrant worker
-@app.route("/getReqHistory/<contactNo>")
-def getReqHistory(contactNo):
-    migrantWorker = MigrantWorker.query.filter_by(contactNo=contactNo).first()
-    if migrantWorker:
-        return jsonify(
-            {
-                "code": 200,
-                "data": { migrantWorker.contactNo: migrantWorker.reqHistory }
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "No migrant workers requested for this item ID."
-        }
-    ), 404
-
-
-# check for the list of MWs, how long since each of them have gotten an item
-@app.route("/getMWLastItemWeeks/<itemID>")
-def getMWLastItemWeeks(itemID):
-    requests = Request.query.filter_by(itemID=itemID)
-    if requests:
-        mwList = []
-        reqHist = {}
-        for req in requests:
-            mwList.append(req.requestorContactNo)
-        for num in mwList:
-            migrantWorker = MigrantWorker.query.filter_by(contactNo=num).first()
-            if migrantWorker.reqHistory in reqHist.keys():
-                reqHist[migrantWorker.reqHistory] += [migrantWorker.contactNo]
-            else:
-                reqHist[migrantWorker.reqHistory] = [migrantWorker.contactNo]
-        allKeys = reqHist.keys()
-        minValue = min(allKeys)
-        priorityMW = reqHist[minValue]
-        return jsonify(
-            {
-                "code": 200,
-                "data": priorityMW,
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "No migrant workers requested for this item ID."
-        }
-    ), 404
-
-
-class Wishlist(db.Model):
-    __tablename__ = 'wishlist'
-
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    itemName = db.Column(db.String(50), nullable=False)
-    remarks = db.Column(db.String(300), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
-    timeSubmitted = db.Column(db.Date, nullable=False)
-    itemStatus = db.Column(db.Integer, nullable=False)
-
-    def __init__(self, id, itemName, remarks, category, timeSubmitted, itemStatus):
-        self.id = id
-        self.itemName = itemName
-        self.remarks = remarks
-        self.category = category
-        self.timeSubmitted = timeSubmitted
-        self.itemStauts = itemStatus
-
-    def json(self):
-        return {"id": self.id, "itemName": self.itemName, "remarks": self.remarks, "category": self.category, 
-                "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
-
-# get all wishlist submitted by migrant workers
-# @app.route("/getWishlist")
-# def getWishlist():
-#     wishlist = Wishlist.query.all()
-#     if len(wishlist):
-#         return jsonify(
-#             {
-#                 "code": 200,
-#                 "data": [wish.json() for wish in wishlist]
-#             }
-#         )
-#     return jsonify(
-#         {
-#             "code": 404,
-#             "message": "There are no requests at the moment."
-#         }
-#     ), 404
-
-# get specific wishlist submitted by migrant workers by wishlist ID
-# @app.route("/getWishlist/<int:id>")
-# def getWishlistByID(id):
-#     wishlist = Wishlist.query.filter_by(id=id).first()
-#     if wishlist:
-#         return jsonify(
-#             {
-#                 "code": 200,
-#                 "data": wishlist.json()
-#             }
-#         )
-#     return jsonify(
-#         {
-#             "code": 404,
-#             "message": "Wishlist cannot be found for this ID."
-#         }
-#     ), 404
-
-# edit wishlist in table
-# @app.route("/updateWishlist/<int:id>", methods=["PUT"])
-# def updateWishlist(id):
-#     wishlistItem = Wishlist.query.filter_by(id=id).first()
-#     data = request.get_json()
-#     if (wishlistItem is None):
-#         return jsonify( 
-#             {
-#                 "code": 404,
-#                 "message": "This ID is not found in the database."
-#             }
-#         )
-#     else:
-#         wishlistItem.itemName = data['itemName']
-#         wishlistItem.remarks = data['remarks']
-#         wishlistItem.category = data['category']
-#         wishlistItem.itemStatus = data['itemStatus']
-#         db.session.add(wishlistItem)
-#         db.session.commit()
-#         return jsonify(
-#             {
-#                 "code": 200,
-#                 "message": "Wishlist successfully updated."
-#             }
-#         )
-
-
 class Matches(db.Model):
     __tablename__ = 'matches'
 
     matchID = db.Column(db.Integer, primary_key=True, nullable=False)
     reqID = db.Column(db.Integer, nullable=False)
-    requestorContactNo = db.Column(db.String(50), nullable=False)
-    donorContactNo = db.Column(db.String(50), nullable=False)
-    requestedItem = db.Column(db.String(50), nullable=False)
+    requestorContactNo = db.Column(db.Integer, nullable=False)
+    donorID = db.Column(db.Integer, nullable=False)
     matchDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, matchID, reqID, requestorContactNo, donorContactNo, requestedItem, matchDate):
+    def __init__(self, matchID, reqID, requestorContactNo, donorID, matchDate):
         self.matchID = matchID
         self.reqID = reqID
         self.requestorContactNo = requestorContactNo
-        self.donorContactNo = donorContactNo
-        self.requestedItem = requestedItem
+        self.donorID = donorID
         self.matchDate = matchDate
 
     def json(self):
         return { "matchID": self.matchID, "reqID": self.reqID, "requestorContactNo": self.requestorContactNo, 
-                "donorContactNo": self.donorContactNo, "requestedItem": self.requestedItem, "matchDate": self.matchDate }
+                "donorID": self.donorID, "matchDate": self.matchDate }
 
 # get all successful matches 
 @app.route("/getSuccessfulMatches")
 def getAllSuccessfulMatches():
     matches = Matches.query.all()
+    data = []
+    row = {}
+    for match in matches:
+        reqID = match.reqID
+        request = NewRequest.query.filter_by(reqID=reqID).first()
+        carouselID = request.carouselID
+        carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
+        itemID = carouselItem.itemID
+        itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
+        row["itemName"] = itemName
+        row.update(match.json())
+        row.update(request.json())
+        row.update(carouselItem.json())
+        row.pop('carouselID')
+        row.pop('reqID')
+        row.pop('itemID')
+        data.append(row)
+    columns = list(data[0].keys())
     if len(matches):
         return jsonify(
             {
                 "code": 200,
-                "data": [match.json() for match in matches], 
-                "columnHeaders": Matches.metadata.tables["matches"].columns.keys()
+                "columnHeaders": columns,
+                "data": data
+                # "data": [match.json() for match in matches], 
+                # "columnHeaders": Matches.metadata.tables["matches"].columns.keys()
             }
         )
     return jsonify(
@@ -549,17 +242,33 @@ def getAllSuccessfulMatches():
         }
     ), 404
 
-# get specific successful match (without matchDate)
+# get specific successful match 
 @app.route("/getSuccessfulMatches/<matchID>")
 def getSuccessfulMatch(matchID):
-    match = Matches.query.filter_by(matchID=matchID).first().json()
-    match.pop('matchDate')
+    data = {}
+    match = Matches.query.filter_by(matchID=matchID).first()
+    reqID = match.reqID
+    request = NewRequest.query.filter_by(reqID=reqID).first()
+    carouselID = request.carouselID
+    carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
+    itemID = carouselItem.itemID
+    itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
+    data = {}
+    data["itemName"] = itemName
+    data.update(request.json())
+    data.update(carouselItem.json())
+    data.pop("itemID")
+    data.pop("carouselID")
+    data.pop("reqID")
+    columns = list(data.keys())
     if match:
         return jsonify(
             {
                 "code": 200,
-                "columnHeaders": Matches.metadata.tables["matches"].columns.keys(),
-                "data": match
+                "columnHeaders": columns,
+                "data": data
+                # "columnHeaders": Matches.metadata.tables["matches"].columns.keys(),
+                # "data": match
             }
         )
     return jsonify(
@@ -573,8 +282,11 @@ def getSuccessfulMatch(matchID):
 @app.route("/updateSuccessfulMatches/<matchID>", methods=["PUT"])
 def updateSuccessfulMatches(matchID):
     match = Matches.query.filter_by(matchID=matchID).first()
+    reqID = match.reqID
+    request = NewRequest.query.filter_by(reqID=reqID).first()
+    carouselID = request.carouselID
+    carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
     data = request.get_json()
-    olddata = data
     if (match is None):
         return jsonify( 
             {
@@ -583,12 +295,13 @@ def updateSuccessfulMatches(matchID):
             }
         )
     else:
-        match.matchID = data['matchID']
-        match.reqID = data['reqID']
         match.requestorContactNo = data['requestorContactNo']
-        match.donorContactNo = data['donorContactNo']
-        match.requestedItem = data['requestedItem']
+        match.donorID = data['donorID']
         db.session.add(match)
+        request.delieryLocation = data['deliveryLocation']
+        db.session.add(request)
+        carouselItem.itemStatus = data['itemStatus']
+        db.session.add(carouselItem)
         db.session.commit()
         return jsonify(
             {
@@ -599,7 +312,6 @@ def updateSuccessfulMatches(matchID):
                 "olddata": data
             }
         )
-
 
 
 class FormBuilder(db.Model):
@@ -662,24 +374,22 @@ class FormAnswers(db.Model):
 class NewWishlist(db.Model):
     __tablename__ = 'newwishlist'
 
-    submissionID = db.Column(db.Integer, nullable=False, primary_key=True)
+    wishlistID = db.Column(db.Integer, nullable=False, primary_key=True)
     migrantID = db.Column(db.Integer, nullable=False)
-    itemName = db.Column(db.String(30), nullable=False)
-    itemCategory = db.Column(db.String(20), nullable=False)
+    itemID = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.DateTime, nullable=False)
     itemStatus = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, submissionID, migrantID, itemName, itemCategory, timeSubmitted, itemStatus):
-        self.submissionID = submissionID
+    def __init__(self, wishlistID, migrantID, itemID, timeSubmitted, itemStatus):
+        self.wishlistID = wishlistID
         self.migrantID = migrantID
-        self.itemName = itemName
-        self.itemCategory = itemCategory
+        self.itemID = itemID
         self.timeSubmitted = timeSubmitted
         self.itemStatus = itemStatus
 
     def json(self):
-        return {"submissionID": self.submissionID, "migrantID": self.migrantID, "itemCategory": self.itemCategory,
-                "itemName": self.itemName, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
+        return {"wishlistID": self.wishlistID, "migrantID": self.migrantID, "itemID": self.itemID,
+                "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
 
 
 # get all form answers for any form
@@ -687,7 +397,7 @@ class NewWishlist(db.Model):
 def getFormAnswersDonate(formName):
     formFields = FormBuilder.query.filter_by(formName=formName)
     formAnswers = FormAnswers.query.filter_by(formName=formName)
-    if formName == "donate":
+    if formName == "carousel":
         tableFields = NewCarousel.metadata.tables["newcarousel"].columns.keys()
     elif formName == "wishlist":
         tableFields = NewWishlist.metadata.tables["newwishlist"].columns.keys()
@@ -695,7 +405,10 @@ def getFormAnswersDonate(formName):
     for field in formFields:
         fieldNames[field.fieldID] = field.fieldName
     for field in tableFields:
-        fieldNames[len(fieldNames) + 1] = field
+        if field == "itemID":
+            fieldNames[len(fieldNames) + 1] = "itemName"
+        else:
+            fieldNames[len(fieldNames) + 1] = field
     data = []
     row = {}
     submissionID = ""
@@ -703,13 +416,15 @@ def getFormAnswersDonate(formName):
         if ans.submissionID != submissionID:
             data.append(row)
             submissionID = ans.submissionID
-            row["submissionID"] = submissionID
-            if formName == "donate":
-                submissions = NewCarousel.query.filter_by(submissionID=submissionID)
+            if formName == "carousel":
+                submissions = NewCarousel.query.filter_by(carouselID=submissionID).first().json()
             elif formName == "wishlist":
-                submissions = NewWishlist.query.filter_by(submissionID=submissionID)
-            for s in submissions:
-                row.update(s.json())
+                submissions = NewWishlist.query.filter_by(wishlistID=submissionID).first().json()
+            itemID = submissions["itemID"]
+            itemName = CategoryItem.query.filter_by(itemID=itemID).first().json()["itemName"]
+            submissions["itemName"] = itemName
+            submissions.pop("itemID")
+            row.update(submissions)
         row[fieldNames[ans.fieldID]] = ans.answer
     if len(data) > 0:
         return jsonify( 
@@ -728,12 +443,12 @@ def getFormAnswersDonate(formName):
         )
 
 
-# get all form answers for specific forms (carousel & wishlist items) (without timeSubmitted & Item Photo)
+# get all form answers for specific forms (carousel & wishlist items)
 @app.route("/getFormAnswers/<formName>/<submissionID>")
 def getSpecificFormAnswers(formName, submissionID):
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
     formFields = FormBuilder.query.filter_by(formName=formName)
-    if formName == "donate":
+    if formName == "carousel":
         tableFields = NewCarousel.metadata.tables["newcarousel"].columns.keys()
     elif formName == "wishlist":
         tableFields = NewWishlist.metadata.tables["newwishlist"].columns.keys()
@@ -745,14 +460,15 @@ def getSpecificFormAnswers(formName, submissionID):
     data = {}
     for ans in formAnswers:
         data["submissionID"] = submissionID
-        if fieldNames[ans.fieldID] != "Item Photo":
-            data[fieldNames[ans.fieldID]] = ans.answer
-        if formName == "donate":
-            item = NewCarousel.query.filter_by(submissionID=submissionID).first()
+        data[fieldNames[ans.fieldID]] = ans.answer
+        if formName == "carousel":
+            item = NewCarousel.query.filter_by(carouselID=submissionID).first()
         elif formName == "wishlist":
-            item = NewWishlist.query.filter_by(submissionID=submissionID).first()
+            item = NewWishlist.query.filter_by(wishlistID=submissionID).first()
         data.update(item.json())
-        data.pop('timeSubmitted')
+        # data.pop('itemName')
+    # data.pop('timeSubmitted')
+    # data.pop('itemID')
     if len(data) > 0:
         return jsonify( 
             {
@@ -774,10 +490,10 @@ def getSpecificFormAnswers(formName, submissionID):
 def updateDonatedItem(formName, submissionID):
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
     formFields = FormBuilder.query.filter_by(formName=formName)
-    if formName == "donate":
-        otherFormFields = NewCarousel.query.filter_by(submissionID=submissionID).first()
+    if formName == "carousel":
+        otherFormFields = NewCarousel.query.filter_by(carouselID=submissionID).first()
     elif formName == "wishlist":
-        otherFormFields = NewWishlist.query.filter_by(submissionID=submissionID).first()
+        otherFormFields = NewWishlist.query.filter_by(wishlistID=submissionID).first()
     fieldNames = {}
     for field in formFields:
         fieldNames[field.fieldID] = field.fieldName
@@ -791,25 +507,26 @@ def updateDonatedItem(formName, submissionID):
         )
     else:
         dataDict = {}
-        if formName == "donate":
-            otherFormFields.carouselID = data["carouselID"]
+        if formName == "carousel":
             otherFormFields.donorID = data["donorID"]
+            otherFormFields.carouselID = data["carouselID"]
         elif formName == "wishlist":
-            otherFormFields.submissionID = data["submissionID"]
+            otherFormFields.wishlistID = data["wishlistID"]
             otherFormFields.migrantID = data["migrantID"]
-        otherFormFields.submissionID = data["submissionID"]
-        otherFormFields.itemName = data["itemName"]
-        otherFormFields.itemCategory = data["itemCategory"]
+        # otherFormFields.submissionID = data["submissionID"]
+        # otherFormFields.itemName = data["itemName"]
+        # otherFormFields.itemCategory = data["itemCategory"]
         otherFormFields.itemStatus = data["itemStatus"]
         db.session.add(otherFormFields)
         db.session.commit()
         for d in data:
             dataDict[d] = data[d]
         for ans in formAnswers:
-            fieldID = ans.fieldID
-            ans.answer = dataDict[str(fieldID)]
-            db.session.add(ans)
-            db.session.commit()
+            if ans.fieldID != 4:
+                fieldID = ans.fieldID
+                ans.answer = dataDict[str(fieldID)]
+                db.session.add(ans)
+                db.session.commit()
         return jsonify(
             {
                 "code": 200,
@@ -825,22 +542,22 @@ def updatePhoto(submissionID):
         formData = request.form
         formDict = formData.to_dict()
         imgFile = request.files['file']
-        formField = FormBuilder.query.filter_by(formName="donate").filter_by(fieldName="Item Photo").first()
+        formField = FormBuilder.query.filter_by(formName="carousel").filter_by(fieldName="Item Photo").first()
         fieldID = formField.fieldID
         formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
-        # delete current file
-        oldFile = formAnswer.answer
-        os.remove(os.path.join(uploads_dir, oldFile))
         # save file
         fileName = secure_filename(imgFile.filename.replace(" ", ""))
         # print(formDict)
         imgFile.save(os.path.join(uploads_dir, fileName))
         # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
         file = formDict['itemImg']
+
+        # delete old photo file
+        oldFile = formAnswer.answer
+        os.remove(os.path.join(uploads_dir, oldFile))
         
         try:
             formAnswer.answer = file
-            print(formAnswer.answer)
             db.session.add(formAnswer)
             db.session.commit()
             return jsonify (
@@ -862,7 +579,7 @@ def updatePhoto(submissionID):
 # rank migrant workers according to reqHistory, get list of MWs who are prioritised
 @app.route("/getRankByReqHistory/<itemID>")
 def getRankByReqHistory(itemID):
-    requests = Request.query.filter_by(itemID=itemID)
+    requests = NewRequest.query.filter_by(itemID=itemID)
     if requests:
         reqHist = {}
         for req in requests:

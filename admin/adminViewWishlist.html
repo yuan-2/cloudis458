@@ -161,10 +161,12 @@
                         // success case
                         for (var i in result.data) {
                             // field = result.data[i];
-                            for (id in result.columnHeaders) {
-                                // console.log(id, result.columnHeaders[id]);
-                                if (result.columnHeaders[id] == i) {
-                                    document.getElementById(id).value = result.data[i];
+                            if (i != "timeSubmitted" && i != "Item Photo" && i != "itemID") {
+                                for (id in result.columnHeaders) {
+                                    // console.log(id, result.columnHeaders[id]);
+                                    if (result.columnHeaders[id] == i) {
+                                        document.getElementById(id).value = result.data[i];
+                                    }
                                 }
                             }
                         }
@@ -184,7 +186,7 @@
         function editWishlist() {
             var data = {};
             var inputFields = document.getElementById("edit-section").children;
-            var submissionID = document.querySelector('[placeholder="submissionID"]').value;
+            var wishlistID = document.querySelector('[placeholder="wishlistID"]').value;
             for (var i in inputFields) {
                 input = inputFields[i];
                 inputChildrenCount = input.childElementCount;
@@ -199,7 +201,7 @@
 
             var jsondata = JSON.stringify(data);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/wishlist/" + submissionID;
+                var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/wishlist/" + wishlistID;
                 try {
                     const response =
                     await fetch(

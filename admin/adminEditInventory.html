@@ -108,8 +108,8 @@
             <div style="display: none" id="edit-photo">
                 <div class="row">
                     <div class="col-6">
-                        <label for="submissionID">submissionID</label>
-                        <input class="form-control mb-2" type="text" placeholder="submissionID" id="submissionID">
+                        <label for="carouselID">carouselID</label>
+                        <input class="form-control mb-2" type="text" placeholder="carouselID" id="carouselID">
                     </div>
                     <div class="col-4">
                         <label for="itemPhoto">Upload Photo</label>
@@ -134,7 +134,7 @@
 
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getFormAnswers/donate",
+                url: "http://127.0.0.1:5000/getFormAnswers/carousel",
                 success: function (data) {
                     columnNames = Object.values(data.columnHeaders);
                     for (var i in columnNames) {
@@ -164,9 +164,9 @@
         } );
 
 
-        function fillInventoryDetails(val) {
+        function fillCarouselDetails(val) {
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/getFormAnswers/donate/" + val;
+                var serviceURL = "http://127.0.0.1:5000/getFormAnswers/carousel/" + val;
                 try {
                     const response =
                     await fetch(
@@ -179,15 +179,14 @@
                         // success case
                         for (var i in result.data) {
                             // field = result.data[i];
-                            for (id in result.columnHeaders) {
-                                // console.log(id, result.columnHeaders[id]);
-                                if (result.columnHeaders[id] == i) {
-                                    document.getElementById(id).value = result.data[i];
+                            if (i != "timeSubmitted" && i != "Item Photo" && i != "itemID") {
+                                for (id in result.columnHeaders) {
+                                    // console.log(id, result.columnHeaders[id]);
+                                    if (result.columnHeaders[id] == i) {
+                                        document.getElementById(id).value = result.data[i];
+                                    }
                                 }
                             }
-                            // if (i != "fileName" && i != "id" && i != "timeSubmitted") {
-                            //     document.getElementById(i).value = result.data[i];
-                            // }
                         }
                     }
                     if (response.status == 404) {
@@ -206,7 +205,7 @@
         function editInventory() {
             var inputFields = document.getElementById("edit-section").children;
             var data = {}
-            var submissionID = document.querySelector('[placeholder="submissionID"]').value;
+            var carouselID = document.querySelector('[placeholder="carouselID"]').value;
             for (var i in inputFields) {
                 input = inputFields[i];
                 inputChildrenCount = input.childElementCount;
@@ -220,7 +219,7 @@
             }
             var jsondata = JSON.stringify(data);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/donate/" + submissionID;
+                var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/carousel/" + carouselID;
                 try {
                     const response =
                     await fetch(
@@ -253,14 +252,14 @@
         function editPhotoFile() {
             var data = new FormData();
             var editElements = document.getElementById("edit-photo").children;
-            var submissionID = document.getElementById("submissionID").value;
+            var carouselID = document.getElementById("carouselID").value;
             var file = document.getElementById("itemPhoto").files;
             var fileName = file[0].name;
             fileName = fileName.replace(/\s+/g, '');
             data.append(document.getElementById("itemPhoto").name, fileName);
             data.append("file", file[0]);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + submissionID;
+                var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + carouselID;
                 try {
                     const response =
                     await fetch(
