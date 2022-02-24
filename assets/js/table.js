@@ -52,7 +52,7 @@ function getEditDetails(fields) {
             fieldArr.unshift(fieldObj);
         }
         else if (field != "timeSubmitted") {
-            if (field != "matchDate") {
+            if (field != "matchDate" && field != "itemPhoto") {
                 fieldArr.push(fieldObj);
             }
         }
