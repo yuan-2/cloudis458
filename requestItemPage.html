@@ -204,19 +204,19 @@
 
         function checkLoginForReq() {
             if (sessionStorage.getItem("user") != null) {
-                user = JSON.parse(sessionStorage.getItem("user"))
+                user = JSON.parse(sessionStorage.getItem("user"));
 
-                console.log(user)
+                console.log(user);
 
-                document.getElementById("loginLogoutButton").innerText = "Logout"
+                document.getElementById("loginLogoutButton").innerText = "Logout";
 
                 const queryString = window.location.search;
                 const urlParams = new URLSearchParams(queryString);
-                itemId = urlParams.get('id')
+                itemId = urlParams.get('id');
 
                 loadItem().then(function retriveInfo(result) {
-                    itemInfo = result
-                    // console.log(itemInfo)
+                    itemInfo = result;
+                    console.log(itemInfo);
 
                     // item info API Works but request is not done up for dynamic work 
                     var x = setInterval(function() {
@@ -236,10 +236,11 @@
                         <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
                         `
 
-                        var date = new Date(item.timeSubmitted);
-                        var lastDate = date.setDate(date.getDate() + 1);
-                        var dateNow = Date.now();
-                        var difference = lastDate - dateNow
+                        var date = new Date(item.timeSubmitted).toUTCString();
+                        var finalDate = new Date(date.slice(0, -4))
+                        finalDate.setDate(finalDate.getDate() + 1);
+                        var dateNow = new Date(Date.now());
+                        var difference = finalDate - dateNow
                         var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                         var mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
                         var seconds = Math.floor((difference % (1000 * 60)) / 1000);
