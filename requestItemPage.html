@@ -104,6 +104,14 @@
             </div>
         </section>
 
+        <div class="container">
+            <div id="errorDiv" class="alert alert-warning d-none">
+                <ul id="errorList"></ul>
+                <p class="text-center">Please resolve the above errors before submitting the request again.</p>
+            </div>
+        </div>
+
+
         <section id="formDisplay" class="d-none">
             <div style="max-width: 1000px; margin: auto;">
                 <h2 class="m-4 text-center">Please fill in the following details</h2>
@@ -113,12 +121,12 @@
                         <input style="width: 300px;" type="text" name="contact" id="contactNo" disabled>
                     </div>
                     <div class="col-4">
-                        <label for="dAddress">Delivery Address:</label>
-                        <input style="width: 300px;" type="text" name="destination" id="dAddress">
+                        <label for="dAddress">Postal Code:</label>
+                        <input style="width: 300px;" type="number" name="destination" id="dAddress" required>
                     </div>
                     <div class="col-4">
                         <label for="quantity">Required Quantity:</label>
-                        <input style="width: 300px;" type="number" name="iQuantity" id="quantity">
+                        <input style="width: 300px;" type="number" name="iQuantity" id="quantity" required>
                     </div>
                     <div class="col-6">
                         <input type="hidden" name="id" id="itemid">
@@ -232,6 +240,7 @@
         var donorInfo = document.getElementById("donorInfo")
         var formDisplay = document.getElementById('formDisplay')
         var difference = ""
+        var availQty = ""
 
         function checkLoginForReq() {
             if (sessionStorage.getItem("user") != null) {
@@ -245,6 +254,10 @@
 
                 loadItem().then(function retriveInfo(result) {
                     var itemInfo = result
+
+                    for (i of itemInfo) {
+                        availQty = i.quantity
+                    }
 
                     // item info API Works but request is not done up for dynamic work 
                     var x = setInterval(function () {
@@ -336,18 +349,47 @@
         }
         const form = document.getElementById('requestForm')
 
+        var errorDiv = document.getElementById('errorDiv')
+
+        var errorList = document.getElementById('errorList')
+
         function submitReq() {
+            let errorArr = []
             reqFormElements = document.forms[0].elements
 
-            var formData = new FormData()
-
-            for (ele in reqFormElements) {
-                eleName = reqFormElements[ele].name
-                eleVal = reqFormElements[ele].value
-
-                formData.append(eleName, eleVal)
+            if (reqFormElements.destination.value.length > 6 || reqFormElements.destination.value.length < 1) {
+                errorArr.push("Postal Codes should be 6 digits long")
             }
-            addReq(formData, "http://127.0.0.1:5004/addRequest")
+
+            if (reqFormElements.iQuantity.value == "") {
+                errorArr.push("Please enter the quantity of items you want to request for")
+            }
+
+            if (availQty < reqFormElements.iQuantity.value) {
+                errorArr.push("Quantity requested is more than quantity available")
+            }
+
+            if (errorArr.length > 0) {
+                errorDiv.classList.remove('d-none')
+                errorList.innerHTML = ""
+                for (err of errorArr) {
+                    errorList.innerHTML += `<li> ${err} </li>`
+                }
+            } else {
+                errorDiv.classList.add('d-none')
+
+                var formData = new FormData()
+
+                for (ele in reqFormElements) {
+                    eleName = reqFormElements[ele].name
+                    eleVal = reqFormElements[ele].value
+
+                    formData.append(eleName, eleVal)
+                }
+                // updateCarousel(formData, "http://127.0.0.1:5004/updateItemQuantity")
+
+                addReq(formData, "http://127.0.0.1:5004/addRequest")
+            }
         }
 
         async function addReq(data, url) {
@@ -365,20 +407,30 @@
             if (response.status >= 200 && response.status < 300) {
                 data = await response.json()
                 if (data.code == "200") {
-                    let res = confirm(
-                        "Item has been posted successfully, Click 'cancel' to make another donation or ok to return to the home page"
-                    )
-
-                    if (res) {
-                        window.location.href = "index.html"
-                    } else {
-                        form.reset()
-                    }
+                    alert(
+                        "You have registered your interest for this item, you will be notified once the item is ready")
                 }
-            } else {
+            }
+        }
+
+        async function updateCarousel(data, url) {
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: data // body data type must match "Content-Type" header
+            });
+            if (response.status >= 200 && response.status < 300) {
                 data = await response.json()
-                alert(data.message)
-                form.reset()
+                console.log(data)
+                if (data.code == "500") {
+                    alert("Quantity requested is more than quantity available")
+                }
+            } else if (data.code == "200" || data.code == "201") {
+                return "All good"
             }
         }
 
