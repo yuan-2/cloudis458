@@ -104,7 +104,7 @@ function buildText(field) {
 function buildNumber(field) {
     var numField = `<div class="col-md-6">
                         <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
-                        <input required type="number" class="form-control" id="${field.fieldID}">
+                        <input required type="number" class="form-control" id="${field.fieldID}" placeholder="${field.placeholder ?? ""}">
                     </div>`;
 
 

@@ -150,6 +150,81 @@
             getDT();
         } );
 
+        function fillSuccessfulMatchesDetails(val) {
+            $(async () => {
+                var serviceURL = "http://127.0.0.1:5000/getSuccessfulMatches/" + val;
+                try {
+                    const response =
+                    await fetch(
+                        serviceURL, { 
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json'},
+                    });
+                    const result = await response.json();
+                    if (response.status == 200) {
+                        // success case
+                        for (var i in result.data) {
+                            if (["deliveryLocation", "donorID", "itemStatus", "requestQty", "requestorContactNo"].includes(i)) {
+                                document.querySelector('[placeholder="' + i + '"]').value = result.data[i];
+                            }
+                            // if (i != 'timeSubmitted' && i != "carouselID" && i != "reqID") {
+                            // }
+                        }
+                    }
+                    if (response.status == 404) {
+                        alert('There is no such request ID in the database, please enter a valid ID.')
+                    }
+                }
+                catch (error) {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    alert('There is a problem retrieving the data, please try again later.');
+                } // error
+            });
+        }
+
+        function editSuccessfulMatches() {
+            var data = {};
+            var inputFields = document.getElementById("edit-section").children;
+            var matchID = document.querySelector('[placeholder="matchID"]').value;
+            for (var i in inputFields) {
+                input = inputFields[i];
+                inputChildrenCount = input.childElementCount;
+                inputChildren = inputFields[i].children;
+                if (inputChildrenCount > 0) {
+                    inputChildElement = inputChildren[1];
+                    inputLabelElement = inputChildren[0];
+                    data[inputChildElement.id] = inputChildElement.value;
+                    data[inputLabelElement.innerHTML] = inputChildElement.value;
+                }
+        }
+            var jsondata = JSON.stringify(data);
+            $(async () => {
+                var serviceURL = "http://127.0.0.1:5000/updateSuccessfulMatches/" + matchID;
+                try {
+                    const response =
+                    await fetch(
+                        serviceURL, { 
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json'},
+                        body: jsondata,
+                    });
+                    const result = await response.json();
+                    if (response.status == 200) {
+                        // success case
+                        alert('Successfully updated data in database. Please refresh to view changes.')
+                        window.location.reload();
+                    }
+                    }
+                catch (error) {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    alert('There is a problem updating the data, please try again later.');
+                } // error
+            });
+        }
+
+
     </script>
 
     </main><!-- End #main -->
