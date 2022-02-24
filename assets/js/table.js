@@ -23,9 +23,14 @@ function editSpecificRow(form) {
     document.getElementById("edit-section").innerHTML += "<br>" + 
                                                             "<button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='edit" + form + "()'>Save Changes</button>" 
     document.getElementById("edit-section").style.display = "block";
-    document.querySelector('[placeholder="submissionID"]').setAttribute("onchange", "fill" + form + "Details(this.value)");
-    if (form == "Inventory") {
-        document.getElementById("edit-photo").style.display = "none";
+    if (form == "Inventory" || form == "Wishlist") {
+        document.querySelector('[placeholder="submissionID"]').setAttribute("onchange", "fill" + form + "Details(this.value)");
+        if (form == "Inventory") {
+            document.getElementById("edit-photo").style.display = "none";
+        }
+    }
+    else if (form == "SuccessfulMatches") {
+        document.getElementById('0').setAttribute("onchange", "fill" + form + "Details(this.value)");
     }
 }
 
@@ -43,11 +48,13 @@ function getEditDetails(fields) {
                 fieldObj["formName"] = "edit-section";
             }
         }
-        if (field == "submissionID") {
+        if (field == "submissionID" || field == "matchID") {
             fieldArr.unshift(fieldObj);
         }
         else if (field != "timeSubmitted") {
-            fieldArr.push(fieldObj);
+            if (field != "matchDate") {
+                fieldArr.push(fieldObj);
+            }
         }
     }
     for (i = 0; i < fieldArr.length - 1; i++) {
@@ -133,7 +140,7 @@ function editRequest() {
     });
 }
 
-function fillMatchDetails(val) {
+function fillSuccessfulMatchesDetails(val) {
     $(async () => {
         var serviceURL = "http://127.0.0.1:5000/getSuccessfulMatches/" + val;
         try {
@@ -147,9 +154,12 @@ function fillMatchDetails(val) {
             if (response.status == 200) {
                 // success case
                 for (var i in result.data) {
-                    if (i != "dateSubmitted" && i != "matchid") {
-                        document.getElementById(i).value = result.data[i];
-                        // console.log(document.getElementById(i).value, result.data[i]);
+                    console.log(i, result.data[i]);
+                    for (id in result.columnHeaders) {
+                        // console.log(id, result.columnHeaders[id]);
+                        if (result.columnHeaders[id] == i) {
+                            document.getElementById(id).value = result.data[i];
+                        }
                     }
                 }
             }
@@ -168,21 +178,21 @@ function fillMatchDetails(val) {
 function editSuccessfulMatches() {
     var data = {};
     var inputFields = document.getElementById("edit-section").children;
+    var matchID = document.getElementById("0").value;
     for (var i in inputFields) {
         input = inputFields[i];
         inputChildrenCount = input.childElementCount;
         inputChildren = inputFields[i].children;
         if (inputChildrenCount > 0) {
-            for (j = 0; j < inputChildrenCount; j++) {
-                inputChildElement = inputChildren[j].children[1];
-                data[inputChildElement.id] = inputChildElement.value;
-            }
+            inputChildElement = inputChildren[1];
+            inputLabelElement = inputChildren[0];
+            data[inputChildElement.id] = inputChildElement.value;
+            data[inputLabelElement.innerHTML] = inputChildElement.value;
         }
-    }
-    console.log(data);
+}
     var jsondata = JSON.stringify(data);
     $(async () => {
-        var serviceURL = "http://127.0.0.1:5000/updateSuccessfulMatches/" + data.reqid;
+        var serviceURL = "http://127.0.0.1:5000/updateSuccessfulMatches/" + matchID;
         try {
             const response =
             await fetch(

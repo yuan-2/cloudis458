@@ -244,13 +244,13 @@
 
         function checkLoginForReq() {
             if (sessionStorage.getItem("user") != null) {
-                user = JSON.parse(sessionStorage.getItem("user"))
+                user = JSON.parse(sessionStorage.getItem("user"));
 
                 document.getElementById("loginLogoutButton").innerText = "Logout"
 
                 const queryString = window.location.search;
                 const urlParams = new URLSearchParams(queryString);
-                itemId = urlParams.get('id')
+                itemId = urlParams.get('id');
 
                 loadItem().then(function retriveInfo(result) {
                     var itemInfo = result
