@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
   `id` int NOT NULL AUTO_INCREMENT,
   `itemName` varchar(50) NOT NULL,
   `quantity` int NOT NULL,
-  `remarks` varchar(300) NOT NULL,
   `category` varchar(50) NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   `itemStatus` varchar(50) NOT NULL,
@@ -145,8 +144,8 @@ CREATE TABLE IF NOT EXISTS `formanswers` (
 --   PRIMARY KEY (`carouselID`)
 -- ) ;
 
--- DROP TABLE IF EXISTS `wishlist`;
--- CREATE TABLE IF NOT EXISTS `wishlist` (
+-- DROP TABLE IF EXISTS `newwishlist`;
+-- CREATE TABLE IF NOT EXISTS `newwishlist` (
 --   `submissionID` varchar(30) NOT NULL,
 --   `migrantID` int NOT NULL,
 --   `itemName` varchar(50) NOT NULL,
@@ -157,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `formanswers` (
 --   PRIMARY KEY (`submissionID`),
 --   FOREIGN KEY (`migrantID`) references user (`username`)
 -- ) ;
-
+-- 
 DROP TABLE IF EXISTS `matches`;
 CREATE TABLE IF NOT EXISTS `matches` (
   `matchID` int NOT NULL AUTO_INCREMENT,
@@ -208,8 +207,8 @@ INSERT INTO wishlist (`itemName`, `quantity`, `remarks`, `category`, `timeSubmit
 -- for user table
 -- INSERT INTO user(`username`, `password`, `userType`) VALUES 
 -- (93261073, ENCRYPT('cheah1124'), 'admin');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('12345678', 'test', 'migrantworker');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('87654321', 'test2', 'migrantworker');
+INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('12345678', 'test', 'worker');
+INSERT INTO `user` (`username`, `password`, `usertype`) VALUES ('87654321', 'test2', 'worker');
 
 -- for category table 
 -- INSERT INTO category(`categoryName`) VALUES ('Food');
@@ -271,9 +270,9 @@ INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('
 -- INSERT INTO newcarousel (`donorID`, `submissionID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES
 -- (92251521, '2022-02-15 21:35:42 92251521', 'Toothbrush', 'Toiletries', '2022-02-15 21:35:42', 'available');
 
--- for newwishlist table
-INSERT INTO newwishlist (`submissionID`, `migrantID`, `itemName`, `itemCategory`, `timeSubmitted`, `itemStatus`) VALUES 
-('test', 12345678, 'shirt', 'clothing', now(), 'available');
+for newwishlist table
+INSERT INTO newwishlist (`submissionID`, `migrantID`, `itemName`, `itemCategory`, `itemSubCat`, `timeSubmitted`, `itemStatus`) VALUES 
+('test', 91225117, 'Mattress', 'Beddings', 'Beddings', now(), 'available');
 
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
@@ -466,4 +465,4 @@ INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
 ('Sim Card', 'Others', 'Others'),
 ('Care Pack', 'Others', 'Others');
 
-select * from carousel;
+select * from request;

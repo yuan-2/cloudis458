@@ -96,7 +96,7 @@
             <!-- search box for categories, add onchange event here -->
             <div>
               <div id="catDropdown">
-                <label for="catSearchList" class="form-label pt-3">Category:</label>
+                <label for="catSearchList" class="form-label pt-3">Category:</label> <button class="badge badge-pill badge-primary" style="color:white; background-color: #E3A587;" onclick="refreshpage()">Reset Carousel</button>
                 <select onchange="populateSubCat(this)" class="form-select" style="width: 50%;" id="catSearchList"
                   name="catSearch">
                   <!--Dynamically dropdown categories listed in existing db-->
@@ -269,7 +269,7 @@
                     <img src="./assets/img/donations/${carouselItemList[i].fileName}" class="card-img-top" alt="...">
                     <div class="card-content">
                       <div class="card-body">
-                        <h5 class="card-title">Item Name: ${carouselItemList[i].itemName}</h5>
+                        <h4 class="card-title">Item Name: ${carouselItemList[i].itemName}</h4>
                         <h6 class="card-subtitle mb-2">Category: ${carouselItemList[i].category}</h6>
                         <h6 class="card-subtitle">Sub-Category: ${carouselItemList[i].subcat}</h6>
                         <a data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
@@ -415,6 +415,10 @@
       }
     }
 
+    function refreshpage() {
+      window.location.reload()
+    }
+
     function loginLogout() {
       if (document.getElementById("loginLogoutButton").innerText === "Login") {
         window.location.href = "login.html"
@@ -450,9 +454,9 @@
                     <img src="./assets/img/donations/${item.fileName}" class="card-img-top" alt="...">
                     <div class="card-content">
                       <div class="card-body">
-                        <h5 class="card-title">${item.itemName}</h5>
-                        <h6 class="card-subtitle mb-2">${item.category}</h6>
-                        <h6 class="card-subtitle">${item.subcat}</h6>
+                        <h4 class="card-title">Item Name: ${item.itemName}</h5>
+                        <h6 class="card-subtitle mb-2">Category: ${item.category}</h6>
+                        <h6 class="card-subtitle">Sub-Category${item.subcat}</h6>
                         <a data-tip="${item.id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
                       </div>
                     </div>
