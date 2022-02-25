@@ -52,22 +52,22 @@ class NewRequest(db.Model):
     __tablename__ = 'newrequest'
 
     reqID = db.Column(db.Integer, primary_key=True, nullable=False)
-    requestorContactNo = db.Column(db.Integer, nullable=False)
+    migrantID = db.Column(db.Integer, nullable=False)
     deliveryLocation = db.Column(db.String(300), nullable=False)
     carouselID = db.Column(db.String(50), nullable=False)
     requestQty = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
 
-    def __init__(self, reqID, requestorContactNo, deliveryLocation, carouselID, requestQty, timeSubmitted):
+    def __init__(self, reqID, migrantID, deliveryLocation, carouselID, requestQty, timeSubmitted):
         self.reqID = reqID
-        self.requestorContactNo = requestorContactNo
+        self.migrantID = migrantID
         self.deliveryLocation = deliveryLocation
         self.carouselID = carouselID
         self.requestyQty = requestQty
         self.timeSubmitted = timeSubmitted
 
     def json(self):
-        return {"reqID": self.reqID, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, 
+        return {"reqID": self.reqID, "migrantID": self.migrantID, "deliveryLocation": self.deliveryLocation, 
                 "carouselID": self.carouselID, "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
 
 # get all requests submitted by migrant workers
@@ -172,7 +172,7 @@ def updateRequest(reqID):
     else:
         requested.deliveryLocation = data['deliveryLocation']
         requested.requestQty = data['requestQty']
-        requested.requestorContactNo = data['requestorContactNo']
+        requested.migrantID = data['migrantID']
         db.session.add(requested)
         db.session.commit()
         return jsonify(
@@ -187,19 +187,19 @@ class Matches(db.Model):
 
     matchID = db.Column(db.Integer, primary_key=True, nullable=False)
     reqID = db.Column(db.Integer, nullable=False)
-    requestorContactNo = db.Column(db.Integer, nullable=False)
+    migrantID = db.Column(db.Integer, nullable=False)
     donorID = db.Column(db.Integer, nullable=False)
     matchDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, matchID, reqID, requestorContactNo, donorID, matchDate):
+    def __init__(self, matchID, reqID, migrantID, donorID, matchDate):
         self.matchID = matchID
         self.reqID = reqID
-        self.requestorContactNo = requestorContactNo
+        self.migrantID = migrantID
         self.donorID = donorID
         self.matchDate = matchDate
 
     def json(self):
-        return { "matchID": self.matchID, "reqID": self.reqID, "requestorContactNo": self.requestorContactNo, 
+        return { "matchID": self.matchID, "reqID": self.reqID, "migrantID": self.migrantID, 
                 "donorID": self.donorID, "matchDate": self.matchDate }
 
 # get all successful matches 
@@ -580,24 +580,25 @@ def updatePhoto(submissionID):
 
 
 # rank migrant workers according to reqHistory, get list of MWs who are prioritised
-@app.route("/getRankByReqHistory/<itemID>")
-def getRankByReqHistory(itemID):
-    requests = NewRequest.query.filter_by(itemID=itemID)
+@app.route("/getRankByReqHistory/<carouselID>")
+def getRankByReqHistory(carouselID):
+    requests = NewRequest.query.filter_by(carouselID=carouselID)
     if requests:
         reqHist = {}
         for req in requests:
-            migrantWorkerCount = Matches.query.filter_by(requestorContactNo=req.requestorContactNo).count()
+            migrantWorkerCount = Matches.query.filter_by(migrantID=req.migrantID).count()
             if migrantWorkerCount in reqHist.keys():
-                reqHist[migrantWorkerCount] += [req.requestorContactNo]
+                reqHist[migrantWorkerCount] += [req.migrantID]
             else:
-                reqHist[migrantWorkerCount] = [req.requestorContactNo]
-        allKeys = reqHist.keys()
+                reqHist[migrantWorkerCount] = [req.migrantID]
+        allKeys = list(reqHist.keys())
+        print(allKeys)
         minValue = min(allKeys)
         priorityMW = reqHist[minValue]
         lastItem = {}
         # check for the list of MWs, how long since each of them have gotten an item            
         for mwNum in priorityMW:
-            mw = Matches.query.filter_by(contactNo=mwNum).first()
+            mw = Matches.query.filter_by(migrantID=mwNum).first()
             # if mw.lastItemTime in lastItem.keys():
             #     lastItem[mw.lastItemTime] += [mw.contactNo]
             # else:

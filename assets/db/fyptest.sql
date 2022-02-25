@@ -158,12 +158,12 @@ DROP TABLE IF EXISTS `matches`;
 CREATE TABLE IF NOT EXISTS `matches` (
   `matchID` int NOT NULL AUTO_INCREMENT,
   `reqID` int NOT NULL,
-  `requestorContactNo` int NOT NULL,
+  `migrantID` int NOT NULL,
   `donorID` int NOT NULL,
   `matchDate` datetime NOT NULL,
   PRIMARY KEY (`matchID`),
   FOREIGN KEY fk_1 (`reqID`) references newrequest (`reqID`),
-  FOREIGN KEY fk_2 (`requestorContactNo`) references user (`username`)
+  FOREIGN KEY fk_2 (`migrantID`) references user (`username`)
 ) ;
 
 -- INSERT values
