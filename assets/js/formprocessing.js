@@ -1,18 +1,16 @@
 // Posting data to backend
 function submitForm(formName) {
-    var donateFormElements = document.forms[0].elements
-
-    // console.log(donateFormElements);
+    var formElements = document.forms[0].elements
 
     var formData = new FormData();
     formData.append("formName", formName);
 
-    for (ele in donateFormElements) {
-        var eleId = donateFormElements[ele].id;
-        var eleType = donateFormElements[ele].type;
-        // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
+    for (ele in formElements) {
+        var eleId = formElements[ele].id;
+        var eleType = formElements[ele].type;
+        // console.log("Name: " + formElements[ele].name + ", Type: " + formElements[ele].type)
         if (eleType == "radio") {
-            var eleName = donateFormElements[ele].name;
+            var eleName = formElements[ele].name;
             if (!formData.has(eleName)) {
                 formData.append(eleName, document.querySelector(`input[name='${eleName}']:checked`).value);
                 // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
@@ -20,7 +18,7 @@ function submitForm(formName) {
         }
         else if (eleType == "checkbox") {
             // store all values as a single string, values separated by ;
-            var eleName = donateFormElements[ele].name;
+            var eleName = formElements[ele].name;
             if (!formData.has(eleName)) {
                 checkedBoxes = document.querySelectorAll(`input[name='${eleName}']:checked`);
                 values = "";
@@ -31,16 +29,17 @@ function submitForm(formName) {
             }
         }
         else if (eleType == "file") {
-            formData.append(eleId, donateFormElements[ele].files[0].name);
-            formData.append("file" + eleId, donateFormElements[ele].files[0]);
+            formData.append(eleId, formElements[ele].files[0].name);
+            formData.append("file" + eleId, formElements[ele].files[0]);
         }
         else {
-            formData.append(eleId, donateFormElements[ele].value);
+            formData.append(eleId, formElements[ele].value);
         }
     }
 
     addDonation(formData, 'http://127.0.0.1:5003/formanswers')
     alert("Item has been posted successfully")
+    // error msg pls add
     window.location = window.location;
 }
 

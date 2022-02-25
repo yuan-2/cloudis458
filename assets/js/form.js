@@ -44,23 +44,33 @@ async function retrieveForm(formName) {
             var contactField = `<label for="contactNo" class="form-label">Contact Number</label>
                                 <input required type="number" class="form-control" id="contactNo">`
 
-            var itemFields = `<!--On change of this dropdown, auto get item names listed under this category-->
-                            <div class="col-6">
-                                <label for="itemCategoryOptions" class="form-label">Item Category</label>
-                                <select onchange="populateItemNames(this)" class="form-select" id="itemCategoryOptions" required>
-                                    <!--Dynamically dropdown categories listed in existing db-->
-                                </select>
-                            </div>
-                            <!--Option value for item name needs to be dynamic, based on category-->
-                            <div class="col-6">
-                                <label for="itemNameOptions" class="form-label">Item Name</label>
-                                <select class="form-select" id="itemNameOptions" required>
-                                    <!--Dynamically update item names-->
-                                </select>
-                            </div>`;
+            var itemNameField = `<!--On change of this dropdown, auto get item names listed under this category-->
+                                <div class="col-6">
+                                    <label for="itemCategoryOptions" class="form-label">Item Category</label>
+                                    <select onchange="populateSubCat(this)" class="form-select" id="itemCategoryOptions" name="category"
+                                        required>
+                                        <!--Dynamically dropdown categories listed in existing db-->
+                                    </select>
+                                </div>`
+
+            var subCatField = `<div class="col-6">
+                                    <label for="subCatOptions" class="form-label">Sub-Category</label>
+                                    <select onchange="populateItemNames(this)" class="form-select" id="subCatOptions" name="subcat"
+                                        required>
+                                        <!--Dynamically dropdown subcats listed in existing db-->
+                                    </select>
+                                </div>`
+
+            var catField = `<!--Option value for item name needs to be dynamic, based on category-->
+                                <div class="col-6">
+                                    <label for="itemNameOptions" class="form-label">Item Name</label>
+                                    <select class="form-select" id="itemNameOptions" name="itemName" required>
+                                        <!--Dynamically update item names-->
+                                    </select>
+                                </div>`;
 
             document.getElementById('contactField').innerHTML += contactField;
-            document.getElementById(formName).innerHTML += itemFields;
+            document.getElementById(formName).innerHTML += itemNameField + subCatField + catField;
         }
     } catch (error) {
         // Errors when calling the service; such as network error, 
@@ -104,7 +114,7 @@ function buildText(field) {
 function buildNumber(field) {
     var numField = `<div class="col-md-6">
                         <label for="${field.fieldID}" class="form-label">${field.fieldName}</label>
-                        <input required type="number" class="form-control" id="${field.fieldID}">
+                        <input required type="number" class="form-control" id="${field.fieldID}" placeholder="${field.placeholder ?? ""}">
                     </div>`;
 
 
@@ -178,32 +188,71 @@ function addIcons(formName) {
 };
 //#endregion
 
-// POPULATING ITEM CATEGORIES AND NAMES DROPDOWN LISTS
+// POPULATING ITEM CATEGORIES, SUB-CATEGORIES AND NAMES DROPDOWN LISTS
 //#region
 function checkLogin() {
 
+    if (sessionStorage.getItem("user") != null) {
+        user = JSON.parse(sessionStorage.getItem("user"))
+
+        document.getElementById("loginLogoutButton").innerText = "Logout"
+    }
     getDropDownCat().then(function autoPopCategories(result) {
         var catList = result
+
         // reset dropdown fields
-        $('#itemCategoryOptions').html("");
+        $('#itemCategoryOptions').html("")
+        $('#itemNameOptions').html("")
+        $('#subCatOptions').html("")
+
         // Start off with an empty selected option for category
-        $('#itemCategoryOptions').append(`<option selected> </option>`);
+        $('#itemCategoryOptions').append(`<option disabled selected> </option>`)
+        $('#subCatOptions').append("<option disabled selected> Please select a category first </option>")
+        $('#itemNameOptions').append("<option disabled selected> Please select a sub-category first </option>")
 
         for (cat of catList) {
             $('#itemCategoryOptions').append(`
                 <option value="${cat}">${cat}</option>
-            `);
+            `)
         }
-    }
-    )
-    if (window.sessionStorage.getItem("userType") != null) {
-        userType = window.sessionStorage.getItem("userType")
-        document.getElementById("loginLogoutButton").innerText = "Logout"
+    })
+    var catalogTable = document.getElementById('catalogTable')
+    getCatalog().then(function populateCatalog(result) {
+        var catalogList = result
+
+        // reset catalog on refresh
+        catalogTable.innerHTML = `<tr>
+                                <th>Category</th>
+                                <th>Sub-Category</th>
+                                <th>Item Name</th>
+                            </tr>`
+
+        for (ele in catalogList) {
+            catalogTable.innerHTML += `
+            <tr>
+                <td>${catalogList[ele].category}</td>
+                <td>${catalogList[ele].subCat}</td>
+                <td>${catalogList[ele].itemName}</td>
+            </tr>
+            `
+        }
+    })
+
+}
+
+async function getCatalog() {
+    let response = await fetch("http://127.0.0.1:5003/getCatalog")
+    let res = await response.json()
+
+    if (res.code == 200) {
+        return res.items
+    } else {
+        alert(res.message)
     }
 }
 
 async function getDropDownCat() {
-    let response = await fetch("http://127.0.0.1:5004/getCat")
+    let response = await fetch("http://127.0.0.1:5003/getCat")
     let responseCode = await response.json()
 
     if (responseCode.code == 200) {
@@ -213,16 +262,35 @@ async function getDropDownCat() {
     }
 }
 
-async function populateItemNames(cat) {
-    $('#itemNameOptions').html("");
+async function populateSubCat(cat) {
+    $('#subCatOptions').html("")
     cat = cat.value
-    let response = await fetch("http://127.0.0.1:5004/getItemsInCat/" + cat)
+    let response = await fetch("http://127.0.0.1:5003/getSubCat/" + cat)
     let responseCode = await response.json()
 
     if (responseCode.code == 200) {
-        $('#itemNameOptions').append("<option selected> </option>");
+        $('#subCatOptions').append("<option disabled selected> </option>")
+        let subCatArr = []
+        for (subcat of responseCode.data.subcats) {
+            if (!subCatArr.includes(subcat.subCat)) {
+                subCatArr.push(subcat.subCat)
+            }
+        }
+        for (sub of subCatArr) {
+            $('#subCatOptions').append(`<option value="${sub}">${sub}</option>`)
+        }
+    }
+}
+
+async function populateItemNames(cat) {
+    $('#itemNameOptions').html("")
+    cat = cat.value
+    let response = await fetch("http://127.0.0.1:5003/getItemsInSubCat/" + cat)
+    let responseCode = await response.json()
+    if (responseCode.code == 200) {
+        $('#itemNameOptions').append("<option disabled selected> </option>")
         for (cat of responseCode.data.itemsInCat) {
-            $('#itemNameOptions').append(`<option>${cat.itemName}</option>`)
+            $('#itemNameOptions').append(`<option value="${cat.itemID}">${cat.itemName}</option>`)
         }
     }
 }
