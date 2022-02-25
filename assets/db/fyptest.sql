@@ -114,12 +114,12 @@ DROP TABLE IF EXISTS `newrequest`;
 CREATE TABLE IF NOT EXISTS `newrequest` (
   `reqID` int NOT NULL AUTO_INCREMENT,
   `carouselID` varchar(30) NOT NULL,
-  `requestorContactNo` int NOT NULL,
+  `migrantID` int NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
   `requestQty` int NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   PRIMARY KEY (`reqID`),
-  FOREIGN KEY (`requestorContactNo`) REFERENCES user (`username`),
+  FOREIGN KEY (`migrantID`) REFERENCES user (`username`),
   FOREIGN KEY (`carouselID`) REFERENCES newcarousel (`carouselID`)
 );
 
@@ -195,22 +195,6 @@ INSERT INTO wishlist (`itemName`, `quantity`, `category`, `subCat`, `timeSubmitt
 -- (93261073, ENCRYPT('cheah1124'), 'admin');
 INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (12345678, 'test', 'worker');
 INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (87654321, 'test2', 'worker');
-
--- for category table 
--- INSERT INTO category(`categoryName`) VALUES ('Food');
--- INSERT INTO category(`categoryName`) VALUES ('Home Appliances');
--- INSERT INTO category(`categoryName`) VALUES ('Clothes');
--- INSERT INTO category(`categoryName`) VALUES ('Furniture');
--- INSERT INTO category(`categoryName`) VALUES ('Toiletries');
--- INSERT INTO category(`categoryName`) VALUES ('Kitchenware');
-
-
--- fixed Item table
--- INSERT INTO fixedItem(`itemName`) VALUES ('Clothes');
--- INSERT INTO fixedItem(`itemName`) VALUES ('microwave');
--- INSERT INTO fixedItem(`itemName`) VALUES ('toothbrush');
--- INSERT INTO fixedItem(`itemName`) VALUES ('water bottle');
--- INSERT INTO fixedItem(`itemName`) VALUES ('handphone');
 
 
 -- for faq
@@ -445,15 +429,15 @@ INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
 
 -- for newcarousel table
 INSERT INTO newcarousel (`donorID`, `carouselID`, `itemID`, `timeSubmitted`, `itemStatus`) VALUES
-(92251521, '2022-02-15 21:35:42 92251521', 152, '2022-02-15 21:35:42', 'available');
+(92251521, '2022-02-24 21:35:42 92251521', 152, '2022-02-24 21:35:42', 'available');
 
 -- for newwishlist table
 INSERT INTO newwishlist (`wishlistID`, `migrantID`, `itemID`, `timeSubmitted`, `itemStatus`) VALUES 
 ('test', 12345678, 1, now(), 'available');
 
 -- for newrequest table
-INSERT INTO newrequest (`reqID`, `requestorContactNo`, `deliveryLocation`, `carouselID`, `requestQty`, `timeSubmitted`) VALUES
-(1, 12345678, 'pasir ris', '2022-02-15 21:35:42 92251521', 1, now());
+INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, `requestQty`, `timeSubmitted`) VALUES
+(1, 12345678, 'pasir ris', '2022-02-24 21:35:42 92251521', 1, now());
 
 -- for matches table
 INSERT INTO matches (`matchID`, `reqID`, `requestorContactNo`, `donorID`, `matchDate`) VALUES
