@@ -194,8 +194,14 @@
                 if (inputChildrenCount > 0) {
                     inputChildElement = inputChildren[1];
                     inputLabelElement = inputChildren[0];
-                    data[inputChildElement.id] = inputChildElement.value;
-                    data[inputLabelElement.innerHTML] = inputChildElement.value;
+                    if (inputChildElement.value == "") {
+                        alert("Please do not leave any blanks.");
+                        break;
+                    }
+                    else {
+                        data[inputChildElement.id] = inputChildElement.value;
+                        data[inputLabelElement.innerHTML] = inputChildElement.value;
+                    }
                 }
             }
 

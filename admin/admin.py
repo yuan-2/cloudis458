@@ -75,8 +75,8 @@ class NewRequest(db.Model):
 def getAllRequests():
     requestList = NewRequest.query.all()
     data = []
-    row = {}
     for request in requestList:
+        row = {}
         carouselID = request.carouselID
         carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
         itemID = carouselItem.itemID
@@ -207,8 +207,8 @@ class Matches(db.Model):
 def getAllSuccessfulMatches():
     matches = Matches.query.all()
     data = []
-    row = {}
     for match in matches:
+        row = {}
         reqID = match.reqID
         request = NewRequest.query.filter_by(reqID=reqID).first()
         carouselID = request.carouselID
@@ -397,9 +397,8 @@ class NewWishlist(db.Model):
 
 # get all form answers for any form
 @app.route("/getFormAnswers/<formName>")
-def getFormAnswersDonate(formName):
+def getFormAnswers(formName):
     formFields = FormBuilder.query.filter_by(formName=formName)
-    formAnswers = FormAnswers.query.filter_by(formName=formName)
     if formName == "carousel":
         tableFields = NewCarousel.metadata.tables["newcarousel"].columns.keys()
     elif formName == "wishlist":
@@ -424,10 +423,10 @@ def getFormAnswersDonate(formName):
         elif formName == "wishlist":
             submission = NewWishlist.query.filter_by(wishlistID=subID[0]).first().json()
         itemID = submission['itemID']
-        print(itemID)
         row["itemName"] = CategoryItem.query.filter_by(itemID=itemID).first().itemName
         row.update(submission)
         row.pop("itemID")
+        formAnswers = FormAnswers.query.filter_by(formName=formName).filter_by(submissionID=subID[0])
         for ans in formAnswers:
             row[fieldNames[ans.fieldID]] = ans.answer
         data.append(row)
