@@ -241,7 +241,7 @@ function checkLogin() {
 }
 
 async function getCatalog() {
-    let response = await fetch("http://127.0.0.1:5004/getCatalog")
+    let response = await fetch("http://127.0.0.1:5003/getCatalog")
     let res = await response.json()
 
     if (res.code == 200) {
@@ -252,7 +252,7 @@ async function getCatalog() {
 }
 
 async function getDropDownCat() {
-    let response = await fetch("http://127.0.0.1:5004/getCat")
+    let response = await fetch("http://127.0.0.1:5003/getCat")
     let responseCode = await response.json()
 
     if (responseCode.code == 200) {
@@ -265,7 +265,7 @@ async function getDropDownCat() {
 async function populateSubCat(cat) {
     $('#subCatOptions').html("")
     cat = cat.value
-    let response = await fetch("http://127.0.0.1:5004/getSubCat/" + cat)
+    let response = await fetch("http://127.0.0.1:5003/getSubCat/" + cat)
     let responseCode = await response.json()
 
     if (responseCode.code == 200) {
@@ -285,12 +285,12 @@ async function populateSubCat(cat) {
 async function populateItemNames(cat) {
     $('#itemNameOptions').html("")
     cat = cat.value
-    let response = await fetch("http://127.0.0.1:5004/getItemsInSubCat/" + cat)
+    let response = await fetch("http://127.0.0.1:5003/getItemsInSubCat/" + cat)
     let responseCode = await response.json()
     if (responseCode.code == 200) {
         $('#itemNameOptions').append("<option disabled selected> </option>")
         for (cat of responseCode.data.itemsInCat) {
-            $('#itemNameOptions').append(`<option value="${cat.itemName}">${cat.itemName}</option>`)
+            $('#itemNameOptions').append(`<option value="${cat.itemID}">${cat.itemName}</option>`)
         }
     }
 }
