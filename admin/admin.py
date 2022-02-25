@@ -1,6 +1,5 @@
 from distutils.command.upload import upload
 from pdb import lasti2lineno
-from typing import ItemsView, Match
 from urllib import response
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -283,10 +282,11 @@ def getSuccessfulMatch(matchID):
 def updateSuccessfulMatches(matchID):
     match = Matches.query.filter_by(matchID=matchID).first()
     reqID = match.reqID
-    request = NewRequest.query.filter_by(reqID=reqID).first()
-    carouselID = request.carouselID
+    req = NewRequest.query.filter_by(reqID=reqID).first()
+    carouselID = req.carouselID
     carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
     data = request.get_json()
+    print(data)
     if (match is None):
         return jsonify( 
             {
@@ -295,12 +295,15 @@ def updateSuccessfulMatches(matchID):
             }
         )
     else:
-        match.requestorContactNo = data['requestorContactNo']
         match.donorID = data['donorID']
         db.session.add(match)
-        request.delieryLocation = data['deliveryLocation']
-        db.session.add(request)
+        db.session.commit()
+        req.deliveryLocation = data['deliveryLocation']
+        req.requestQty = data['requestQty']
+        db.session.add(req)
+        db.session.commit()
         carouselItem.itemStatus = data['itemStatus']
+        carouselItem.donorID = data['donorID']
         db.session.add(carouselItem)
         db.session.commit()
         return jsonify(
