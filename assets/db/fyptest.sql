@@ -429,7 +429,7 @@ INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
 
 -- for newcarousel table
 INSERT INTO newcarousel (`donorID`, `carouselID`, `itemID`, `timeSubmitted`, `itemStatus`) VALUES
-(92251521, '2022-02-24 21:35:42 92251521', 152, '2022-02-24 21:35:42', 'available');
+(92251521, '2022-02-15 21:35:42 92251521', 152, '2022-02-24 21:35:42', 'available');
 
 -- for newwishlist table
 INSERT INTO newwishlist (`wishlistID`, `migrantID`, `itemID`, `timeSubmitted`, `itemStatus`) VALUES 
@@ -437,10 +437,10 @@ INSERT INTO newwishlist (`wishlistID`, `migrantID`, `itemID`, `timeSubmitted`, `
 
 -- for newrequest table
 INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, `requestQty`, `timeSubmitted`) VALUES
-(1, 12345678, 'pasir ris', '2022-02-24 21:35:42 92251521', 1, now());
+(1, 12345678, 'pasir ris', '2022-02-15 21:35:42 92251521', 1, now());
 
 -- for matches table
-INSERT INTO matches (`matchID`, `reqID`, `requestorContactNo`, `donorID`, `matchDate`) VALUES
+INSERT INTO matches (`matchID`, `reqID`, `migrantID`, `donorID`, `matchDate`) VALUES
 (1, 1, 12345678, 11888811, now())
 
 -- select * from request;

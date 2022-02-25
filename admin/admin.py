@@ -413,22 +413,24 @@ def getFormAnswersDonate(formName):
         else:
             fieldNames[len(fieldNames) + 1] = field
     data = []
-    row = {}
-    submissionID = ""
-    for ans in formAnswers:
-        if ans.submissionID != submissionID:
-            data.append(row)
-            submissionID = ans.submissionID
-            if formName == "carousel":
-                submissions = NewCarousel.query.filter_by(carouselID=submissionID).first().json()
-            elif formName == "wishlist":
-                submissions = NewWishlist.query.filter_by(wishlistID=submissionID).first().json()
-            itemID = submissions["itemID"]
-            itemName = CategoryItem.query.filter_by(itemID=itemID).first().json()["itemName"]
-            submissions["itemName"] = itemName
-            submissions.pop("itemID")
-            row.update(submissions)
-        row[fieldNames[ans.fieldID]] = ans.answer
+    if formName == "carousel":
+        submissionIDList = NewCarousel.query.with_entities(NewCarousel.carouselID).distinct()
+    elif formName == "wishlist":
+        submissionIDList = NewWishlist.query.with_entities(NewWishlist.wishlistID).distinct()
+    for subID in submissionIDList:
+        row = {}
+        if formName == "carousel":
+            submission = NewCarousel.query.filter_by(carouselID=subID[0]).first().json()
+        elif formName == "wishlist":
+            submission = NewWishlist.query.filter_by(wishlistID=subID[0]).first().json()
+        itemID = submission['itemID']
+        print(itemID)
+        row["itemName"] = CategoryItem.query.filter_by(itemID=itemID).first().itemName
+        row.update(submission)
+        row.pop("itemID")
+        for ans in formAnswers:
+            row[fieldNames[ans.fieldID]] = ans.answer
+        data.append(row)
     if len(data) > 0:
         return jsonify( 
             {
