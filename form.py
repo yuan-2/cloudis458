@@ -331,8 +331,7 @@ def createSubmission():
     files = request.files
     userid = formDict['contactNo']
     formName =  formDict['formName']
-    itemName = formDict['itemNameOptions']
-    itemCategory = formDict['itemCategoryOptions']
+    itemID = formDict['itemNameOptions']
 
     # calculate submissionID (datetime userID)
     now = datetime.now()
@@ -352,9 +351,10 @@ def createSubmission():
     #     print(answer + ": " +formDict[answer])
 
     # submit into carousel/wishlist
-    details = {"submissionID": submissionID, "itemName": itemName, "itemCategory": itemCategory, "timeSubmitted": currentDT, "itemStatus": "Available"}
-    if formName == "request":
+    details = {"itemID": itemID, "timeSubmitted": currentDT, "itemStatus": "Available"}
+    if formName == "wishlist":
         details["migrantID"] = userid
+        details["wishlistID"] = submissionID
         submission = Wishlist(**details)
         try:
                 db.session.add(submission)
@@ -365,8 +365,9 @@ def createSubmission():
                 "message": "Unable to commit to database.",
                 "data" : submission.json()
             }), 500
-    elif formName == "donate":
+    elif formName == "carousel":
         details["donorID"] = userid
+        details["carouselID"] = submissionID
         submission = Carousel(**details)
         try:
                 db.session.add(submission)
@@ -427,18 +428,21 @@ def getAllCarouselItems():
 # API for search function
 @app.route("/getItemsByCat/<string:cat>")
 def getItemsByCategory(cat):
-    categoryList = Carousel.query.with_entities(Carousel.itemID).distinct()
-    itemList = []
-    for category in categoryList:
-        item = CategoryItem.query.filter_by(itemID=category,category=cat).first()
-        if item is not None:
-            itemList.append(item)
+    catList = CategoryItem.query.filter_by(category=cat).all()
+    catItemList = []
+    for category in catList:
+        itemList = Carousel.query.filter_by(itemID=category.itemID).all()
+        if (len(itemList)):
+            categorydict = category.json()
+            categorydict.pop("itemID")
+            catList = [dict(**item.json(),**categorydict) for item in itemList]
+            catItemList.extend(catList)
     if len(itemList):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "itemsByCat": [carouselItem.json() for carouselItem in itemList]
+                    "itemsByCat": catItemList
                 }
             }
         )
@@ -454,15 +458,18 @@ def filterItems(subcat):
     subcatList = CategoryItem.query.filter_by(subCat=subcat).all()
     subcatItemList = []
     for category in subcatList:
-        item = Carousel.query.filter_by(subCat=category).all()
+        itemList = Carousel.query.filter_by(itemID=category.itemID).all()
         if (len(itemList)):
-            subcatItemList.append(item)
-    if (len(itemList)):
+            categorydict = category.json()
+            categorydict.pop("itemID")
+            subcatList = [dict(**item.json(),**categorydict) for item in itemList]
+            subcatItemList.extend(subcatList)
+    if (len(subcatItemList)):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "items": [carouselItem.json() for carouselItem in itemList]
+                    "items": subcatItemList
                 }
             }
         )

@@ -39,6 +39,7 @@ function submitForm(formName) {
 
     addDonation(formData, 'http://127.0.0.1:5003/formanswers')
     alert("Item has been posted successfully")
+    // error msg pls add
     window.location = window.location;
 }
 
