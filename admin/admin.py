@@ -1,6 +1,5 @@
 from distutils.command.upload import upload
 from pdb import lasti2lineno
-from typing import ItemsView, Match
 from urllib import response
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -53,22 +52,22 @@ class NewRequest(db.Model):
     __tablename__ = 'newrequest'
 
     reqID = db.Column(db.Integer, primary_key=True, nullable=False)
-    requestorContactNo = db.Column(db.Integer, nullable=False)
+    migrantID = db.Column(db.Integer, nullable=False)
     deliveryLocation = db.Column(db.String(300), nullable=False)
     carouselID = db.Column(db.String(50), nullable=False)
     requestQty = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
 
-    def __init__(self, reqID, requestorContactNo, deliveryLocation, carouselID, requestQty, timeSubmitted):
+    def __init__(self, reqID, migrantID, deliveryLocation, carouselID, requestQty, timeSubmitted):
         self.reqID = reqID
-        self.requestorContactNo = requestorContactNo
+        self.migrantID = migrantID
         self.deliveryLocation = deliveryLocation
         self.carouselID = carouselID
         self.requestyQty = requestQty
         self.timeSubmitted = timeSubmitted
 
     def json(self):
-        return {"reqID": self.reqID, "requestorContactNo": self.requestorContactNo, "deliveryLocation": self.deliveryLocation, 
+        return {"reqID": self.reqID, "migrantID": self.migrantID, "deliveryLocation": self.deliveryLocation, 
                 "carouselID": self.carouselID, "requestQty": self.requestQty, "timeSubmitted": self.timeSubmitted}
 
 # get all requests submitted by migrant workers
@@ -76,8 +75,8 @@ class NewRequest(db.Model):
 def getAllRequests():
     requestList = NewRequest.query.all()
     data = []
-    row = {}
     for request in requestList:
+        row = {}
         carouselID = request.carouselID
         carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
         itemID = carouselItem.itemID
@@ -173,7 +172,7 @@ def updateRequest(reqID):
     else:
         requested.deliveryLocation = data['deliveryLocation']
         requested.requestQty = data['requestQty']
-        requested.requestorContactNo = data['requestorContactNo']
+        requested.migrantID = data['migrantID']
         db.session.add(requested)
         db.session.commit()
         return jsonify(
@@ -188,19 +187,19 @@ class Matches(db.Model):
 
     matchID = db.Column(db.Integer, primary_key=True, nullable=False)
     reqID = db.Column(db.Integer, nullable=False)
-    requestorContactNo = db.Column(db.Integer, nullable=False)
+    migrantID = db.Column(db.Integer, nullable=False)
     donorID = db.Column(db.Integer, nullable=False)
     matchDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, matchID, reqID, requestorContactNo, donorID, matchDate):
+    def __init__(self, matchID, reqID, migrantID, donorID, matchDate):
         self.matchID = matchID
         self.reqID = reqID
-        self.requestorContactNo = requestorContactNo
+        self.migrantID = migrantID
         self.donorID = donorID
         self.matchDate = matchDate
 
     def json(self):
-        return { "matchID": self.matchID, "reqID": self.reqID, "requestorContactNo": self.requestorContactNo, 
+        return { "matchID": self.matchID, "reqID": self.reqID, "migrantID": self.migrantID, 
                 "donorID": self.donorID, "matchDate": self.matchDate }
 
 # get all successful matches 
@@ -208,8 +207,8 @@ class Matches(db.Model):
 def getAllSuccessfulMatches():
     matches = Matches.query.all()
     data = []
-    row = {}
     for match in matches:
+        row = {}
         reqID = match.reqID
         request = NewRequest.query.filter_by(reqID=reqID).first()
         carouselID = request.carouselID
@@ -283,10 +282,11 @@ def getSuccessfulMatch(matchID):
 def updateSuccessfulMatches(matchID):
     match = Matches.query.filter_by(matchID=matchID).first()
     reqID = match.reqID
-    request = NewRequest.query.filter_by(reqID=reqID).first()
-    carouselID = request.carouselID
+    req = NewRequest.query.filter_by(reqID=reqID).first()
+    carouselID = req.carouselID
     carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
     data = request.get_json()
+    print(data)
     if (match is None):
         return jsonify( 
             {
@@ -295,12 +295,15 @@ def updateSuccessfulMatches(matchID):
             }
         )
     else:
-        match.requestorContactNo = data['requestorContactNo']
         match.donorID = data['donorID']
         db.session.add(match)
-        request.delieryLocation = data['deliveryLocation']
-        db.session.add(request)
+        db.session.commit()
+        req.deliveryLocation = data['deliveryLocation']
+        req.requestQty = data['requestQty']
+        db.session.add(req)
+        db.session.commit()
         carouselItem.itemStatus = data['itemStatus']
+        carouselItem.donorID = data['donorID']
         db.session.add(carouselItem)
         db.session.commit()
         return jsonify(
@@ -394,9 +397,8 @@ class NewWishlist(db.Model):
 
 # get all form answers for any form
 @app.route("/getFormAnswers/<formName>")
-def getFormAnswersDonate(formName):
+def getFormAnswers(formName):
     formFields = FormBuilder.query.filter_by(formName=formName)
-    formAnswers = FormAnswers.query.filter_by(formName=formName)
     if formName == "carousel":
         tableFields = NewCarousel.metadata.tables["newcarousel"].columns.keys()
     elif formName == "wishlist":
@@ -410,22 +412,24 @@ def getFormAnswersDonate(formName):
         else:
             fieldNames[len(fieldNames) + 1] = field
     data = []
-    row = {}
-    submissionID = ""
-    for ans in formAnswers:
-        if ans.submissionID != submissionID:
-            data.append(row)
-            submissionID = ans.submissionID
-            if formName == "carousel":
-                submissions = NewCarousel.query.filter_by(carouselID=submissionID).first().json()
-            elif formName == "wishlist":
-                submissions = NewWishlist.query.filter_by(wishlistID=submissionID).first().json()
-            itemID = submissions["itemID"]
-            itemName = CategoryItem.query.filter_by(itemID=itemID).first().json()["itemName"]
-            submissions["itemName"] = itemName
-            submissions.pop("itemID")
-            row.update(submissions)
-        row[fieldNames[ans.fieldID]] = ans.answer
+    if formName == "carousel":
+        submissionIDList = NewCarousel.query.with_entities(NewCarousel.carouselID).distinct()
+    elif formName == "wishlist":
+        submissionIDList = NewWishlist.query.with_entities(NewWishlist.wishlistID).distinct()
+    for subID in submissionIDList:
+        row = {}
+        if formName == "carousel":
+            submission = NewCarousel.query.filter_by(carouselID=subID[0]).first().json()
+        elif formName == "wishlist":
+            submission = NewWishlist.query.filter_by(wishlistID=subID[0]).first().json()
+        itemID = submission['itemID']
+        row["itemName"] = CategoryItem.query.filter_by(itemID=itemID).first().itemName
+        row.update(submission)
+        row.pop("itemID")
+        formAnswers = FormAnswers.query.filter_by(formName=formName).filter_by(submissionID=subID[0])
+        for ans in formAnswers:
+            row[fieldNames[ans.fieldID]] = ans.answer
+        data.append(row)
     if len(data) > 0:
         return jsonify( 
             {
@@ -577,31 +581,53 @@ def updatePhoto(submissionID):
 
 
 # rank migrant workers according to reqHistory, get list of MWs who are prioritised
-@app.route("/getRankByReqHistory/<itemID>")
-def getRankByReqHistory(itemID):
-    requests = NewRequest.query.filter_by(itemID=itemID)
+@app.route("/getRankByReqHistory/<carouselID>")
+def getRankByReqHistory(carouselID):
+    requests = NewRequest.query.filter_by(carouselID=carouselID)
     if requests:
         reqHist = {}
         for req in requests:
-            migrantWorkerCount = Matches.query.filter_by(requestorContactNo=req.requestorContactNo).count()
+            migrantWorkerCount = Matches.query.filter_by(migrantID=req.migrantID).count()
             if migrantWorkerCount in reqHist.keys():
-                reqHist[migrantWorkerCount] += [req.requestorContactNo]
+                reqHist[migrantWorkerCount] += [req.migrantID]
             else:
-                reqHist[migrantWorkerCount] = [req.requestorContactNo]
+                reqHist[migrantWorkerCount] = [req.migrantID]
         allKeys = reqHist.keys()
-        minValue = min(allKeys)
+        minValue = min(allKeys, default="EMPTY")
         priorityMW = reqHist[minValue]
-        lastItem = {}
-        # check for the list of MWs, how long since each of them have gotten an item            
-        for mwNum in priorityMW:
-            mw = Matches.query.filter_by(contactNo=mwNum).first()
+        mwPoints = {}
+        # check whether item requires delivery
+        deliveryFieldID = FormBuilder.query.filter_by(fieldName="Delivery Method").first()
+        deliveryOption = FormAnswers.query.filter_by(submissionID=carouselID).filter_by(fieldID=deliveryFieldID).first()
+        # if deliveryOption == "Self Pick-Up":
+            # find migrant worker(s) w shortest distance 
+        
+        # else: 
+        # check for the list of MWs, how long since each of them have gotten an item
+        # i only wrote down the logic... the code below doesn't work yet HAHAHA
+        if minValue != 0:      
+            timeNow = datetime.now()
+            for mwNum in priorityMW:
+                mw = Matches.query.filter_by(migrantID=mwNum).first()
+                lastItemTime = mw.matchDate
+                days = timeNow - lastItemTime # convert difference into no. of days
+                if 0 <= days < 14:
+                    mwPoints[mwNum] = 0
+                elif 14 <= days < 28:
+                    mwPoints[mwNum] = 1
+                elif 28 <= days < 42:
+                    mwPoints[mwNum] = 2
+                elif 42 <= days < 56:
+                    mwPoints[mwNum] = 4
+                else:
+                    mwPoints[mwNum] = 6
             # if mw.lastItemTime in lastItem.keys():
             #     lastItem[mw.lastItemTime] += [mw.contactNo]
             # else:
             #     lastItem[mw.lastItemTime] = [mw.contactNo]
-        allKeys = lastItem.keys()
-        minValue = min(allKeys)
-        priorityMW = lastItem[minValue]
+        # allKeys = lastItem.keys()
+        # minValue = min(allKeys)
+        # priorityMW = lastItem[minValue]
         return jsonify(
             {
                 "code": 200,
