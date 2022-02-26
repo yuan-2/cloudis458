@@ -75,8 +75,8 @@ class NewRequest(db.Model):
 def getAllRequests():
     requestList = NewRequest.query.all()
     data = []
-    row = {}
     for request in requestList:
+        row = {}
         carouselID = request.carouselID
         carouselItem = NewCarousel.query.filter_by(carouselID=carouselID).first()
         itemID = carouselItem.itemID
@@ -207,8 +207,8 @@ class Matches(db.Model):
 def getAllSuccessfulMatches():
     matches = Matches.query.all()
     data = []
-    row = {}
     for match in matches:
+        row = {}
         reqID = match.reqID
         request = NewRequest.query.filter_by(reqID=reqID).first()
         carouselID = request.carouselID
@@ -397,9 +397,8 @@ class NewWishlist(db.Model):
 
 # get all form answers for any form
 @app.route("/getFormAnswers/<formName>")
-def getFormAnswersDonate(formName):
+def getFormAnswers(formName):
     formFields = FormBuilder.query.filter_by(formName=formName)
-    formAnswers = FormAnswers.query.filter_by(formName=formName)
     if formName == "carousel":
         tableFields = NewCarousel.metadata.tables["newcarousel"].columns.keys()
     elif formName == "wishlist":
@@ -424,10 +423,10 @@ def getFormAnswersDonate(formName):
         elif formName == "wishlist":
             submission = NewWishlist.query.filter_by(wishlistID=subID[0]).first().json()
         itemID = submission['itemID']
-        print(itemID)
         row["itemName"] = CategoryItem.query.filter_by(itemID=itemID).first().itemName
         row.update(submission)
         row.pop("itemID")
+        formAnswers = FormAnswers.query.filter_by(formName=formName).filter_by(submissionID=subID[0])
         for ans in formAnswers:
             row[fieldNames[ans.fieldID]] = ans.answer
         data.append(row)
@@ -593,21 +592,42 @@ def getRankByReqHistory(carouselID):
                 reqHist[migrantWorkerCount] += [req.migrantID]
             else:
                 reqHist[migrantWorkerCount] = [req.migrantID]
-        allKeys = list(reqHist.keys())
-        print(allKeys)
-        minValue = min(allKeys)
+        allKeys = reqHist.keys()
+        minValue = min(allKeys, default="EMPTY")
         priorityMW = reqHist[minValue]
-        lastItem = {}
-        # check for the list of MWs, how long since each of them have gotten an item            
-        for mwNum in priorityMW:
-            mw = Matches.query.filter_by(migrantID=mwNum).first()
+        mwPoints = {}
+        # check whether item requires delivery
+        deliveryFieldID = FormBuilder.query.filter_by(fieldName="Delivery Method").first()
+        deliveryOption = FormAnswers.query.filter_by(submissionID=carouselID).filter_by(fieldID=deliveryFieldID).first()
+        # if deliveryOption == "Self Pick-Up":
+            # find migrant worker(s) w shortest distance 
+        
+        # else: 
+        # check for the list of MWs, how long since each of them have gotten an item
+        # i only wrote down the logic... the code below doesn't work yet HAHAHA
+        if minValue != 0:      
+            timeNow = datetime.now()
+            for mwNum in priorityMW:
+                mw = Matches.query.filter_by(migrantID=mwNum).first()
+                lastItemTime = mw.matchDate
+                days = timeNow - lastItemTime # convert difference into no. of days
+                if 0 <= days < 14:
+                    mwPoints[mwNum] = 0
+                elif 14 <= days < 28:
+                    mwPoints[mwNum] = 1
+                elif 28 <= days < 42:
+                    mwPoints[mwNum] = 2
+                elif 42 <= days < 56:
+                    mwPoints[mwNum] = 4
+                else:
+                    mwPoints[mwNum] = 6
             # if mw.lastItemTime in lastItem.keys():
             #     lastItem[mw.lastItemTime] += [mw.contactNo]
             # else:
             #     lastItem[mw.lastItemTime] = [mw.contactNo]
-        allKeys = lastItem.keys()
-        minValue = min(allKeys)
-        priorityMW = lastItem[minValue]
+        # allKeys = lastItem.keys()
+        # minValue = min(allKeys)
+        # priorityMW = lastItem[minValue]
         return jsonify(
             {
                 "code": 200,

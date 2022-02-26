@@ -36,7 +36,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-        
+
         <!-- =======================================================
         * Template Name: Medilab - v4.7.0
         * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
@@ -79,24 +79,24 @@
                     <li><a class="nav-link" href="adminViewDelivery.html">Delivery</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-            <a href="#appointment" class="appointment-btn"><span class="d-none d-md-inline">Logout</a>
-        </div>
+                </nav><!-- .navbar -->
+                <a href="#appointment" class="appointment-btn"><span class="d-none d-md-inline">Logout</a>
+            </div>
     </header><!-- End Header -->
 
     <main id="main">
     <section></section>
     <section style="padding-bottom: 0px;">
         <div class="section-title">
-            <h2>View Successful Matches</h2>
-            <p>View all successful matches for Migrant Workers and items</p>
+            <h2>View Delivery</h2>
+            <p>View all Deliveries and their statuses</p>
         </div>
     </section>
     <section class="inner-page">
         <div class="container">
-            <table id="successMatches" class="table table-striped table-hover" style="width: 100%">
+            <table id="wishlist" class="table table-striped table-hover" style="width: 100%">
             </table>
-            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow('SuccessfulMatches')">Edit Specific Row</button>
+            <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow('Wishlist')">Edit Specific Row</button>
             <br><br>
             <hr>
             <br>
@@ -108,15 +108,13 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap5.min.js"></script>
-    <script src="../assets/js/table.js"></script>
     <script src="../assets/js/form.js"></script>
+    <script src="../assets/js/table.js"></script>
     <script>
         var columns = [];
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getSuccessfulMatches",
+                url: "http://127.0.0.1:5000/getFormAnswers/wishlist",
                 success: function (data) {
                     columnNames = Object.keys(data.data[0]);
                     // items = data.data.items;
@@ -126,12 +124,10 @@
                         columns.push({data: columnNames[i], 
                                     title: columnNames[i]});
                     }
-                    var table = $('#successMatches').DataTable( {
+                    var table = $('#wishlist').DataTable( {
                         data: data.data,
                         columns: columns,
                         fixedHeader: true,
-                        // scrollY: true,
-                        // scrollX: true,
                     } );
                     fields = data.data[0];
                     fields["columnDetails"] = data.columnHeaders;
@@ -139,7 +135,7 @@
                 },
                 error: function () {
                     document.getElementById("edit-btn").style.display = "none";
-                    document.getElementById("edit-section").innerHTML = "There are currently no successful matches to be found."
+                    document.getElementById("edit-section").innerHTML = "There are currently no wishlist items to be found."
                     document.getElementById("edit-section").style.display = "block";
                 }
 
@@ -150,9 +146,9 @@
             getDT();
         } );
 
-        function fillSuccessfulMatchesDetails(val) {
+        function fillWishlistDetails(val) {
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/getSuccessfulMatches/" + val;
+                var serviceURL = "http://127.0.0.1:5000/getFormAnswers/wishlist/" + val;
                 try {
                     const response =
                     await fetch(
@@ -164,11 +160,15 @@
                     if (response.status == 200) {
                         // success case
                         for (var i in result.data) {
-                            if (["deliveryLocation", "donorID", "itemStatus", "requestQty", "migrantID"].includes(i)) {
-                                document.querySelector('[placeholder="' + i + '"]').value = result.data[i];
+                            // field = result.data[i];
+                            if (i != "timeSubmitted" && i != "Item Photo" && i != "itemID") {
+                                for (id in result.columnHeaders) {
+                                    // console.log(id, result.columnHeaders[id]);
+                                    if (result.columnHeaders[id] == i) {
+                                        document.getElementById(id).value = result.data[i];
+                                    }
+                                }
                             }
-                            // if (i != 'timeSubmitted' && i != "carouselID" && i != "reqID") {
-                            // }
                         }
                     }
                     if (response.status == 404) {
@@ -183,10 +183,10 @@
             });
         }
 
-        function editSuccessfulMatches() {
+        function editWishlist() {
             var data = {};
             var inputFields = document.getElementById("edit-section").children;
-            var matchID = document.querySelector('[placeholder="matchID"]').value;
+            var wishlistID = document.querySelector('[placeholder="wishlistID"]').value;
             for (var i in inputFields) {
                 input = inputFields[i];
                 inputChildrenCount = input.childElementCount;
@@ -194,19 +194,20 @@
                 if (inputChildrenCount > 0) {
                     inputChildElement = inputChildren[1];
                     inputLabelElement = inputChildren[0];
-                    // data[inputChildElement.id] = inputChildElement.value;
                     if (inputChildElement.value == "") {
                         alert("Please do not leave any blanks.");
                         break;
                     }
                     else {
+                        data[inputChildElement.id] = inputChildElement.value;
                         data[inputLabelElement.innerHTML] = inputChildElement.value;
                     }
                 }
-        }
+            }
+
             var jsondata = JSON.stringify(data);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updateSuccessfulMatches/" + matchID;
+                var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/wishlist/" + wishlistID;
                 try {
                     const response =
                     await fetch(
