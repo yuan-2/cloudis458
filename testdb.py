@@ -1,5 +1,6 @@
 from distutils.command.upload import upload
 import json
+from sqlite3 import Date
 from urllib import response
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -250,6 +251,23 @@ def getItemsByCategory(Cat):
             "message": "There are no items listed under this category."
         }
     ), 404
+    
+@app.route("/getMWRequested/<contactNo>")
+def compareReq(contactNo):
+    itemReqList = CarouselItem.query\
+        .join(Request, Request.itemId==CarouselItem.id)\
+            .filter(Request.itemId==CarouselItem.id)\
+                .filter(Request.requestorContactNo==contactNo)\
+                    .distinct()
+                    
+    itemIdArr = [id.json()['id'] for id in itemReqList]
+    
+    return jsonify(
+        {
+            "code": 200,
+            "requestedItemIds": itemIdArr
+        }
+    )
 
 @app.route("/getCatalog")
 def retrieveCatalog():
@@ -337,9 +355,7 @@ def getItemsInSubCat(subcat):
         }
     ), 404
 
-
 # API to add item into carousel table from donor form
-
 
 @app.route("/addDonation", methods=['POST'])
 def addCarouselItem():
@@ -362,6 +378,13 @@ def addCarouselItem():
         # save file
         fileName = secure_filename(imgFile.filename.replace(" ", ""))
         # print(formDict)
+        
+        # Testing of fileCheck function (if name is same, do something with it)
+        # nameCheckQuery = CarouselItem.query.with_entities(CarouselItem.fileName)\
+        #     .filter(CarouselItem.fileName==fileName).all()
+            
+        # print(nameCheckQuery)
+        
         imgFile.save(os.path.join(uploads_dir, fileName))
         # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
         file = formDict['itemImg']
@@ -419,7 +442,8 @@ def addNewRequest():
                     "message": "An error occurred while registering your request, please try again later"
                 }
             ), 500
-            
+
+# update query to change item qty in carousel table if ever needed            
 @app.route("/updateItemQuantity", methods=["POST"])
 def updateQuantity():
     formData = request.form
@@ -512,11 +536,15 @@ def checkLogin():
     uName = formDict["username"]
     pw = formDict["password"]
     
+    now = datetime.now()
+    currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
+    timeLoggedIn = currentDT
+    
     user = User.query.filter_by(username=uName).first()
     if (user != None):
         if (bcrypt.checkpw(str(pw).encode('utf-8'), str(user.password).encode('utf-8'))):
         
-            print("Password checks out")
+            print("User has logged in at " + timeLoggedIn)
     
         
             return jsonify(

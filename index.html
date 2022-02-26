@@ -96,7 +96,9 @@
             <!-- search box for categories, add onchange event here -->
             <div>
               <div id="catDropdown">
-                <label for="catSearchList" class="form-label pt-3">Category:</label> <button class="badge badge-pill badge-primary" style="color:white; background-color: #E3A587;" onclick="refreshpage()">Reset Carousel</button>
+                <label for="catSearchList" class="form-label pt-3">Category:</label> <button
+                  class="badge badge-pill badge-primary" style="color:white; background-color: #E3A587;"
+                  onclick="refreshpage()">Reset Carousel</button>
                 <select onchange="populateSubCat(this)" class="form-select" style="width: 50%;" id="catSearchList"
                   name="catSearch">
                   <!--Dynamically dropdown categories listed in existing db-->
@@ -231,16 +233,25 @@
     var wishListTable = document.getElementById('wishListTable')
     var emptyWLDisplay = document.getElementById('emptyWLDisplay')
 
-    // DataList display
+    // Search bar display
     var catSearchList = document.getElementById('catSearchList')
     var subCatList = document.getElementById('subCatList')
+
+    // requestedItemArr
+    reqItemArr = ''
 
     function checkLogin() {
       if (sessionStorage.getItem("user") != null) {
         user = JSON.parse(sessionStorage.getItem("user"))
-        // console.log(JSON.parse(user))
 
         document.getElementById("loginLogoutButton").innerText = "Logout"
+      }
+
+      // Requested Item Check
+      if (user != "") {
+        checkRequestedItems().then(function updateReqArr(result) {
+          reqItemArr = result
+        })
       }
 
       // async to return promise and update carousel page with items 
@@ -263,7 +274,8 @@
               itemCheck.push(carouselItemList[i])
 
               if (itemCheck.length > 0) {
-                mainCarouselDisplay.innerHTML += `
+                if (reqItemArr.indexOf(carouselItemList[i].id) != -1) {
+                  mainCarouselDisplay.innerHTML += `
                 <div class="col-lg-4 d-flex align-items-stretch p-3 rounded-2">
                 <div class="card" style="width: 20rem;">
                     <img src="./assets/img/donations/${carouselItemList[i].fileName}" class="card-img-top" alt="...">
@@ -272,12 +284,29 @@
                         <h4 class="card-title">Item Name: ${carouselItemList[i].itemName}</h4>
                         <h6 class="card-subtitle mb-2">Category: ${carouselItemList[i].category}</h6>
                         <h6 class="card-subtitle">Sub-Category: ${carouselItemList[i].subcat}</h6>
-                        <a data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</a>
+                        <button data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary disabled">Requested!</button>
                       </div>
                     </div>
                 </div>
                 </div>
             `
+                } else {
+                  mainCarouselDisplay.innerHTML += `
+                <div class="col-lg-4 d-flex align-items-stretch p-3 rounded-2">
+                <div class="card" style="width: 20rem;">
+                    <img src="./assets/img/donations/${carouselItemList[i].fileName}" class="card-img-top" alt="...">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <h4 class="card-title">Item Name: ${carouselItemList[i].itemName}</h4>
+                        <h6 class="card-subtitle mb-2">Category: ${carouselItemList[i].category}</h6>
+                        <h6 class="card-subtitle">Sub-Category: ${carouselItemList[i].subcat}</h6>
+                        <button data-tip="${carouselItemList[i].id}" onclick="checkUserType(this)" class="btn btn-primary">Request</button>
+                      </div>
+                    </div>
+                </div>
+                </div>
+            `
+                }
               } else {
                 mainCarouselDisplay.innerHTML =
                   "<div class='text-center alert alert-warning rounded-3' style='height: 120px'> <p class='mt-3'> There are no items available for request at the moment, please try again later </p> </div>"
@@ -285,13 +314,10 @@
             }
           }
         }
-
-
       })
 
       loadWishList().then(function getWishList(result) {
         var wishListItems = result
-        // console.log(wishListItems)
 
         // Reset Table when page refreshes
         wishListTable.innerHTML = ""
@@ -340,6 +366,8 @@
                     `
         }
       })
+      
+
     }
 
     // Function to load donations
@@ -357,7 +385,7 @@
       }
     }
 
-    // Function to view wishlist items
+    // Function to load wishlist items
     async function loadWishList() {
       try {
         let response = await fetch("http://127.0.0.1:5004/getWL")
@@ -369,7 +397,7 @@
         alert(error)
       }
     }
-    // Async function for Search Dropdown (Index Page)
+    // Async functions for Search Dropdown (Index Page)
     async function getDropDownCat() {
       let response = await fetch("http://127.0.0.1:5004/getCat")
       let responseCode = await response.json()
@@ -380,20 +408,6 @@
         alert(responseCode.message)
       }
     }
-
-    // async function populateItemNames(cat) {
-    //   itemSearchList.innerHTML = ""
-    //   itemSearchList.innerHTML = "<option selected> Please select a Category above </option>"
-    //   cat = cat.value
-    //   let response = await fetch("http://127.0.0.1:5004/getItemsInCat/" + cat)
-    //   let responseCode = await response.json()
-
-    //   if (responseCode.code == 200) {
-    //     for (cat of responseCode.data.itemsInCat) {
-    //       itemSearchList.innerHTML += `<option value="${cat.itemName}">${cat.itemName}</option>`
-    //     }
-    //   }
-    // }
 
     async function populateSubCat(cat) {
       subCatList.innerHTML = ""
@@ -412,6 +426,15 @@
         for (sub of subCatArr) {
           subCatList.innerHTML += `<option value="${sub}">${sub}</option>`
         }
+      }
+    }
+
+    // If user is a MW, check if he has requested any items, then display item cards differently
+    async function checkRequestedItems() {
+      let response = await fetch("http://127.0.0.1:5004/getMWRequested/" + user.username)
+      let data = await response.json()
+      if (data.code == 200) {
+        return data.requestedItemIds
       }
     }
 

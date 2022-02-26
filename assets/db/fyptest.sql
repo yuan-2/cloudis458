@@ -441,6 +441,6 @@ INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, 
 
 -- for matches table
 INSERT INTO matches (`matchID`, `reqID`, `migrantID`, `donorID`, `matchDate`) VALUES
-(1, 1, 12345678, 11888811, now())
+(1, 1, 12345678, 11888811, now());
 
--- select * from request;
+-- select * from carousel;

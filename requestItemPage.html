@@ -292,7 +292,7 @@
                                 <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
                                 <p>Quantity Remaining: <span id="itemQuantity">${item.quantity}</span></p>
                                 <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-outline-success" onclick="showReqForm()">Request!</button>
+                                <button id="reqButton" class="btn btn-outline-success" onclick="showReqForm()">Request!</button>
                             </div>
                         `
                             } else {
@@ -301,7 +301,7 @@
                                 <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
                                 <p>Quantity Remaining: <span id="itemQuantity">${item.quantity}</span></p>
                                 <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
-                                <button class="btn btn-success" onclick="showReqForm()">Request!</button>
+                                <button id="reqButton" class="btn btn-success" onclick="showReqForm()">Request!</button>
                             </div>
                         `
                             }
@@ -393,6 +393,8 @@
             }
         }
 
+        
+
         async function addReq(data, url) {
 
             const response = await fetch(url, {
@@ -410,6 +412,8 @@
                 if (data.code == "200") {
                     alert(
                         "You have registered your interest for this item, you will be notified once the item is ready")
+
+                    window.location.href = "index.html"
                 }
             }
         }
