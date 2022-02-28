@@ -116,13 +116,17 @@
             <div style="max-width: 1000px; margin: auto;">
                 <h2 class="m-4 text-center">Please fill in the following details</h2>
                 <form id="requestForm" class="row g-3">
-                    <div class="col-6">
+                    <div class="col-4">
                         <label for="contactNo">Requestor Contact:</label>
                         <input style="width: 300px;" type="text" name="contact" id="contactNo" disabled>
                     </div>
-                    <div class="col-6">
+                    <div class="col-4">
                         <label for="dAddress">Postal Code:</label>
                         <input style="width: 300px;" type="number" name="destination" id="dAddress" required>
+                    </div>
+                    <div class="col-4">
+                        <label for="quantity">Required Quantity:</label>
+                        <input style="width: 300px;" type="number" name="iQuantity" id="quantity" required>
                     </div>
                     <div class="col-6">
                         <input type="hidden" name="id" id="itemid">
@@ -249,51 +253,63 @@
                 itemId = urlParams.get('id');
 
                 loadItem().then(function retriveInfo(result) {
-                    var item = result;
-                    // console.log(result)
+                    var itemInfo = result
 
-                    itemReqDisplay.innerHTML = `
+                    for (i of itemInfo) {
+                        availQty = i.quantity
+                    }
+
+                    // item info API Works but request is not done up for dynamic work 
+                    var x = setInterval(function () {
+                        for (item of itemInfo) {
+                            itemReqDisplay.innerHTML = `
                         <div class="row">
                             <div class="col-sm-12 col-lg-6">
                                 <div class="pt-3">
                                     <h2 id="itemName">${item.itemName}</h2>
-                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span>, &nbsp Sub-Category: <span id="itemSubCat">${item.subCat}</span></p>
+                                    <p style="font-style: italic;">Category: <span id="itemCat">${item.category}</span>, &nbsp Sub-Category: <span id="itemSubCat">${item.subcat}</span></p>
                                 </div>
                             </div>
                         </div>
                         `
 
-                    itemImage.innerHTML = `
-                        <img style="width: 300px; width: 300px;" src="assets/img/donations/${item["Item Photo"]}" alt="">
+                            itemImage.innerHTML = `
+                        <img style="width: 300px; width: 300px;" src="assets/img/donations/${item.fileName}" alt="">
                         `
 
-                    donorInfo.innerHTML = `
-                        <div class="pt-5">
-                            <p>Delivery Method: <span id="itemDelivery">${item["Delivery Method"]}</span></p>
-                            <p>Quantity: <span id="itemQuantity">${item.Quantity}</span></p>
-                            <p>Time left to request for item: <span id="timeLeft"></span></p>
-                            <button class="btn btn-success" onclick="showReqForm()">Request!</button>
-                        </div>
-                    `
+                            var date = new Date(item.timeSubmitted).toUTCString();
+                            var finalDate = new Date(date.slice(0, -4));
+                            var lastDate = finalDate.setDate(finalDate.getDate() + 1);
+                            var dateNow = Date.now();
+                            difference = lastDate - dateNow
+                            hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                            seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-                    // item info API Works but request is not done up for dynamic work 
-                    var x = setInterval(function () {
-                        
-                        var date = new Date(item.timeSubmitted).toUTCString();
-                        var finalDate = new Date(date.slice(0, -4));
-                        var lastDate = finalDate.setDate(finalDate.getDate() + 1);
-                        var dateNow = Date.now();
-                        difference = lastDate - dateNow
-                        hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-                        seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-                        
-                        document.getElementById('timeLeft').innerHTML = `${hours} hours ${mins} mins ${seconds} secs`
-                        // If the count down is over, show that item has expired and clear interval 
-                        if (difference < 0) {
-                            clearInterval(x);
-                            document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
+                            if (item.requireDelivery == 1) {
+                                donorInfo.innerHTML = `
+                            <div class="pt-5">
+                                <p>Delivery Method: <span id="itemDelivery">Driver required</span></p>
+                                <p>Quantity Remaining: <span id="itemQuantity">${item.quantity}</span></p>
+                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
+                                <button id="reqButton" class="btn btn-outline-success" onclick="showReqForm()">Request!</button>
+                            </div>
+                        `
+                            } else {
+                                donorInfo.innerHTML = `
+                            <div class="pt-5">
+                                <p>Delivery Method: <span id="itemDelivery">Arranged by donor</span></p>
+                                <p>Quantity Remaining: <span id="itemQuantity">${item.quantity}</span></p>
+                                <p>Time left to request for item: <span id="timeLeft">${hours} hours ${mins} mins ${seconds} secs</span></p>
+                                <button id="reqButton" class="btn btn-success" onclick="showReqForm()">Request!</button>
+                            </div>
+                        `
+                            }
+                            // If the count down is over, show that item has expired and clear interval 
+                            if (difference < 0) {
+                                clearInterval(x);
+                                document.getElementById("timeLeft").innerHTML = "ITEM EXPIRED";
+                            }
                         }
                     }, 1000)
                 })
@@ -309,10 +325,10 @@
         }
 
         async function loadItem() {
-            let response = await fetch("http://127.0.0.1:5003/carousel/" + itemId)
+            let response = await fetch("http://127.0.0.1:5004/getItemById/" + itemId)
             let responseCode = await response.json()
             if (responseCode.code == 200) {
-                return responseCode.data
+                return responseCode.data.itemDetail
             } else {
                 alert(responseCode.message)
             }
@@ -330,20 +346,28 @@
                 formDisplay.classList.remove('d-none')
                 contactNo.value = user.username
                 itemid.value = itemId
-                formDisplay.scrollIntoView()
             }
         }
-        const form = document.getElementById('requestForm');
+        const form = document.getElementById('requestForm')
 
-        var errorDiv = document.getElementById('errorDiv');
-        var errorList = document.getElementById('errorList');
+        var errorDiv = document.getElementById('errorDiv')
+
+        var errorList = document.getElementById('errorList')
 
         function submitReq() {
             let errorArr = []
             reqFormElements = document.forms[0].elements
 
-            if (reqFormElements.destination.value.length != 6) {
+            if (reqFormElements.destination.value.length > 6 || reqFormElements.destination.value.length < 1) {
                 errorArr.push("Postal Codes should be 6 digits long")
+            }
+
+            if (reqFormElements.iQuantity.value == "") {
+                errorArr.push("Please enter the quantity of items you want to request for")
+            }
+
+            if (availQty < reqFormElements.iQuantity.value) {
+                errorArr.push("Quantity requested is more than quantity available")
             }
 
             if (errorArr.length > 0) {
@@ -363,10 +387,13 @@
 
                     formData.append(eleName, eleVal)
                 }
+                // updateCarousel(formData, "http://127.0.0.1:5004/updateItemQuantity")
 
-                addReq(formData, "http://127.0.0.1:5003/request")
+                addReq(formData, "http://127.0.0.1:5004/addRequest")
             }
         }
+
+        
 
         async function addReq(data, url) {
 
@@ -383,9 +410,32 @@
             if (response.status >= 200 && response.status < 300) {
                 data = await response.json()
                 if (data.code == "200") {
-                    alert("You have registered your interest for this item, you will be notified once the item is ready");
-                    window.location.href = "index.html";
+                    alert(
+                        "You have registered your interest for this item, you will be notified once the item is ready")
+
+                    window.location.href = "index.html"
                 }
+            }
+        }
+
+        async function updateCarousel(data, url) {
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: data // body data type must match "Content-Type" header
+            });
+            if (response.status >= 200 && response.status < 300) {
+                data = await response.json()
+                console.log(data)
+                if (data.code == "500") {
+                    alert("Quantity requested is more than quantity available")
+                }
+            } else if (data.code == "200" || data.code == "201") {
+                return "All good"
             }
         }
 

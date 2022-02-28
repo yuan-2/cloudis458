@@ -300,7 +300,7 @@ async function populateItemNames(cat) {
 //#region 
 function showFieldType(){
     var inputType = $("#fieldType :selected").val();
-    if (inputType == "text") {
+    if (inputType == "text" || inputType == "number") {
         if ($('#textInput').length == 0) {
             $('#newField').append(`<div id="textInput">
                                     <input type="text" class="form-control" id="placeholder" placeholder="Enter placeholder text here (optional)">
@@ -341,7 +341,7 @@ function removeOption(elem){
 async function addField(formName, fieldID="") {
     var fieldName = $('#fieldName').val();
     var fieldType = $('#fieldType').val();
-    if (fieldType == "text") {
+    if (fieldType == "text" || fieldType == "number") {
         var placeholder = $('#placeholder').val();
         var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType, placeholder: placeholder})
     } else if (fieldType == "radio" || fieldType == "dropdown" || fieldType == "checkbox"){

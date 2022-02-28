@@ -8,7 +8,9 @@ from flask_cors import CORS
 from datetime import datetime
 import os
 from os import environ
+from sqlalchemy import ForeignKey
 from werkzeug.utils import secure_filename
+import bcrypt
 
 
 app = Flask(__name__)
@@ -22,7 +24,22 @@ uploads_dir = os.path.join('assets/img/donations')
 db = SQLAlchemy(app)
 CORS(app)
 
-#region MODELS
+# region MODELS
+class User(db.Model):
+    __tablename__ = 'user'
+    
+    username = db.Column(db.Integer, primary_key=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    userType = db.Column(db.String(20), nullable=False)
+
+    def __init__(self, username, password, userType):
+        self.username = username
+        self.password = password
+        self.userType = userType
+
+    def json(self):
+        return {"username": self.username, "password": self.password, "userType": self.userType}
+
 class FormBuilder(db.Model):
     __tablename__ = 'formbuilder'
 
@@ -85,10 +102,83 @@ class FormAnswers(db.Model):
 
     def json(self):
         return {"answerID": self.answerID, "submissionID": self.submissionID, "fieldID": self.fieldID, "formName": self.formName, "answer": self.answer}
+
+class Request(db.Model):
+    __tablename__ = 'newrequest'
+    
+    reqId = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    migrantID = db.Column(db.Integer, nullable=False)           #, ForeignKey('user.username')
+    deliveryLocation = db.Column(db.Integer, nullable=False)
+    carouselID = db.Column(db.String(30), nullable=False)       #, ForeignKey('carousel.id')
+    timeSubmitted = db.Column(db.Date, nullable=False)
+        
+    def json(self):
+        return {"reqId": self.reqId, "migrantID": self.migrantID, "deliveryLocation": self.deliveryLocation, "carouselID": self.carouselID, "timeSubmitted": self.timeSubmitted}
+
 #endregion
 
 
-#region FORMBUILDER
+# region USER
+@app.route("/registermw", methods=['POST'])
+def register():
+        formData = request.form
+        formDict = formData.to_dict()
+        username = formDict['userName']
+        pw = formDict['pw']
+        hashedpw = bcrypt.hashpw(str(pw).encode('utf-8'), bcrypt.gensalt())
+
+        addtodb = User(username, hashedpw, "worker")
+        
+        try:
+            db.session.add(addtodb)
+            db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Worker account successfully created!"
+                }
+            )
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while registering user :" + str(e)
+                }
+            ), 500
+            
+@app.route("/login", methods=['POST'])
+def checkLogin():
+    formData = request.form
+    formDict = formData.to_dict()
+    uName = formDict["username"]
+    pw = formDict["password"]
+    
+    user = User.query.filter_by(username=uName).first()
+    if (user != None):
+        if (bcrypt.checkpw(str(pw).encode('utf-8'), str(user.password).encode('utf-8'))):
+        
+            print("Password checks out")
+    
+        
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "message": "Authentication success!",
+                        "userType": user.json()
+                    }
+                }
+            )
+        return jsonify(
+        {
+            "code": 404,
+            "message": "User not found, please register and try again."
+        }
+    ), 404
+# endregion
+
+# region FORMBUILDER
 # get all fields by form
 @app.route("/formbuilder/<string:formName>")
 def getFieldsByForm(formName):
@@ -184,7 +274,7 @@ def delete_field(fieldID):
             }), 500
 #endregion
 
-#region CATEGORYITEMS
+# region CATEGORYITEMS
 @app.route("/getCatalog")
 def retrieveCatalog():
     catalog = CategoryItem.query.all()
@@ -287,7 +377,7 @@ def getItem(itemID):
     ), 404
 #endregion
 
-# FORMANSWERS + CAROUSEL/WISHLIST
+# region FORMANSWERS + CAROUSEL/WISHLIST
 # get all form answers by carousel/wishlist submission
 def getFormAnswersBySubmission(submissionID):
     answerlist = FormAnswers.query.filter_by(submissionID=submissionID).all()
@@ -396,8 +486,9 @@ def createSubmission():
                 }), 500
     
     return jsonify(formDict), 201
+# endregion
 
-# CAROUSEL
+# region CAROUSEL
 # get all carousel items
 @app.route("/carousel")
 def getAllCarouselItems():
@@ -423,6 +514,28 @@ def getAllCarouselItems():
         {
             "code": 404,
             "message": "There are no donations at the moment."
+        }
+    ), 404
+
+# get specified carousel item
+@app.route("/carousel/<string:carouselID>")
+def getCarouselItem(carouselID):
+    carouselItem = Carousel.query.filter_by(carouselID=carouselID).first()
+    if carouselItem:
+        formAnswers = getFormAnswersBySubmission(carouselItem.carouselID)
+        itemDetails = getItem(carouselItem.itemID).get_json()["data"]
+        itemDetails.pop("itemID")   # remove duplicate itemID
+
+        return jsonify(
+            {
+                "code": 200,
+                "data": dict(**carouselItem.json(), **formAnswers, **itemDetails)
+            }
+        )
+    return jsonify(
+        {
+            "code": 404,
+            "message": "Donation does not exist."
         }
     ), 404
 
@@ -463,8 +576,11 @@ def filterItems(subcat):
         if (len(itemList)):
             categorydict = category.json()
             categorydict.pop("itemID")
-            subcatList = [dict(**item.json(),**categorydict) for item in itemList]
-            subcatItemList.extend(subcatList)
+            subcatDetailsList = []
+            for item in itemList:
+                formAns = getFormAnswersBySubmission(item.carouselID)
+                subcatDetailsList.append(dict(**item.json(),**categorydict, **formAns))
+            subcatItemList.extend(subcatDetailsList)
     if (len(subcatItemList)):
         return jsonify(
             {
@@ -480,8 +596,10 @@ def filterItems(subcat):
             "message": "There are no items donated under this Sub-category"
         }
     ), 404
+    
+# endregion
 
-# WISHLIST
+# region WISHLIST
 # get all items in wishlist
 @app.route("/wishlist")
 def getAllWishListItems():
@@ -509,6 +627,63 @@ def getAllWishListItems():
             "message": "Wishlist is currently empty."
         }
     ), 404
+# endregion
+
+# region REQUEST
+@app.route("/request/<string:contactNo>")
+def getMwRequest(contactNo):
+    itemReqList = Carousel.query\
+        .join(Request, Request.carouselID==Carousel.carouselID)\
+            .filter(Request.carouselID==Carousel.carouselID)\
+                .filter(Request.migrantID==contactNo)\
+                    .distinct()
+
+    itemIdArr = [id.json()['carouselID'] for id in itemReqList]
+    
+    return jsonify(
+        {
+            "code": 200,
+            "requestedItemIds": itemIdArr
+        }
+    )
+
+@app.route("/request", methods=['POST'])
+def addNewRequest():
+        formData = request.form
+        formDict = formData.to_dict()
+        addtodb = {}
+        addtodb["carouselID"] = formDict['id']
+        addtodb["deliveryLocation"] = formDict['destination']
+        addtodb["migrantID"] = formDict['contact']
+
+        # Get datetime of donation posting
+        now = datetime.now()
+        currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
+        timeSubmitted = currentDT
+
+        addtodb["timeSubmitted"] = timeSubmitted
+
+        item = Request(**addtodb)
+        
+        try:
+            db.session.add(item)
+            db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Request registered successfully!"
+                }
+            )
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while registering your request, please try again later"
+                }
+            ), 500
+            
+# endregion
 
 if __name__ == "__main__":
     app.run(port="5003", debug=True)
