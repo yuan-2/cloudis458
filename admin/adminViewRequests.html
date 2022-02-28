@@ -71,12 +71,13 @@
 
             <nav id="navbar" class="navbar order-last order-lg-0">
             <ul>
-                <li><a class="nav-link" href="#hero">Home</a></li>
+                <li><a class="nav-link" href="adminHomepage.html">Home</a></li>
                 <li><a class="nav-link" href="adminViewRequests.html">Requests</a></li>
                 <li><a class="nav-link" href="adminViewSuccessfulMatches.html">Matches</a></li>
                 <li><a class="nav-link" href="adminEditInventory.html">Inventory</a></li>
                 <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
-                <li><a class="nav-link" href="#doctors">Delivery</a></li>
+                <li><a class="nav-link" href="adminViewDelivery.html">Delivery</a></li>
+                <li><a class="nav-link" href="adminViewAccounts.html">Accounts</a></li>
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
@@ -94,7 +95,6 @@
         <div class="text-center">
             <a type="button" href="adminEditDonorForm.html" class="btn appointment-btn">Edit Donate Form</a>
             <a type="button" href="adminEditRequestItemForm.html" class="btn appointment-btn">Edit Request Form</a>
-            <a type="button" href="adminViewWishlist.html" class="btn appointment-btn">Edit Wishlist</a>
             <a type="button" href="adminEditFaq.html" class="btn appointment-btn">Edit FAQ Page</a>
         </div>
     </section>
@@ -133,7 +133,6 @@
                         data: data.data,
                         columns: columns,
                         fixedHeader: true,
-                        responsive: true,
                     } );
                     fields = data.data[0];
                     fields["columnDetails"] = data.columnHeaders;
@@ -167,7 +166,7 @@
                     if (response.status == 200) {
                         // success case
                         for (var i in result.data) {
-                            if (["deliveryLocation", "donorID", "itemStatus", "requestQty", "requestorContactNo"].includes(i)) {
+                            if (["deliveryLocation", "donorID", "itemStatus", "requestQty", "migrantID"].includes(i)) {
                                 for (id in result.columnHeaders) {
                                     if (result.columnHeaders[id] == i) {
                                         document.querySelector('[placeholder="' + i + '"]').value = result.data[i];
@@ -200,8 +199,14 @@
                 if (inputChildrenCount > 0) {
                     inputChildElement = inputChildren[1];
                     inputLabelElement = inputChildren[0];
-                    data[inputChildElement.id] = inputChildElement.value;
-                    data[inputLabelElement.innerHTML] = inputChildElement.value;
+                    // data[inputChildElement.id] = inputChildElement.value;
+                    if (inputChildElement.value == "") {
+                        alert("Please do not leave any blanks.");
+                        break;
+                    }
+                    else {
+                        data[inputLabelElement.innerHTML] = inputChildElement.value;
+                    }
                 }
             }
             var jsondata = JSON.stringify(data);
