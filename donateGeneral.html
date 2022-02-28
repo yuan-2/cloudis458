@@ -31,6 +31,19 @@
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
 
+    <!-- jQuery & Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+
+    <!-- Custom Javascript -->
+    <script src="assets/js/form.js" type="text/javascript"></script>
+    <script src="assets/js/formprocessing.js" type="text/javascript"></script>
+
     <!-- =======================================================
   * Template Name: Medilab - v4.7.0
   * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
@@ -75,7 +88,7 @@
                     <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
+            </nav>
 
             <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
                 class="appointment-btn scrollto">Login</a>
@@ -119,6 +132,7 @@
                             </div>
                             <div class="modal-body">
                                 <table id="catalogTable" class="table table-sm table-hover float-end text-center">
+                                    <caption>Item Catalog</caption>
                                     <tr>
                                         <th>Category</th>
                                         <th>Sub-Category</th>
@@ -138,94 +152,15 @@
         </div>
 
         <div style="max-width: 1000px; margin: auto;">
-            <form id="donateForm" class="row g-3" enctype="multipart/form-data">
-                <div class="col-md-6">
-                    <label for="donorContact" class="form-label">Contact Number</label>
-                    <input type="text" class="form-control" id="donorContact" placeholder="Enter a valid contact number"
-                        name="dContact" required>
-                </div>
-                <div class="col-6">
-                    <label for="donorAddress" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="donorAddress" placeholder="Enter a valid address"
-                        name="dAddress" required>
-                </div>
-                <div class="col-6">
-                    <label class="form-label">Area</label>
-                    <br>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="area" value="North">
-                        <label class="form-check-label">North</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="area" value="South">
-                        <label class="form-check-label">South</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="area" value="East">
-                        <label class="form-check-label">East</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="area" value="West">
-                        <label class="form-check-label">West</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="region" id="area" value="Central">
-                        <label class="form-check-label">Central</label>
+            <form id="donateForm" enctype="multipart/form-data">
+                <div class="row g-3" id='carousel'>
+                    <div id="contactField" class="col-md-6">
                     </div>
                 </div>
-
-                <!--On change of this dropdown, auto get item names listed under this category-->
-                <div class="col-6">
-                    <label for="itemCategoryOptions" class="form-label">Item Category</label>
-                    <select onchange="populateSubCat(this)" class="form-select" id="itemCategoryOptions" name="category"
-                        required>
-                        <!--Dynamically dropdown categories listed in existing db-->
-                    </select>
-                </div>
-
-                <div class="col-6">
-                    <label for="subCatOptions" class="form-label">Sub-Category</label>
-                    <select onchange="populateItemNames(this)" class="form-select" id="subCatOptions" name="subcat"
-                        required>
-                        <!--Dynamically dropdown subcats listed in existing db-->
-                    </select>
-                </div>
-
-                <!--Option value for item name needs to be dynamic, based on category-->
-                <div class="col-6">
-                    <label for="itemNameOptions" class="form-label">Item Name</label>
-                    <select class="form-select" id="itemNameOptions" name="itemName" required>
-                        <!--Dynamically update item names-->
-                    </select>
-                </div>
-
-                <div class="col-6">
-                    <div class="form-group">
-                        <label for="itemPhoto">Upload Photo <span style="font-weight: bolder;">('.png', '.jpg',
-                                '.jfif')</span></label>
-                        <br>
-                        <input type="file" required name="itemImg" class="form-control-file" id="itemPhoto"
-                            style='padding-top: 10px;'>
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <label for="itemQty" class="form-label">Quantity</label>
-                    <input type="number" class="form-control" name="quantity" id="itemQty">
-                </div>
-
-                <div class="col-6">
-                    <label for="pickUpOption" class="form-label">Require drivers to pick it up?</label>
-                    <select class="form-select" id="pickUpOption" name="r_Delivery" required>
-                        <option selected value="yes">Yes</option>
-                        <option value="no">No</option>
-                    </select>
-                </div>
-
                 <br>
 
                 <div class="col-12" style='text-align: center; color: #E3A587;'>
-                    <button type="button" onclick="submitDonation()" class="btn btn-outline-light"
+                    <button type="button" onclick="submitForm('carousel')" class="btn btn-outline-light"
                         style="color:white; background-color: #E3A587;">Submit</button>
                 </div>
             </form>
@@ -325,183 +260,14 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        var user = ""
-
-        var itemCategoryOptions = document.getElementById('itemCategoryOptions')
-
-        var itemNameOptions = document.getElementById("itemNameOptions")
-
-        var subCatOptions = document.getElementById('subCatOptions')
-
-        function checkLogin() {
-            if (sessionStorage.getItem("user") != null) {
-                user = JSON.parse(sessionStorage.getItem("user"))
-
-                document.getElementById("loginLogoutButton").innerText = "Logout"
-            }
-            getDropDownCat().then(function autoPopCategories(result) {
-                var catList = result
-
-                // reset dropdown fields
-                itemCategoryOptions.innerHTML = ""
-
-                itemNameOptions.innerHTML = ""
-
-                subCatOptions.innerHTML = ""
-
-                // Start off with an empty selected option for category
-                itemCategoryOptions.innerHTML += `<option selected> </option>`
-
-                for (cat of catList) {
-                    itemCategoryOptions.innerHTML += `
-                        <option value="${cat}">${cat}</option>
-                    `
-                }
-            })
-            var catalogTable = document.getElementById('catalogTable')
-            getCatalog().then(function populateCatalog(result) {
-                var catalogList = result
-
-                // reset catalog on refresh
-                catalogTable.innerHTML = `<tr>
-                                        <th>Category</th>
-                                        <th>Sub-Category</th>
-                                        <th>Item Name</th>
-                                    </tr>`
-
-                for (ele in catalogList) {
-                    catalogTable.innerHTML += `
-                    <tr>
-                        <td>${catalogList[ele].category}</td>
-                        <td>${catalogList[ele].subCat}</td>
-                        <td>${catalogList[ele].itemName}</td>
-                    </tr>
-                    `
-                }
-            })
-
-        }
-
-        async function getCatalog() {
-            let response = await fetch("http://127.0.0.1:5004/getCatalog")
-            let res = await response.json()
-
-            if (res.code == 200) {
-                return res.items
-            } else {
-                alert(res.message)
-            }
-        }
-
-        async function getDropDownCat() {
-            let response = await fetch("http://127.0.0.1:5004/getCat")
-            let responseCode = await response.json()
-
-            if (responseCode.code == 200) {
-                return responseCode.data.categories
-            } else {
-                alert(responseCode.message)
-            }
-        }
-
-        async function populateSubCat(cat) {
-            itemNameOptions.innerHTML = ""
-            subCatOptions.innerHTML = ""
-            cat = cat.value
-            let response = await fetch("http://127.0.0.1:5004/getSubCat/" + cat)
-            let responseCode = await response.json()
-
-            if (responseCode.code == 200) {
-                subCatOptions.innerHTML += "<option selected> </option>"
-                let subCatArr = []
-                for (subcat of responseCode.data.subcats) {
-                    if (!subCatArr.includes(subcat.subCat)) {
-                        subCatArr.push(subcat.subCat)
-                    }
-                }
-                for (sub of subCatArr) {
-                    subCatOptions.innerHTML += `<option value="${sub}">${sub}</option>`
-                }
-            }
-        }
-
-        async function populateItemNames(cat) {
-            itemNameOptions.innerHTML = ""
-            cat = cat.value
-            let response = await fetch("http://127.0.0.1:5004/getItemsInSubCat/" + cat)
-            let responseCode = await response.json()
-
-            if (responseCode.code == 200) {
-                itemNameOptions.innerHTML += "<option selected> </option>"
-                for (cat of responseCode.data.itemsInCat) {
-                    itemNameOptions.innerHTML += `<option value="${cat.itemName}">${cat.itemName}</option>`
-                }
-            }
-        }
-
-        function submitDonation() {
-            var donateFormElements = document.forms[0].elements
-
-            var formData = new FormData();
-
-            for (ele in donateFormElements) {
-                var eleName = donateFormElements[ele].name
-                // console.log("Name: " + donateFormElements[ele].name + ", Type: " + donateFormElements[ele].type)
-                if (donateFormElements[ele].type == "radio") {
-                    formData.append(donateFormElements[ele].name, document.querySelector("input[name='" + eleName +
-                        "']:checked").value)
-                    // console.log(document.querySelector("input[name='"+eleName+"']:checked").value)
-                } else if (donateFormElements[ele].type == "file") {
-                    fileName = donateFormElements[ele].files[0].name
-                    // Replace empty spaces for filename
-                    fileName = fileName.replace(/\s+/g, '')
-                    formData.append(donateFormElements[ele].name, fileName)
-                    formData.append("file", donateFormElements[ele].files[0])
-                } else {
-                    formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
-                }
-            }
-            addDonation(formData, 'http://127.0.0.1:5004/addDonation')
-
-        }
-
-        async function addDonation(data, url) {
-
-            const response = await fetch(url, {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                mode: 'cors', // no-cors, *cors, same-origin
-                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: 'same-origin', // include, *same-origin, omit
-                redirect: 'follow', // manual, *follow, error
-                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                body: data // body data type must match "Content-Type" header
-            });
-
-            if (response.status >= 200 && response.status < 300) {
-                data = await response.json()
-                if (data.code == "200") {
-                    let res = confirm(
-                        "Item has been posted successfully, Click 'cancel' to make another donation or ok to return to the home page"
-                    )
-
-                    if (res) {
-                        window.location.href = "index.html"
-                    } else {
-                        document.getElementById('donorForm').reset()
-                    }
-                }
-            } else {
-                data = await response.json()
-                alert(data.message)
-                document.getElementById('donorForm').reset()
-            }
-        }
-
+        retrieveForm('carousel');
+        
+        // can move to a common folder if every page uses?
         function loginLogout() {
             if (document.getElementById("loginLogoutButton").innerText === "Login") {
                 window.location.href = "login.html"
             } else {
-                sessionStorage.removeItem("user")
+                window.sessionStorage.removeItem("userType")
                 window.location.reload()
             }
         }

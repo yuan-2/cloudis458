@@ -116,7 +116,6 @@ CREATE TABLE IF NOT EXISTS `newrequest` (
   `carouselID` varchar(30) NOT NULL,
   `migrantID` int NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
-  `requestQty` int NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   PRIMARY KEY (`reqID`),
   FOREIGN KEY (`migrantID`) REFERENCES user (`username`),
@@ -436,8 +435,8 @@ INSERT INTO newwishlist (`wishlistID`, `migrantID`, `itemID`, `timeSubmitted`, `
 ('test', 12345678, 1, now(), 'available');
 
 -- for newrequest table
-INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, `requestQty`, `timeSubmitted`) VALUES
-(1, 12345678, 'pasir ris', '2022-02-15 21:35:42 92251521', 1, now());
+INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, `timeSubmitted`) VALUES
+(1, 12345678, 'pasir ris', '2022-02-15 21:35:42 92251521', now());
 
 -- for matches table
 INSERT INTO matches (`matchID`, `reqID`, `migrantID`, `donorID`, `matchDate`) VALUES
