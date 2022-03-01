@@ -287,7 +287,7 @@
         }
 
         async function loadItem() {
-            let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:5004/getItemById/" + itemId)
+            let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5004/getItemById/" + itemId)
             let responseCode = await response.json()
             if (responseCode.code == 200) {
                 return responseCode.data.itemDetail

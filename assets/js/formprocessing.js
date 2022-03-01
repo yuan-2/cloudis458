@@ -37,7 +37,7 @@ function submitForm(formName) {
         }
     }
 
-    addDonation(formData, 'http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:5003/formanswers')
+    addDonation(formData, 'http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5003/formanswers')
     alert("Item has been posted successfully")
     // error msg pls add
     window.location = window.location;

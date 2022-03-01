@@ -2,7 +2,7 @@
 -- version 4.9.2
 -- https://www.phpmyadmin.net/
 --
--- Host: ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:3306
+-- Host: ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:3306
 -- Generation Time: Nov 03, 2021 at 06:55 AM
 -- Server version: 8.0.18
 -- PHP Version: 7.4.0
