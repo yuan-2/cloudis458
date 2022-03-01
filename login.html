@@ -10,8 +10,14 @@
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon">
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link rel="icon"
+        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
+        sizes="32x32" />
+    <link rel="icon"
+        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
+        sizes="192x192" />
+    <link rel="apple-touch-icon"
+        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
 
     <!-- Google Fonts -->
     <link
@@ -156,7 +162,8 @@
                     <div class="col-lg-3 col-md-6 footer-links">
                         <h4>Useful Links</h4>
                         <ul>
-                            <li><i class="bx bx-chevron-right"></i> <a href="https://www.itsrainingraincoats.com/">Homesite</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a
+                                    href="https://www.itsrainingraincoats.com/">Homesite</a></li>
                         </ul>
                     </div>
 
@@ -187,9 +194,12 @@
             </div>
             <div class="social-links text-center text-md-right pt-3 pt-md-0">
                 <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i class="bx bxl-facebook"></i></a>
-                <a href="https://www.instagram.com/itsrainingraincoats/?hl=en" class="instagram"><i class="bx bxl-instagram"></i></a>
-                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i
+                        class="bx bxl-facebook"></i></a>
+                <a href="https://www.instagram.com/itsrainingraincoats/?hl=en" class="instagram"><i
+                        class="bx bxl-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i
+                        class="bx bxl-linkedin"></i></a>
             </div>
         </div>
     </footer><!-- End Footer -->
@@ -209,7 +219,6 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-
         function login() {
             let errorArr = []
 
@@ -217,8 +226,8 @@
 
             if (loginForm.username.value === "") {
                 errorArr.push("Username field cannot be empty")
-            }  
-            
+            }
+
             if (loginForm.password.value === "") {
                 errorArr.push("Password field cannot be empty")
             }
@@ -279,22 +288,19 @@
                     if (confirmMsg == true) {
                         window.location.href = "index.html"
                     }
-                } 
-                else if (userData.userType === "master") {
+                } else if (userData.userType === "master") {
                     sessionStorage.setItem("user", JSON.stringify(userData))
                     let confirmMsg = confirm("Logging in as Master Admin (" + String(userData.username) + ")")
                     if (confirmMsg == true) {
                         window.location.href = "admin/adminHomepage.html"
                     }
-                } 
-                else if (userData.userType === "admin") {
+                } else if (userData.userType === "admin") {
                     sessionStorage.setItem("user", JSON.stringify(userData))
                     let confirmMsg = confirm("Logging in as Admin (" + String(userData.username) + ")")
                     if (confirmMsg == true) {
                         window.location.href = "admin/adminHomepage.html"
                     }
-                } 
-                else if (userData.userType === "driver") {
+                } else if (userData.userType === "driver") {
                     sessionStorage.setItem("user", JSON.stringify(userData))
                     let confirmMsg = confirm("Logging in as a Driver (" + String(userData.username) + ")")
                     if (confirmMsg == true) {
@@ -303,8 +309,7 @@
                 }
 
                 return "ok"
-            }
-            else {
+            } else {
                 data = await reponse.json()
 
                 alert(data.message)

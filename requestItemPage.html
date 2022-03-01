@@ -6,12 +6,19 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <title>Request for Item</title>
+    
     <meta content="" name="description">
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon">
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link rel="icon"
+        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
+        sizes="32x32" />
+    <link rel="icon"
+        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
+        sizes="192x192" />
+    <link rel="apple-touch-icon"
+        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
 
     <!-- Google Fonts -->
     <link
@@ -168,7 +175,8 @@
                     <div class="col-lg-3 col-md-6 footer-links">
                         <h4>Useful Links</h4>
                         <ul>
-                            <li><i class="bx bx-chevron-right"></i> <a href="https://www.itsrainingraincoats.com/">Homesite</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a
+                                    href="https://www.itsrainingraincoats.com/">Homesite</a></li>
                         </ul>
                     </div>
 
@@ -199,9 +207,12 @@
             </div>
             <div class="social-links text-center text-md-right pt-3 pt-md-0">
                 <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i class="bx bxl-facebook"></i></a>
-                <a href="https://www.instagram.com/itsrainingraincoats/?hl=en" class="instagram"><i class="bx bxl-instagram"></i></a>
-                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i
+                        class="bx bxl-facebook"></i></a>
+                <a href="https://www.instagram.com/itsrainingraincoats/?hl=en" class="instagram"><i
+                        class="bx bxl-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i
+                        class="bx bxl-linkedin"></i></a>
             </div>
         </div>
     </footer><!-- End Footer -->
@@ -270,7 +281,7 @@
 
                     // item info API Works but request is not done up for dynamic work 
                     var x = setInterval(function () {
-                        
+
                         var date = new Date(item.timeSubmitted).toUTCString();
                         var finalDate = new Date(date.slice(0, -4));
                         var lastDate = finalDate.setDate(finalDate.getDate() + 1);
@@ -280,8 +291,9 @@
                         mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
                         seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-                        
-                        document.getElementById('timeLeft').innerHTML = `${hours} hours ${mins} mins ${seconds} secs`
+
+                        document.getElementById('timeLeft').innerHTML =
+                            `${hours} hours ${mins} mins ${seconds} secs`
                         // If the count down is over, show that item has expired and clear interval 
                         if (difference < 0) {
                             clearInterval(x);
@@ -375,7 +387,8 @@
             if (response.status >= 200 && response.status < 300) {
                 data = await response.json()
                 if (data.code == "200") {
-                    alert("You have registered your interest for this item, you will be notified once the item is ready");
+                    alert(
+                        "You have registered your interest for this item, you will be notified once the item is ready");
                     window.location.href = "index.html";
                 }
             }
