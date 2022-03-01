@@ -136,7 +136,6 @@ def register():
                 }
             )
         except Exception as e:
-            print(e)
             return jsonify(
                 {
                     "code": 500,
