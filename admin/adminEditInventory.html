@@ -136,7 +136,7 @@
 
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getFormAnswers/carousel",
+                url: "http://127.0.0.1:5003/getFormAnswers/carousel",
                 success: function (data) {
                     columnNames = Object.values(data.columnHeaders);
                     for (var i in columnNames) {
@@ -168,7 +168,7 @@
 
         function fillCarouselDetails(val) {
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/getFormAnswers/carousel/" + val;
+                var serviceURL = "http://127.0.0.1:5003/getFormAnswers/carousel/" + val;
                 try {
                     const response =
                     await fetch(
@@ -227,7 +227,7 @@
             }
             var jsondata = JSON.stringify(data);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/carousel/" + carouselID;
+                var serviceURL = "http://127.0.0.1:5003/updateFormAnswers/carousel/" + carouselID;
                 try {
                     const response =
                     await fetch(
@@ -267,7 +267,7 @@
             data.append(document.getElementById("itemPhoto").name, fileName);
             data.append("file", file[0]);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updatePhoto/" + carouselID;
+                var serviceURL = "http://127.0.0.1:5003/updatePhoto/" + carouselID;
                 try {
                     const response =
                     await fetch(

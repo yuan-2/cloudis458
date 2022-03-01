@@ -120,7 +120,7 @@
         var columns = [];
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getRequests",
+                url: "http://127.0.0.1:5003/getRequests",
                 success: function (data) {
                     columnNames = Object.values(data.columnHeaders);
                     // items = data.data.items;
@@ -155,7 +155,7 @@
         function fillRequestDetails(val) {
             console.log(val);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/getRequests/" + val;
+                var serviceURL = "http://127.0.0.1:5003/getRequests/" + val;
                 try {
                     const response =
                     await fetch(
@@ -212,7 +212,7 @@
             }
             var jsondata = JSON.stringify(data);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updateRequest/" + reqID;
+                var serviceURL = "http://127.0.0.1:5003/updateRequest/" + reqID;
                 try {
                     const response =
                     await fetch(
