@@ -277,7 +277,7 @@
 
             if (response.status >= 200 && response.status < 300) {
                 data = await response.json()
-                alert(data.data.message)
+                // alert(data.data.message)
 
                 var userData = data.data.userType
                 // console.log(userData)
@@ -288,15 +288,24 @@
                     if (confirmMsg == true) {
                         window.location.href = "index.html"
                     }
-                } else if (userData.userType === "admin") {
+                } 
+                else if (userData.userType === "master") {
                     sessionStorage.setItem("user", JSON.stringify(userData))
-                    let confirmMsg = confirm("Logging in as Admin")
+                    let confirmMsg = confirm("Logging in as Master Admin (" + String(userData.username) + ")")
                     if (confirmMsg == true) {
-                        // window.location.href = "index.html"
+                        window.location.href = "admin/adminHomepage.html"
                     }
-                } else if (userData.userType === "driver") {
+                } 
+                else if (userData.userType === "admin") {
                     sessionStorage.setItem("user", JSON.stringify(userData))
-                    let confirmMsg = confirm("Logging in as a Driver")
+                    let confirmMsg = confirm("Logging in as Admin (" + String(userData.username) + ")")
+                    if (confirmMsg == true) {
+                        window.location.href = "admin/adminHomepage.html"
+                    }
+                } 
+                else if (userData.userType === "driver") {
+                    sessionStorage.setItem("user", JSON.stringify(userData))
+                    let confirmMsg = confirm("Logging in as a Driver (" + String(userData.username) + ")")
                     if (confirmMsg == true) {
                         // window.location.href = "index.html"
                     }

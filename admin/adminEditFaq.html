@@ -42,7 +42,7 @@
   ======================================================== -->
 </head>
 
-<body>
+<body onload="checkLogin()">
 
     <!-- ======= Top Bar ======= -->
     <div id="topbar" class="d-flex align-items-center fixed-top">
@@ -82,7 +82,8 @@
                     </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
-            <a href="#appointment" class="appointment-btn"><span class="d-none d-md-inline">Logout</a>
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
 
         </div>
     </header><!-- End Header -->
@@ -363,7 +364,7 @@
             } // error
         });
     </script>
-
+    <script src="login.js"></script>
 </body>
 
 </html>

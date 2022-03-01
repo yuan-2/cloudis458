@@ -188,14 +188,6 @@ INSERT INTO wishlist (`itemName`, `quantity`, `category`, `subCat`, `timeSubmitt
 ('TV', 2, 'Electronics', 'TVs', now(), 'available');
 
 
-
--- for user table
--- INSERT INTO user(`username`, `password`, `userType`) VALUES 
--- (93261073, ENCRYPT('cheah1124'), 'admin');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (12345678, 'test', 'worker');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (87654321, 'test2', 'worker');
-
-
 -- for faq
 INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I donate?', 'Just do it!', 'donor');
 INSERT INTO faq (`question`, `answer`, `section`) VALUES ('What do I donate?', 'Check out our wishlist', 'donor');
@@ -442,4 +434,7 @@ INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, 
 INSERT INTO matches (`matchID`, `reqID`, `migrantID`, `donorID`, `matchDate`) VALUES
 (1, 1, 12345678, 11888811, now());
 
+select * from user;
+
+-- UPDATE user set usertype = 'master' where username = 93261073;
 -- select * from carousel;
