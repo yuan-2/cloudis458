@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from scipy.fftpack import cs_diff
 from sqlalchemy.orm import load_only
 from flask_cors import CORS
 from datetime import datetime

@@ -55,7 +55,7 @@ async function retrieveForm(formName) {
             if (formName == "wishlist") {
                 disable = "disabled"
             }
-            console.log(user.username)
+            // console.log(user.username)
             var contactField = `<label for="contactNo" class="form-label">Contact Number</label>
                                 <input required type="number" ${disable} class="form-control" value=${user.username} id="contactNo">`
             var itemNameField = `<!--On change of this dropdown, auto get item names listed under this category-->
