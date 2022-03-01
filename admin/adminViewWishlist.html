@@ -11,13 +11,13 @@
 
     <!-- Favicons -->
     <link rel="icon"
-        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
+        href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
         sizes="32x32" />
     <link rel="icon"
-        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
+        href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
         sizes="192x192" />
     <link rel="apple-touch-icon"
-        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
+        href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
 
     <!-- Google Fonts -->
     <link
@@ -134,7 +134,7 @@
 
             function getDT() {
                 $.ajax({
-                    url: "http://127.0.0.1:5000/getFormAnswers/wishlist",
+                    url: "http://127.0.0.1:5003/getFormAnswers/wishlist",
                     success: function (data) {
                         columnNames = Object.keys(data.data[0]);
                         // items = data.data.items;
@@ -171,7 +171,7 @@
 
             function fillWishlistDetails(val) {
                 $(async () => {
-                    var serviceURL = "http://127.0.0.1:5000/getFormAnswers/wishlist/" + val;
+                    var serviceURL = "http://127.0.0.1:5003/getFormAnswers/wishlist/" + val;
                     try {
                         const response =
                             await fetch(
@@ -230,7 +230,7 @@
 
                 var jsondata = JSON.stringify(data);
                 $(async () => {
-                    var serviceURL = "http://127.0.0.1:5000/updateFormAnswers/wishlist/" + wishlistID;
+                    var serviceURL = "http://127.0.0.1:5003/updateFormAnswers/wishlist/" + wishlistID;
                     try {
                         const response =
                             await fetch(

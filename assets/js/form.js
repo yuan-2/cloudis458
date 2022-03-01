@@ -3,11 +3,6 @@ user = ""
 // FORM BUILDING
 //#region 
 async function retrieveForm(formName) {
-    if (sessionStorage.getItem("user") != null) {
-        user = JSON.parse(sessionStorage.getItem("user"))
-        console.log(sessionStorage.getItem("user"))
-        document.getElementById("loginLogoutButton").innerText = "Logout"
-    }
 
     var serviceURL = "http://127.0.0.1:5003/formbuilder/" + formName;
 

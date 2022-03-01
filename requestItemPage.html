@@ -12,13 +12,13 @@
 
     <!-- Favicons -->
     <link rel="icon"
-        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
+        href="assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
         sizes="32x32" />
     <link rel="icon"
-        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
+        href="assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
         sizes="192x192" />
     <link rel="apple-touch-icon"
-        href="https://www.itsrainingraincoats.com/wp-content/uploads/2020/06/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
+        href="assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
 
     <!-- Google Fonts -->
     <link
@@ -95,7 +95,7 @@
 
     <main id="main">
 
-        <!-- Adaptive section to auto populate data carried over from carousel page click -->
+        <!-- Adaptive section to auto populate data carried over from donation page click -->
         <section id="pageTitle">
             <div class="container" id="itemReqDisplay">
             </div>
@@ -313,7 +313,7 @@
         }
 
         async function loadItem() {
-            let response = await fetch("http://127.0.0.1:5003/carousel/" + itemId)
+            let response = await fetch("http://127.0.0.1:5003/donation/" + itemId)
             let responseCode = await response.json()
             if (responseCode.code == 200) {
                 return responseCode.data
