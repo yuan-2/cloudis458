@@ -383,7 +383,7 @@
         }
 
         async function getCatalog() {
-            let response = await fetch("http://127.0.0.1:5004/getCatalog")
+            let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:5004/getCatalog")
             let res = await response.json()
 
             if (res.code == 200) {
@@ -394,7 +394,7 @@
         }
 
         async function getDropDownCat() {
-            let response = await fetch("http://127.0.0.1:5004/getCat")
+            let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:5004/getCat")
             let responseCode = await response.json()
 
             if (responseCode.code == 200) {
@@ -408,7 +408,7 @@
             itemNameOptions.innerHTML = ""
             subCatOptions.innerHTML = ""
             cat = cat.value
-            let response = await fetch("http://127.0.0.1:5004/getSubCat/" + cat)
+            let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:5004/getSubCat/" + cat)
             let responseCode = await response.json()
 
             if (responseCode.code == 200) {
@@ -428,7 +428,7 @@
         async function populateItemNames(cat) {
             itemNameOptions.innerHTML = ""
             cat = cat.value
-            let response = await fetch("http://127.0.0.1:5004/getItemsInSubCat/" + cat)
+            let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:5004/getItemsInSubCat/" + cat)
             let responseCode = await response.json()
 
             if (responseCode.code == 200) {
@@ -461,7 +461,7 @@
                     formData.append(donateFormElements[ele].name, donateFormElements[ele].value)
                 }
             }
-            addDonation(formData, 'http://127.0.0.1:5004/addDonation')
+            addDonation(formData, 'http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com/:5004/addDonation')
 
         }
 
