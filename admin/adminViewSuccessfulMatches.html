@@ -118,7 +118,7 @@
         var columns = [];
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5000/getSuccessfulMatches",
+                url: "http://127.0.0.1:5003/getSuccessfulMatches",
                 success: function (data) {
                     columnNames = Object.keys(data.data[0]);
                     // items = data.data.items;
@@ -154,7 +154,7 @@
 
         function fillSuccessfulMatchesDetails(val) {
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/getSuccessfulMatches/" + val;
+                var serviceURL = "http://127.0.0.1:5003/getSuccessfulMatches/" + val;
                 try {
                     const response =
                     await fetch(
@@ -208,7 +208,7 @@
         }
             var jsondata = JSON.stringify(data);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5000/updateSuccessfulMatches/" + matchID;
+                var serviceURL = "http://127.0.0.1:5003/updateSuccessfulMatches/" + matchID;
                 try {
                     const response =
                     await fetch(
