@@ -12,7 +12,7 @@ import bcrypt
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/fyptest'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/imatch'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
@@ -63,20 +63,20 @@ class CategoryItem(db.Model):
     def json(self):
         return {"itemID": self.itemID, "itemName": self.itemName, "category": self.category, "subCat": self.subCat}
 
-class Carousel(db.Model):
-    __tablename__ = 'newcarousel'
+class Donation(db.Model):
+    __tablename__ = 'donation'
     
     donorID = db.Column(db.Integer)
-    carouselID = db.Column(db.String(30), nullable=False, primary_key=True)
+    donationID = db.Column(db.String(30), nullable=False, primary_key=True)
     itemID = db.Column(db.Integer, nullable=False)
     timeSubmitted = db.Column(db.Date, nullable=False)
     itemStatus = db.Column(db.String(50), nullable=False)
         
     def json(self):
-        return {"carouselID": self.carouselID, "donorID": self.donorID, "carouselID": self.carouselID, "itemID": self.itemID, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
+        return {"donationID": self.donationID, "donorID": self.donorID, "donationID": self.donationID, "itemID": self.itemID, "timeSubmitted": self.timeSubmitted, "itemStatus": self.itemStatus}
 
 class Wishlist(db.Model):
-    __tablename__ = 'newwishlist'
+    __tablename__ = 'wishlist'
     
     migrantID = db.Column(db.Integer)
     wishlistID = db.Column(db.String(30), nullable=False, primary_key=True)
@@ -101,16 +101,16 @@ class FormAnswers(db.Model):
         return {"answerID": self.answerID, "submissionID": self.submissionID, "fieldID": self.fieldID, "formName": self.formName, "answer": self.answer}
 
 class Request(db.Model):
-    __tablename__ = 'newrequest'
+    __tablename__ = 'request'
     
     reqID = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     migrantID = db.Column(db.Integer, nullable=False)           #, ForeignKey('user.username')
     deliveryLocation = db.Column(db.Integer, nullable=False)
-    carouselID = db.Column(db.String(30), nullable=False)       #, ForeignKey('carousel.id')
+    donationID = db.Column(db.String(30), nullable=False)       #, ForeignKey('donation.id')
     timeSubmitted = db.Column(db.Date, nullable=False)
         
     def json(self):
-        return {"reqID": self.reqID, "migrantID": self.migrantID, "deliveryLocation": self.deliveryLocation, "carouselID": self.carouselID, "timeSubmitted": self.timeSubmitted}
+        return {"reqID": self.reqID, "migrantID": self.migrantID, "deliveryLocation": self.deliveryLocation, "donationID": self.donationID, "timeSubmitted": self.timeSubmitted}
 
 class Matches(db.Model):
     __tablename__ = 'matches'
@@ -411,7 +411,7 @@ def getItem(itemID):
 #endregion
 
 # region FORMANSWERS + CAROUSEL/WISHLIST
-# get all form answers by carousel/wishlist submission
+# get all form answers by donation/wishlist submission
 def getFormAnswersBySubmission(submissionID):
     answerlist = FormAnswers.query.filter_by(submissionID=submissionID).all()
 
@@ -423,11 +423,11 @@ def getFormAnswersBySubmission(submissionID):
     
     return mappedAnswerlist
 
-# get all details of a carousel/wishlist submission
+# get all details of a donation/wishlist submission
 @app.route("/formanswers/<string:submissionID>")
 def getAllDetailsBySubmission(submissionID):
-    # check if submission from Carousel or wishlist
-    submission = Carousel.query.filter_by(carouselID=submissionID).first()
+    # check if submission from Donation or wishlist
+    submission = Donation.query.filter_by(donationID=submissionID).first()
     if submission is None:
         submission = Wishlist.query.filter_by(wishlistID=submissionID).first()
 
@@ -474,7 +474,7 @@ def createSubmission():
     #     print(type(answer))
     #     print(answer + ": " +formDict[answer])
 
-    # submit into carousel/wishlist
+    # submit into donation/wishlist
     details = {"itemID": itemID, "timeSubmitted": currentDT, "itemStatus": "Available"}
     if formName == "wishlist":
         details["migrantID"] = userid
@@ -489,10 +489,10 @@ def createSubmission():
                 "message": "Unable to commit to database.",
                 "data" : submission.json()
             }), 500
-    elif formName == "carousel":
+    elif formName == "donation":
         details["donorID"] = userid
-        details["carouselID"] = submissionID
-        submission = Carousel(**details)
+        details["donationID"] = submissionID
+        submission = Donation(**details)
         try:
                 db.session.add(submission)
                 db.session.commit()
@@ -524,10 +524,10 @@ def createSubmission():
 @app.route("/getFormAnswers/<formName>")
 def getFormAnswers(formName):
     formFields = FormBuilder.query.filter_by(formName=formName)
-    if formName == "carousel":
-        tableFields = Carousel.metadata.tables["newcarousel"].columns.keys()
+    if formName == "donation":
+        tableFields = Donation.metadata.tables["donation"].columns.keys()
     elif formName == "wishlist":
-        tableFields = Wishlist.metadata.tables["newwishlist"].columns.keys()
+        tableFields = Wishlist.metadata.tables["wishlist"].columns.keys()
     fieldNames = {}
     for field in formFields:
         fieldNames[field.fieldID] = field.fieldName
@@ -540,14 +540,14 @@ def getFormAnswers(formName):
             fieldNames[lastKey + 1] = field
         print(fieldNames)
     data = []
-    if formName == "carousel":
-        submissionIDList = Carousel.query.with_entities(Carousel.carouselID).distinct()
+    if formName == "donation":
+        submissionIDList = Donation.query.with_entities(Donation.donationID).distinct()
     elif formName == "wishlist":
         submissionIDList = Wishlist.query.with_entities(Wishlist.wishlistID).distinct()
     for subID in submissionIDList:
         row = {}
-        if formName == "carousel":
-            submission = Carousel.query.filter_by(carouselID=subID[0]).first().json()
+        if formName == "donation":
+            submission = Donation.query.filter_by(donationID=subID[0]).first().json()
         elif formName == "wishlist":
             submission = Wishlist.query.filter_by(wishlistID=subID[0]).first().json()
         row.update(submission)
@@ -582,15 +582,15 @@ def getFormAnswers(formName):
             }
         )
 
-# get all form answers for specific forms (carousel & wishlist items)
+# get all form answers for specific forms (donation & wishlist items)
 @app.route("/getFormAnswers/<formName>/<submissionID>")
 def getSpecificFormAnswers(formName, submissionID):
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
     formFields = FormBuilder.query.filter_by(formName=formName)
-    if formName == "carousel":
-        tableFields = Carousel.metadata.tables["newcarousel"].columns.keys()
+    if formName == "donation":
+        tableFields = Donation.metadata.tables["donation"].columns.keys()
     elif formName == "wishlist":
-        tableFields = Wishlist.metadata.tables["newwishlist"].columns.keys()
+        tableFields = Wishlist.metadata.tables["wishlist"].columns.keys()
     fieldNames = {}
     for field in formFields:
         fieldNames[field.fieldID] = field.fieldName
@@ -600,8 +600,8 @@ def getSpecificFormAnswers(formName, submissionID):
     for ans in formAnswers:
         data["submissionID"] = submissionID
         data[fieldNames[ans.fieldID]] = ans.answer
-        if formName == "carousel":
-            item = Carousel.query.filter_by(carouselID=submissionID).first()
+        if formName == "donation":
+            item = Donation.query.filter_by(donationID=submissionID).first()
         elif formName == "wishlist":
             item = Wishlist.query.filter_by(wishlistID=submissionID).first()
         data.update(item.json())
@@ -624,13 +624,13 @@ def getSpecificFormAnswers(formName, submissionID):
             }
         )
 
-# edit donated (carousel) item OR wishlist in table
+# edit donated (donation) item OR wishlist in table
 @app.route("/updateFormAnswers/<formName>/<submissionID>", methods=["PUT"])
 def updateDonatedItem(formName, submissionID):
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
     formFields = FormBuilder.query.filter_by(formName=formName)
-    if formName == "carousel":
-        otherFormFields = Carousel.query.filter_by(carouselID=submissionID).first()
+    if formName == "donation":
+        otherFormFields = Donation.query.filter_by(donationID=submissionID).first()
     elif formName == "wishlist":
         otherFormFields = Wishlist.query.filter_by(wishlistID=submissionID).first()
     fieldNames = {}
@@ -646,9 +646,9 @@ def updateDonatedItem(formName, submissionID):
         )
     else:
         dataDict = {}
-        if formName == "carousel":
+        if formName == "donation":
             otherFormFields.donorID = data["donorID"]
-            otherFormFields.carouselID = data["carouselID"]
+            otherFormFields.donationID = data["donationID"]
         elif formName == "wishlist":
             otherFormFields.wishlistID = data["wishlistID"]
             otherFormFields.migrantID = data["migrantID"]
@@ -683,7 +683,7 @@ def updatePhoto(submissionID):
         formData = request.form
         formDict = formData.to_dict()
         imgFile = request.files['file']
-        formField = FormBuilder.query.filter_by(formName="carousel").filter_by(fieldName="Item Photo").first()
+        formField = FormBuilder.query.filter_by(formName="donation").filter_by(fieldName="Item Photo").first()
         fieldID = formField.fieldID
         formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
         # save file
@@ -720,15 +720,15 @@ def updatePhoto(submissionID):
 # endregion
 
 # region CAROUSEL
-# get all carousel items
-@app.route("/carousel")
-def getAllCarouselItems():
-    carouselList = Carousel.query.all()
-    if len(carouselList):
+# get all donation items
+@app.route("/donation")
+def getAllDonationItems():
+    donationList = Donation.query.all()
+    if len(donationList):
         itemList = []
-        for carouselItem in carouselList:
-            item = carouselItem.json()
-            formAnswers = getFormAnswersBySubmission(item["carouselID"])
+        for donationItem in donationList:
+            item = donationItem.json()
+            formAnswers = getFormAnswersBySubmission(item["donationID"])
             itemDetails = getItem(item["itemID"]).get_json()["data"]
             itemDetails.pop("itemID")   # remove duplicate itemID
 
@@ -748,19 +748,19 @@ def getAllCarouselItems():
         }
     ), 404
 
-# get specified carousel item
-@app.route("/carousel/<string:carouselID>")
-def getCarouselItem(carouselID):
-    carouselItem = Carousel.query.filter_by(carouselID=carouselID).first()
-    if carouselItem:
-        formAnswers = getFormAnswersBySubmission(carouselItem.carouselID)
-        itemDetails = getItem(carouselItem.itemID).get_json()["data"]
+# get specified donation item
+@app.route("/donation/<string:donationID>")
+def getDonationItem(donationID):
+    donationItem = Donation.query.filter_by(donationID=donationID).first()
+    if donationItem:
+        formAnswers = getFormAnswersBySubmission(donationItem.donationID)
+        itemDetails = getItem(donationItem.itemID).get_json()["data"]
         itemDetails.pop("itemID")   # remove duplicate itemID
 
         return jsonify(
             {
                 "code": 200,
-                "data": dict(**carouselItem.json(), **formAnswers, **itemDetails)
+                "data": dict(**donationItem.json(), **formAnswers, **itemDetails)
             }
         )
     return jsonify(
@@ -776,7 +776,7 @@ def getItemsByCategory(cat):
     catList = CategoryItem.query.filter_by(category=cat).all()
     catItemList = []
     for category in catList:
-        itemList = Carousel.query.filter_by(itemID=category.itemID).all()
+        itemList = Donation.query.filter_by(itemID=category.itemID).all()
         if (len(itemList)):
             categorydict = category.json()
             categorydict.pop("itemID")
@@ -803,13 +803,13 @@ def filterItems(subcat):
     subcatList = CategoryItem.query.filter_by(subCat=subcat).all()
     subcatItemList = []
     for category in subcatList:
-        itemList = Carousel.query.filter_by(itemID=category.itemID).all()
+        itemList = Donation.query.filter_by(itemID=category.itemID).all()
         if (len(itemList)):
             categorydict = category.json()
             categorydict.pop("itemID")
             subcatDetailsList = []
             for item in itemList:
-                formAns = getFormAnswersBySubmission(item.carouselID)
+                formAns = getFormAnswersBySubmission(item.donationID)
                 subcatDetailsList.append(dict(**item.json(),**categorydict, **formAns))
             subcatItemList.extend(subcatDetailsList)
     if (len(subcatItemList)):
@@ -863,13 +863,13 @@ def getAllWishListItems():
 # region REQUEST
 @app.route("/request/<string:contactNo>")
 def getMwRequest(contactNo):
-    itemReqList = Carousel.query\
-        .join(Request, Request.carouselID==Carousel.carouselID)\
-            .filter(Request.carouselID==Carousel.carouselID)\
+    itemReqList = Donation.query\
+        .join(Request, Request.donationID==Donation.donationID)\
+            .filter(Request.donationID==Donation.donationID)\
                 .filter(Request.migrantID==contactNo)\
                     .distinct()
 
-    itemIdArr = [id.json()['carouselID'] for id in itemReqList]
+    itemIdArr = [id.json()['donationID'] for id in itemReqList]
     
     return jsonify(
         {
@@ -883,7 +883,7 @@ def addNewRequest():
         formData = request.form
         formDict = formData.to_dict()
         addtodb = {}
-        addtodb["carouselID"] = formDict['id']
+        addtodb["donationID"] = formDict['id']
         addtodb["deliveryLocation"] = formDict['destination']
         addtodb["migrantID"] = formDict['contact']
 
@@ -921,15 +921,15 @@ def getAllRequests():
     data = []
     for request in requestList:
         row = {}
-        carouselID = request.carouselID
-        carouselItem = Carousel.query.filter_by(carouselID=carouselID).first()
-        itemID = carouselItem.itemID
+        donationID = request.donationID
+        donationItem = Donation.query.filter_by(donationID=donationID).first()
+        itemID = donationItem.itemID
         itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
         row["itemName"] = itemName
-        row.update(carouselItem.json())
+        row.update(donationItem.json())
         row.update(request.json())
         row.pop('itemID')
-        row.pop('carouselID')
+        row.pop('donationID')
         data.append(row)
     columns = list(data[0].keys())
     if len(requestList):
@@ -951,16 +951,16 @@ def getAllRequests():
 @app.route("/getRequests/<reqID>")
 def getRequestByID(reqID):
     request = Request.query.filter_by(reqID=reqID).first()
-    carouselID = request.carouselID
-    carouselItem = Carousel.query.filter_by(carouselID=carouselID).first()
-    itemID = carouselItem.itemID
+    donationID = request.donationID
+    donationItem = Donation.query.filter_by(donationID=donationID).first()
+    itemID = donationItem.itemID
     itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
     data = {}
     data["itemName"] = itemName
     data.update(request.json())
-    data.update(carouselItem.json())
+    data.update(donationItem.json())
     data.pop("itemID")
-    data.pop("carouselID")
+    data.pop("donationID")
     fieldNames = {}
     columns = sorted(list(data.keys()))
     for i in range(len(columns)):
@@ -971,7 +971,7 @@ def getRequestByID(reqID):
                 "code": 200,
                 "columnHeaders": fieldNames,
                 "data": data
-                # "columnHeaders": NewRequest.metadata.tables["newrequest"].columns.keys(),
+                # "columnHeaders": NewRequest.metadata.tables["request"].columns.keys(),
                 # "data": request
             }
         )
@@ -985,7 +985,7 @@ def getRequestByID(reqID):
 @app.route("/updateRequest/<reqID>", methods=["PUT"])
 def updateRequest(reqID):
     requested = Request.query.filter_by(reqID=reqID).first()
-    carousel = Carousel.query.filter_by(carouselID=requested.carouselID).first()
+    donation = Donation.query.filter_by(donationID=requested.donationID).first()
     data = request.get_json()
     if (requested is None):
         return jsonify( 
@@ -1000,8 +1000,8 @@ def updateRequest(reqID):
         requested.migrantID = data['migrantID']
         db.session.add(requested)
         db.session.commit()
-        carousel.itemStatus = data['itemStatus']
-        db.session.add(carousel)
+        donation.itemStatus = data['itemStatus']
+        db.session.add(donation)
         db.session.commit()
         return jsonify(
             {
@@ -1022,15 +1022,15 @@ def getAllSuccessfulMatches():
         row = {}
         reqID = match.reqID
         request = Request.query.filter_by(reqID=reqID).first()
-        carouselID = request.carouselID
-        carouselItem = Carousel.query.filter_by(carouselID=carouselID).first()
-        itemID = carouselItem.itemID
+        donationID = request.donationID
+        donationItem = Donation.query.filter_by(donationID=donationID).first()
+        itemID = donationItem.itemID
         itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
         row["itemName"] = itemName
         row.update(match.json())
         row.update(request.json())
-        row.update(carouselItem.json())
-        row.pop('carouselID')
+        row.update(donationItem.json())
+        row.pop('donationID')
         row.pop('reqID')
         row.pop('itemID')
         data.append(row)
@@ -1059,16 +1059,16 @@ def getSuccessfulMatch(matchID):
     match = Matches.query.filter_by(matchID=matchID).first()
     reqID = match.reqID
     request = Request.query.filter_by(reqID=reqID).first()
-    carouselID = request.carouselID
-    carouselItem = Carousel.query.filter_by(carouselID=carouselID).first()
-    itemID = carouselItem.itemID
+    donationID = request.donationID
+    donationItem = Donation.query.filter_by(donationID=donationID).first()
+    itemID = donationItem.itemID
     itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
     data = {}
     data["itemName"] = itemName
     data.update(request.json())
-    data.update(carouselItem.json())
+    data.update(donationItem.json())
     data.pop("itemID")
-    data.pop("carouselID")
+    data.pop("donationID")
     data.pop("reqID")
     columns = list(data.keys())
     if match:
@@ -1094,8 +1094,8 @@ def updateSuccessfulMatches(matchID):
     match = Matches.query.filter_by(matchID=matchID).first()
     reqID = match.reqID
     req = Request.query.filter_by(reqID=reqID).first()
-    carouselID = req.carouselID
-    carouselItem = Carousel.query.filter_by(carouselID=carouselID).first()
+    donationID = req.donationID
+    donationItem = Donation.query.filter_by(donationID=donationID).first()
     data = request.get_json()
     print(data)
     if (match is None):
@@ -1113,9 +1113,9 @@ def updateSuccessfulMatches(matchID):
         req.requestQty = data['requestQty']
         db.session.add(req)
         db.session.commit()
-        carouselItem.itemStatus = data['itemStatus']
-        carouselItem.donorID = data['donorID']
-        db.session.add(carouselItem)
+        donationItem.itemStatus = data['itemStatus']
+        donationItem.donorID = data['donorID']
+        db.session.add(donationItem)
         db.session.commit()
         return jsonify(
             {
@@ -1128,9 +1128,9 @@ def updateSuccessfulMatches(matchID):
         )
 
 # rank migrant workers according to reqHistory, get list of MWs who are prioritised
-@app.route("/getRankByReqHistory/<carouselID>")
-def getRankByReqHistory(carouselID):
-    requests = Request.query.filter_by(carouselID=carouselID)
+@app.route("/getRankByReqHistory/<donationID>")
+def getRankByReqHistory(donationID):
+    requests = Request.query.filter_by(donationID=donationID)
     if requests:
         reqHist = {}
         for req in requests:
@@ -1145,7 +1145,7 @@ def getRankByReqHistory(carouselID):
         mwPoints = {}
         # check whether item requires delivery
         deliveryFieldID = FormBuilder.query.filter_by(fieldName="Delivery Method").first()
-        deliveryOption = FormAnswers.query.filter_by(submissionID=carouselID).filter_by(fieldID=deliveryFieldID).first()
+        deliveryOption = FormAnswers.query.filter_by(submissionID=donationID).filter_by(fieldID=deliveryFieldID).first()
         # if deliveryOption == "Self Pick-Up":
             # find migrant worker(s) w shortest distance 
         

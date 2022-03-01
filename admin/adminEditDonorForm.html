@@ -10,8 +10,14 @@
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="../assets/img/favicon.png" rel="icon">
-    <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link rel="icon"
+        href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
+        sizes="32x32" />
+    <link rel="icon"
+        href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
+        sizes="192x192" />
+    <link rel="apple-touch-icon"
+        href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
 
     <!-- Google Fonts -->
     <link
@@ -109,7 +115,7 @@
         </section>
 
         <div style="max-width: 1000px; margin: auto;">
-            <div class="row g-3" id='carousel'>
+            <div class="row g-3" id='donation'>
                 <div id="contactField" class="col-md-6">
                 </div>
             </div>
@@ -150,7 +156,7 @@
                     </div>
                     <div class="row justify-content-end">
                         <button class="col-sm-3 m-3 btn btn-secondary" type='button' id="addFieldBtn"
-                            onclick="addField('carousel')">Add New Field</button>
+                            onclick="addField('donation')">Add New Field</button>
                     </div>
                 </div>
 
@@ -235,7 +241,7 @@
     </footer><!-- End Footer -->
 
     <script>
-        retrieveForm('carousel');
+        retrieveForm('donation');
     </script>
 
     <div id="preloader"></div>

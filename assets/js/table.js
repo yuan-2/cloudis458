@@ -24,7 +24,7 @@ function editSpecificRow(form) {
                                                             "<button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='edit" + form + "()'>Save Changes</button>" 
     document.getElementById("edit-section").style.display = "block";
     if (form == "Inventory") {
-        document.querySelector('[placeholder="carouselID"]').setAttribute("onchange", "fillCarouselDetails(this.value)");
+        document.querySelector('[placeholder="donationID"]').setAttribute("onchange", "fillCarouselDetails(this.value)");
         document.getElementById("edit-photo").style.display = "none";
     }
     else if (form == "Wishlist") {
@@ -56,7 +56,7 @@ function getEditDetails(fields) {
         if (field == "reqID") {
             fieldArr.unshift(fieldObj);
         }
-        else if (["carouselID", "wishlistID", "matchID"].includes(field)) {
+        else if (["donationID", "wishlistID", "matchID"].includes(field)) {
             fieldArr.unshift(fieldObj);
         }
         else if (field != "timeSubmitted") {
