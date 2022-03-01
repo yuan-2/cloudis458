@@ -1,3 +1,5 @@
+user = ""
+
 // FORM BUILDING
 //#region 
 async function retrieveForm(formName) {
@@ -7,7 +9,9 @@ async function retrieveForm(formName) {
         // Retrieve list of all fields
         const response =
             await fetch(
-                serviceURL, { method: 'GET' }
+                serviceURL, {
+                    method: 'GET'
+                }
             );
         const result = await response.json();
         if (response.ok) {
@@ -34,15 +38,20 @@ async function retrieveForm(formName) {
                 }
             }
 
-            
+
             // if edit page --> change as needed
-            if($('body').is('.editForm')){
+            if ($('body').is('.editForm')) {
                 addIcons(formName);
             }
-            
+
             // compulsory fields
+            var disable = ""
+            if (formName == "wishlist") {
+                disable = "disabled"
+            }
+
             var contactField = `<label for="contactNo" class="form-label">Contact Number</label>
-                                <input required type="number" class="form-control" id="contactNo">`
+                                <input required type="number" ${disable} class="form-control" value=${user.username} id="contactNo">`
 
             var itemNameField = `<!--On change of this dropdown, auto get item names listed under this category-->
                                 <div class="col-6">
@@ -174,14 +183,14 @@ function buildCheckbox(field) {
 
 // add edit icons to each field
 function addIcons(formName) {
-    $(`#${formName}`).find('input, select').each(function() {
+    $(`#${formName}`).find('input, select').each(function () {
         var fieldID = $(this).attr("name");
         if (fieldID === undefined) {
             fieldID = $(this).attr("id");
         }
         var editIcon = ` <i type="button" onclick="editField(${fieldID})" class="bi bi-pencil m-1" style="font-size:14px"></i>`;
         var label = $(`label[for="${fieldID}"]`);
-        if (!label.next().is("i")){
+        if (!label.next().is("i")) {
             label.after(editIcon);
         }
     });
@@ -298,9 +307,9 @@ async function populateItemNames(cat) {
 
 // DISPLAYING EDITING FORM
 //#region 
-function showFieldType(){
+function showFieldType() {
     var inputType = $("#fieldType :selected").val();
-    if (inputType == "text") {
+    if (inputType == "text" || inputType == "number") {
         if ($('#textInput').length == 0) {
             $('#newField').append(`<div id="textInput">
                                     <input type="text" class="form-control" id="placeholder" placeholder="Enter placeholder text here (optional)">
@@ -308,7 +317,7 @@ function showFieldType(){
         }
         $('#addOptions').hide();
         $('#textInput').show();
-    } else if (inputType == "radio" || inputType == "dropdown" || inputType == "checkbox"){
+    } else if (inputType == "radio" || inputType == "dropdown" || inputType == "checkbox") {
         if ($('#addOptions').length == 0) {
             $('#newField').append(`<div id="addOptions"><ol id="optionsList"></ol></div>`)
             addOption();
@@ -323,7 +332,7 @@ function showFieldType(){
     }
 }
 
-function addOption(value=""){
+function addOption(value = "") {
     var option = `<li><div class="input-group">
                         <input type="text" class="form-control mb-3" ${value} name="option" placeholder="Enter new option">
                         <button type="button" onclick="removeOption(this)" class="btn-close m-2" aria-label="Close"></button>
@@ -331,44 +340,58 @@ function addOption(value=""){
     $('#optionsList').append(option);
 }
 
-function removeOption(elem){
+function removeOption(elem) {
     elem.parentNode.parentNode.remove();
 }
 //#endregion
 
 // FIELD CUD
 //#region 
-async function addField(formName, fieldID="") {
+async function addField(formName, fieldID = "") {
     var fieldName = $('#fieldName').val();
     var fieldType = $('#fieldType').val();
-    if (fieldType == "text") {
+    if (fieldType == "text" || fieldType == "number") {
         var placeholder = $('#placeholder').val();
-        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType, placeholder: placeholder})
-    } else if (fieldType == "radio" || fieldType == "dropdown" || fieldType == "checkbox"){
+        var fieldData = JSON.stringify({
+            formName: formName,
+            fieldName: fieldName,
+            fieldType: fieldType,
+            placeholder: placeholder
+        })
+    } else if (fieldType == "radio" || fieldType == "dropdown" || fieldType == "checkbox") {
         var options = '';
-        $("[name='option']").each(function() {
+        $("[name='option']").each(function () {
             options += this.value + ';';
         });
-        options = options.slice(0,-1);
-        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType, options: options})
+        options = options.slice(0, -1);
+        var fieldData = JSON.stringify({
+            formName: formName,
+            fieldName: fieldName,
+            fieldType: fieldType,
+            options: options
+        })
     } else {
-        var fieldData = JSON.stringify({formName: formName, fieldName: fieldName, fieldType: fieldType})}
+        var fieldData = JSON.stringify({
+            formName: formName,
+            fieldName: fieldName,
+            fieldType: fieldType
+        })
+    }
 
     var serviceURL = "http://127.0.0.1:5003/formbuilder" + fieldID;
 
-    return fetch (serviceURL,
-    {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json"
-        },
-        body: fieldData
-    })
-    .then(response => response.json())
-    .then(data => {
-        // console.log(data);
-        window.location = window.location;
-    })
+    return fetch(serviceURL, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: fieldData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // console.log(data);
+            window.location = window.location;
+        })
 };
 
 async function editField(fieldID) {
@@ -377,9 +400,11 @@ async function editField(fieldID) {
     try {
         // Retrieve list of all FAQ
         const response =
-        await fetch(
-           serviceURL, { method: 'GET' }
-        );
+            await fetch(
+                serviceURL, {
+                    method: 'GET'
+                }
+            );
         const result = await response.json();
         if (response.ok) {
             var field = result.data;
@@ -423,7 +448,7 @@ async function editField(fieldID) {
                 $('#addFieldBtn').text("Save Changes");
                 $('#editField').html("Edit Field");
             }
-            
+
             $('#deleteFieldBtn').attr("onclick", `deleteField(${field.fieldID})`);
             $('#addFieldBtn').attr("onclick", `addField('${field.formName}', '/${field.fieldID}')`);
             document.getElementById('editField').scrollIntoView();
@@ -437,15 +462,17 @@ async function editField(fieldID) {
 }
 
 async function deleteField(fieldID) {
-    if (confirm("Are you sure you want to delete this field? This will also delete all data related to the field.")){
+    if (confirm("Are you sure you want to delete this field? This will also delete all data related to the field.")) {
         var serviceURL = "http://127.0.0.1:5003/formbuilder/" + fieldID;
 
         try {
             // Retrieve list of all FAQ
             const response =
-            await fetch(
-            serviceURL, { method: 'DELETE' }
-            );
+                await fetch(
+                    serviceURL, {
+                        method: 'DELETE'
+                    }
+                );
             const result = await response.json();
             if (response.ok) {
                 // console.log(result);

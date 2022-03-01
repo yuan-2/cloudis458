@@ -116,7 +116,6 @@ CREATE TABLE IF NOT EXISTS `newrequest` (
   `carouselID` varchar(30) NOT NULL,
   `migrantID` int NOT NULL,
   `deliveryLocation` varchar(300) NOT NULL,
-  `requestQty` int NOT NULL,
   `timeSubmitted` datetime NOT NULL,
   PRIMARY KEY (`reqID`),
   FOREIGN KEY (`migrantID`) REFERENCES user (`username`),
@@ -182,19 +181,15 @@ CREATE TABLE IF NOT EXISTS `matches` (
 -- INSERT INTO carousel (`itemName`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
 -- ('jeans', 'jeans in size 40', 'mei fang', 'pasir ris', '92251521', 'clothing', 1, 'yes', 'east', now(), 'available', 'jeans.jpg');
 
+INSERT INTO user (`username`, `password`, `usertype`) VALUES 
+(12345678, 'test1', 'worker'),
+(93261073, '$2b$12$hPh2gudOwUvmBs18PBa.deDRGOLiiDXuSkCV5qkA056I/n97blTJG', 'master');
+
 
 -- for wishlist table
 INSERT INTO wishlist (`itemName`, `quantity`, `category`, `subCat`, `timeSubmitted`, `itemStatus`) VALUES
 ('Large Blender', 1,'Kitchen', 'Small Appliances', now(), 'available'),
 ('TV', 2, 'Electronics', 'TVs', now(), 'available');
-
-
-
--- for user table
--- INSERT INTO user(`username`, `password`, `userType`) VALUES 
--- (93261073, ENCRYPT('cheah1124'), 'admin');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (12345678, 'test', 'worker');
-INSERT INTO `user` (`username`, `password`, `usertype`) VALUES (87654321, 'test2', 'worker');
 
 
 -- for faq
@@ -205,8 +200,6 @@ INSERT INTO faq (`question`, `answer`, `section`) VALUES ('How do I drive?', 'Ju
 
 
 -- for formbuilder table
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
-('carousel', 'Name', 'text', 'Your name or the Organization you are representing');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('carousel', 'Address', 'text');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
@@ -219,22 +212,18 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('carousel', 'Quantity', 'number');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('carousel', 'Delivery Method', 'dropdown', 'Delivery required;Arranged by donor');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
-('wishlist', 'Address', 'text', 'Enter Address');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('wishlist', 'Quantity', 'number');
 
 
 -- for formanswers table
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '1', 'yew wei');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '2', 'pasir ris grove');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '3', 'East');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '4', 'toothbrush.png');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '5', 'can make teeth sparkle sparkle');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '6', '3');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '7', 'Arranged by donor');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '8', 'pasir ris');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '9', '1');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '1', 'pasir ris grove');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '2', 'East');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '3', 'toothbrush.png');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '4', 'can make teeth sparkle sparkle');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '5', '3');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '6', 'Arranged by donor');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '7', '1');
 
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
@@ -436,11 +425,14 @@ INSERT INTO newwishlist (`wishlistID`, `migrantID`, `itemID`, `timeSubmitted`, `
 ('test', 12345678, 1, now(), 'available');
 
 -- for newrequest table
-INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, `requestQty`, `timeSubmitted`) VALUES
-(1, 12345678, 'pasir ris', '2022-02-15 21:35:42 92251521', 1, now());
+INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, `timeSubmitted`) VALUES
+(1, 12345678, 'pasir ris', '2022-02-15 21:35:42 92251521', now());
 
 -- for matches table
 INSERT INTO matches (`matchID`, `reqID`, `migrantID`, `donorID`, `matchDate`) VALUES
-(1, 1, 12345678, 11888811, now())
+(1, 1, 12345678, 11888811, now());
 
--- select * from request;
+select * from newwishlist;
+
+-- UPDATE user set usertype = 'master' where username = 93261073;
+-- select * from carousel;

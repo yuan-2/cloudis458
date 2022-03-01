@@ -705,7 +705,7 @@ body {
     background: linear-gradient(to bottom left, #E19587 40%, #DB5A42 100%);
   }
 
-  .card-body > a {
+  .card-body > button {
     margin-top: 1.5rem;
     display: flex;
     justify-content: center;
