@@ -463,6 +463,7 @@
                 mainCarouselDisplay.innerHTML = ""
                 let itemCheck = []
                 for (item of responseCode.data.items) {
+                  console.log(item)
                     date = new Date(item.timeSubmitted);
                     lastDate = date.setDate(date.getDate() + 1);
                     dateNow = Date.now();
@@ -472,8 +473,8 @@
 
                         if (itemCheck.length > 0) {
                             if (reqItemArr.indexOf(item.carouselID) != -1) {
-                                req = "Requested!";
-                                disable = "disabled";
+                                var req = "Requested!";
+                                var disable = "disabled";
                             }
                             
                             mainCarouselDisplay.innerHTML += `
