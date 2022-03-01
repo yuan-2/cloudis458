@@ -181,6 +181,10 @@ CREATE TABLE IF NOT EXISTS `matches` (
 -- INSERT INTO carousel (`itemName`, `description`, `donorName`, `donorAddr`, `contactNo`, `category`, `quantity`, `requireDelivery`, `region`, `timeSubmitted`, `itemStatus`, `fileName`) VALUES
 -- ('jeans', 'jeans in size 40', 'mei fang', 'pasir ris', '92251521', 'clothing', 1, 'yes', 'east', now(), 'available', 'jeans.jpg');
 
+INSERT INTO user (`username`, `password`, `usertype`) VALUES 
+(12345678, 'test1', 'worker'),
+(93261073, '$2b$12$hPh2gudOwUvmBs18PBa.deDRGOLiiDXuSkCV5qkA056I/n97blTJG', 'master');
+
 
 -- for wishlist table
 INSERT INTO wishlist (`itemName`, `quantity`, `category`, `subCat`, `timeSubmitted`, `itemStatus`) VALUES
@@ -208,8 +212,6 @@ INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('carousel', 'Quantity', 'number');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `options`) VALUES
 ('carousel', 'Delivery Method', 'dropdown', 'Delivery required;Arranged by donor');
-INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`, `placeholder`) VALUES
-('wishlist', 'Address', 'text', 'Enter Address');
 INSERT INTO formbuilder (`formName`, `fieldName`, `fieldType`) VALUES
 ('wishlist', 'Quantity', 'number');
 
@@ -221,8 +223,7 @@ INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '4', 'can make teeth sparkle sparkle');
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '5', '3');
 INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('2022-02-15 21:35:42 92251521', 'carousel', '6', 'Arranged by donor');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '7', 'pasir ris');
-INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '8', '1');
+INSERT INTO formanswers (`submissionID`,`formName`,`fieldID`,`answer`) VALUES ('test', 'wishlist', '7', '1');
 
 -- categoryitem table
 INSERT INTO `categoryitem` (`itemname`, `category`, `subcat`) VALUES
@@ -431,7 +432,7 @@ INSERT INTO newrequest (`reqID`, `migrantID`, `deliveryLocation`, `carouselID`, 
 INSERT INTO matches (`matchID`, `reqID`, `migrantID`, `donorID`, `matchDate`) VALUES
 (1, 1, 12345678, 11888811, now());
 
-select * from user;
+select * from newwishlist;
 
 -- UPDATE user set usertype = 'master' where username = 93261073;
 -- select * from carousel;
