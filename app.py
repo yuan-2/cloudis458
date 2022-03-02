@@ -186,14 +186,13 @@ def checkLogin():
     formDict = formData.to_dict()
     uName = formDict["username"]
     pw = formDict["password"]
-    
+
     user = User.query.filter_by(username=uName).first()
     if (user != None):
         if (bcrypt.checkpw(str(pw).encode('utf-8'), str(user.password).encode('utf-8'))):
-        
+
             print("Password checks out")
-    
-        
+
             return jsonify(
                 {
                     "code": 200,
@@ -203,12 +202,13 @@ def checkLogin():
                     }
                 }
             )
+    else:
         return jsonify(
-        {
-            "code": 404,
-            "message": "User not found, please register and try again."
-        }
-    ), 404
+            {
+                "code": 404,
+                "message": "User not found, please register and try again."
+            }
+        )
 # endregion
 
 # region FORMBUILDER
