@@ -534,12 +534,10 @@ def getFormAnswers(formName):
         fieldNames[field.fieldID] = field.fieldName
     for field in tableFields:
         lastKey = list(fieldNames.keys())[-1]
-        print(field)
         if field == "itemID":
             fieldNames[lastKey + 1] = "itemName"
         else:
             fieldNames[lastKey + 1] = field
-        print(fieldNames)
     data = []
     if formName == "carousel":
         submissionIDList = Carousel.query.with_entities(Carousel.carouselID).distinct()
@@ -627,7 +625,7 @@ def getSpecificFormAnswers(formName, submissionID):
 
 # edit donated (carousel) item OR wishlist in table
 @app.route("/updateFormAnswers/<formName>/<submissionID>", methods=["PUT"])
-def updateDonatedItem(formName, submissionID):
+def updateFormAnswers(formName, submissionID):
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
     formFields = FormBuilder.query.filter_by(formName=formName)
     if formName == "carousel":
@@ -660,14 +658,21 @@ def updateDonatedItem(formName, submissionID):
         db.session.add(otherFormFields)
         db.session.commit()
         for d in data:
-            dataDict[d] = data[d]
+            if d not in ["donorID", "carouselID", "wishlistID", "migrantID", "itemStatus"]:
+                dataDict[d] = data[d]
         for ans in formAnswers:
+            fieldName = FormBuilder.query.filter_by(fieldID=ans.fieldID).first().fieldName
             if ans.fieldID != 3:
-                fieldID = ans.fieldID
-                print(fieldID, ans.fieldID)
-                print(dataDict)
-                ans.answer = dataDict[str(fieldID)]
+                fieldName = FormBuilder.query.filter_by(fieldID=ans.fieldID).first().fieldName
+                ans.answer = dataDict[fieldName]
+                dataDict.pop(fieldName)
                 db.session.add(ans)
+                db.session.commit()
+        for data in dataDict:
+            if data.isdigit() == False:
+                answer = {"submissionID": submissionID, "formName": formName, "fieldID": FormBuilder.query.filter_by(fieldName=data).first().fieldID, "answer": dataDict[data]}
+                answer = FormAnswers(**answer)
+                db.session.add(answer)
                 db.session.commit()
         return jsonify(
             {
@@ -681,41 +686,67 @@ def updateDonatedItem(formName, submissionID):
 # edit uploaded photo
 @app.route("/updatePhoto/<submissionID>", methods=['POST'])
 def updatePhoto(submissionID):
-        formData = request.form
-        formDict = formData.to_dict()
-        imgFile = request.files['file']
-        formField = FormBuilder.query.filter_by(formName="carousel").filter_by(fieldName="Item Photo").first()
-        fieldID = formField.fieldID
-        formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
-        # save file
-        fileName = secure_filename(imgFile.filename.replace(" ", ""))
-        # print(formDict)
-        imgFile.save(os.path.join(uploads_dir, fileName))
-        # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
-        file = formDict['itemImg']
+    formData = request.form
+    formDict = formData.to_dict()
+    imgFile = request.files['file']
+    formField = FormBuilder.query.filter_by(formName="carousel").filter_by(fieldName="Item Photo").first()
+    fieldID = formField.fieldID
+    formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
+    # save file
+    fileName = secure_filename(imgFile.filename.replace(" ", ""))
+    # print(formDict)
+    imgFile.save(os.path.join(uploads_dir, fileName))
+    # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
+    file = formDict['itemImg']
 
-        # delete old photo file
-        oldFile = formAnswer.answer
-        os.remove(os.path.join(uploads_dir, oldFile))
-        
-        try:
-            formAnswer.answer = file
-            db.session.add(formAnswer)
+    # delete old photo file
+    oldFile = formAnswer.answer
+    os.remove(os.path.join(uploads_dir, oldFile))
+    
+    try:
+        formAnswer.answer = file
+        db.session.add(formAnswer)
+        db.session.commit()
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Photo Successfully Updated"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while updating the item photo, please try again later"
+            }
+        ), 500
+
+# delete formAnswers + carousel/wishlist
+@app.route("/deleteRow/<submissionID>", methods=["DELETE"])
+def deleteRow(submissionID):
+    carouselRow = Carousel.query.filter_by(carouselID=submissionID).first()
+    formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
+    try:
+        db.session.delete(carouselRow)
+        db.session.commit()
+        for ans in formAnswers:
+            db.session.delete(ans)
             db.session.commit()
-            return jsonify (
-                {
-                    "code": 200,
-                    "message": "Photo Successfully Updated"
-                }
-            )
-        except Exception as e:
-            print(e)
-            return jsonify(
-                {
-                    "code": 500,
-                    "message": "An error occurred while updating the item photo, please try again later"
-                }
-            ), 500
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Row deleted successfully!"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while deleting the data, please try again later"
+            }
+        ), 500
 
 
 # endregion
