@@ -727,12 +727,14 @@ def updatePhoto(submissionID):
 def deleteRow(submissionID):
     carouselRow = Carousel.query.filter_by(carouselID=submissionID).first()
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
+    oldFile = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=3).first().answer
     try:
         db.session.delete(carouselRow)
         db.session.commit()
         for ans in formAnswers:
             db.session.delete(ans)
             db.session.commit()
+        os.remove(os.path.join(uploads_dir, oldFile))
         return jsonify (
             {
                 "code": 200,
