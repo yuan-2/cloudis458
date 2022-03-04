@@ -1020,6 +1020,7 @@ def getRequestByID(reqID):
         }
     ), 404
 
+# update request by reqID
 @app.route("/updateRequest/<reqID>", methods=["PUT"])
 def updateRequest(reqID):
     requested = Request.query.filter_by(reqID=reqID).first()
@@ -1047,6 +1048,28 @@ def updateRequest(reqID):
                 "message": "Request successfully updated."
             }
         )
+
+# delete request by reqID
+@app.route("/deleteRequest/<reqID>", methods=["DELETE"])
+def deleteRequest(reqID):
+    request = Request.query.filter_by(reqID=reqID).first()
+    try:
+        db.session.delete(request)
+        db.session.commit()
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Row deleted successfully!"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while deleting the data, please try again later"
+            }
+        ), 500
 
 # endregion
 
