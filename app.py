@@ -723,18 +723,22 @@ def updatePhoto(submissionID):
         ), 500
 
 # delete formAnswers + carousel/wishlist
-@app.route("/deleteRow/<submissionID>", methods=["DELETE"])
-def deleteRow(submissionID):
-    carouselRow = Carousel.query.filter_by(carouselID=submissionID).first()
+@app.route("/deleteRow/<formName>/<submissionID>", methods=["DELETE"])
+def deleteRow(formName, submissionID):
+    if formName == "carousel":
+        row = Carousel.query.filter_by(carouselID=submissionID).first()
+        oldFile = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=3).first().answer
+    elif formName == "wishlist":
+        row = Wishlist.query.filter_by(wishlistID=submissionID).first()
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
-    oldFile = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=3).first().answer
     try:
-        db.session.delete(carouselRow)
+        if formName == "carousel":
+            os.remove(os.path.join(uploads_dir, oldFile))
+        db.session.delete(row)
         db.session.commit()
         for ans in formAnswers:
             db.session.delete(ans)
             db.session.commit()
-        os.remove(os.path.join(uploads_dir, oldFile))
         return jsonify (
             {
                 "code": 200,

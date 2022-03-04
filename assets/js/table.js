@@ -21,8 +21,8 @@ $(document).ready(function() {
 function editSpecificRow(form) {
     document.getElementById("edit-section").innerHTML += "<br>" + 
                                                             "<button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='edit" + form + "()'>Save Changes</button>" 
-    document.getElementById("edit-section").style.display = "block";
-    document.getElementById("carousel").style.display = "none";
+    $("#edit-section").show();
+    $("#carousel").hide();
     if (form == "Inventory") {
         document.querySelector('[placeholder="carouselID"]').setAttribute("onchange", "fillCarouselDetails(this.value)");
         document.getElementById("edit-photo").style.display = "none";
@@ -89,9 +89,14 @@ async function getDropDownCat() {
 
 async function retrieveFormAdmin(formName) {
     document.getElementById("edit-section").style.display = "none";
-    document.getElementById("edit-photo").style.display = "none";
-    document.getElementById("carousel").style.display = "block";
     var serviceURL = "http://127.0.0.1:5003/formbuilder/" + formName;
+    if (formName == "carousel") {
+        document.getElementById("edit-photo").style.display = "none";
+        document.getElementById("carousel").style.display = "block";
+    }
+    else if (formName == "wishlist") {
+        document.getElementById("wishlist").style.display = "block";
+    }
 
     try {
         // Retrieve list of all fields
@@ -157,7 +162,7 @@ async function retrieveFormAdmin(formName) {
                                         <!--Dynamically update item names-->
                                     </select>
                                 </div>`;
-            var addButton = `<br><button type="button" onclick="submitForm('carousel')" class="btn btn-outline-secondary col-2">Submit</button>`
+            var addButton = `<br><button type="button" onclick="submitForm('${formName}')" class="btn btn-outline-secondary col-2">Submit</button>`
 
             // document.getElementById('contactField').innerHTML += contactField;
             document.getElementById(formName).innerHTML += contactField + itemNameField + subCatField + catField + addButton;
@@ -191,21 +196,34 @@ async function retrieveFormAdmin(formName) {
     } // error
 }
 
-function deleteRow() {
+function deleteRow(formName) {
+    document.getElementById(formName).style.display = "none";
+    if (formName == "carousel") {
+        id = "carouselID"
+    }
+    else if (formName == "wishlist") {
+        id = "wishlistID"
+    }
     document.getElementById("edit-section").innerHTML = `<div class='col-md-6'>
-                                                            <label for="carouselID" class="form-label">carouselID</label>
-                                                            <input required type="text" class="form-control" id="carouselID" placeholder="carouselID"> 
+                                                            <label for="${id}" class="form-label">${id}</label>
+                                                            <input required type="text" class="form-control" id="${id}" placeholder="${id}"> 
                                                             <br>
-                                                            <button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='confirmDeleteRow()'>Delete Row</button>
+                                                            <button type='button' id='save-btn' class='btn btn-outline-secondary' onclick='confirmDeleteRow("${id}")'>Delete Row</button>
                                                         </div>`;
     document.getElementById("edit-section").style.display = "block";
-    document.getElementById("carousel").style.display = "none";
 }
 
-function confirmDeleteRow() {
+function confirmDeleteRow(id) {
     $(async () => {
-        val = document.getElementById("carouselID").value
-        var serviceURL = "http://127.0.0.1:5003/deleteRow/" + val;
+        console.log(id)
+        val = document.getElementById(id).value
+        if (id == "wishlistID") {
+            formName = "wishlist";
+        }
+        else if (id == "carouselID") {
+            formName = "carousel"
+        }
+        var serviceURL = "http://127.0.0.1:5003/deleteRow/" + formName + "/" + val;
         try {
             const response =
             await fetch(
