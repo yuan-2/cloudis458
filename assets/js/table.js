@@ -92,6 +92,9 @@ async function retrieveFormAdmin(formName) {
     if (formName == "request") {
         $("#request").show();
     }
+    else if (formName == "successfulMatch") {
+        $("#successfulMatch").show();
+    }
     else if (formName == "carousel" || formName == "wishlist") {
         var serviceURL = "http://127.0.0.1:5003/formbuilder/" + formName;
         if (formName == "carousel") {
@@ -136,9 +139,9 @@ async function retrieveFormAdmin(formName) {
                 }
     
                 // if edit page --> change as needed
-                if ($('body').is('.editForm')) {
-                    addIcons(formName);
-                }
+                // if ($('body').is('.editForm')) {
+                //     addIcons(formName);
+                // }
     
                 var contactField = `<div id="contactField" class="col-md-6">
                                         <label for="contactNo" class="form-label">Contact Number</label>
@@ -201,47 +204,50 @@ async function retrieveFormAdmin(formName) {
 }
 
 function addRow(formName) {
-    if (formName == "request") {
-        reqFormElements = document.forms[0].elements
-        // console.log(reqFormElements);
-        var formData = new FormData()
-        for (ele in reqFormElements) {
-            // console.log(reqFormElements[ele])
-            if ((["carouselID", "migrantID", "deliveryLocation"]).includes(reqFormElements[ele].id)) {
-                if (reqFormElements[ele].value == "") {
-                    alert("Please do not leave any blanks.");
-                    return "error";
-                }
-                eleName = reqFormElements[ele].name
-                eleVal = reqFormElements[ele].value
-                formData.append(eleName, eleVal)
+    reqFormElements = document.forms[0].elements
+    // console.log(reqFormElements);
+    var formData = new FormData()
+    for (ele in reqFormElements) {
+        // console.log(reqFormElements[ele])
+        if ((["carouselID", "migrantID", "deliveryLocation","donorID", "reqID"]).includes(reqFormElements[ele].id)) {
+            if (reqFormElements[ele].value == "") {
+                alert("Please do not leave any blanks.");
+                return "error";
             }
+            eleName = reqFormElements[ele].name;
+            eleVal = reqFormElements[ele].value;
+            formData.append(eleName, eleVal);
         }
-        $(async () => {
-            var serviceURL = "http://127.0.0.1:5003/request";
-            try {
-                const response =
-                await fetch(
-                    serviceURL, { 
-                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                        mode: 'cors', // no-cors, *cors, same-origin
-                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                        credentials: 'same-origin', // include, *same-origin, omit
-                        redirect: 'follow', // manual, *follow, error
-                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                        body: formData // body data type must match "Content-Type" header
-                    });
-                const result = await response.json();
-                alert("Request successfully added!")
-                window.location.reload()
-            }
-            catch (error) {
-                // Errors when calling the service; such as network error, 
-                // service offline, etc
-                alert('There is a problem retrieving the data, please try again later.');
-            } // error
-        });
     }
+    if (formName == "request") {
+        var serviceURL = "http://127.0.0.1:5003/request";
+    }
+    else if (formName == "successfulMatch") {
+        var serviceURL = "http://127.0.0.1:5003/addMatch";
+    }
+    $(async () => {
+        try {
+            const response =
+            await fetch(
+                serviceURL, { 
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    mode: 'cors', // no-cors, *cors, same-origin
+                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: 'same-origin', // include, *same-origin, omit
+                    redirect: 'follow', // manual, *follow, error
+                    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    body: formData // body data type must match "Content-Type" header
+                });
+            const result = await response.json();
+            alert("Row successfully added!")
+            window.location.reload()
+        }
+        catch (error) {
+            // Errors when calling the service; such as network error, 
+            // service offline, etc
+            alert('There is a problem adding the data, please try again later.');
+        } // error
+    });
 }
 
 function deleteRow(formName) {
@@ -255,6 +261,9 @@ function deleteRow(formName) {
     else if (formName == "request") {
         id = "reqID"
     }
+    else if (formName == "successfulMatch") {
+        id = "matchID"
+    }
     document.getElementById("edit-section").innerHTML = `<div class='col-md-6'>
                                                             <label for="${id}" class="form-label">${id}</label>
                                                             <input required type="text" class="form-control" id="${id}" placeholder="${id}"> 
@@ -267,14 +276,21 @@ function deleteRow(formName) {
 function confirmDeleteRow(id) {
     $(async () => {
         val = document.getElementById(id).value
+        if (val == "") {
+            alert("Please enter a valid input.");
+            return "blank ID";
+        }
         if (id == "wishlistID") {
             formName = "wishlist";
         }
         else if (id == "carouselID") {
-            formName = "carousel"
+            formName = "carousel";
         }
         if (id == "reqID") {
-            var serviceURL = "http://127.0.0.1:5003/deleteRequest/" + val
+            var serviceURL = "http://127.0.0.1:5003/deleteRequest/" + val;
+        }
+        else if (id == "matchID") {
+            var serviceURL = "http://127.0.0.1:5003/deleteMatch/" + val;
         }
         else {
             var serviceURL = "http://127.0.0.1:5003/deleteRow/" + formName + "/" + val;

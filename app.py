@@ -1,3 +1,5 @@
+from cgi import print_directory
+from cv2 import Mat_DEPTH_MASK
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from scipy.fftpack import cs_diff
@@ -122,12 +124,12 @@ class Matches(db.Model):
     donorID = db.Column(db.Integer, nullable=False)
     matchDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, matchID, reqID, migrantID, donorID, matchDate):
-        self.matchID = matchID
-        self.reqID = reqID
-        self.migrantID = migrantID
-        self.donorID = donorID
-        self.matchDate = matchDate
+    # def __init__(self, matchID, reqID, migrantID, donorID, matchDate):
+    #     self.matchID = matchID
+    #     self.reqID = reqID
+    #     self.migrantID = migrantID
+    #     self.donorID = donorID
+    #     self.matchDate = matchDate
 
     def json(self):
         return { "matchID": self.matchID, "reqID": self.reqID, "migrantID": self.migrantID, 
@@ -1187,6 +1189,65 @@ def updateSuccessfulMatches(matchID):
                 "olddata": data
             }
         )
+
+# add new match
+@app.route("/addMatch", methods=['POST'])
+def addNewMatch():
+        formData = request.form
+        formDict = formData.to_dict()
+        addtodb = {}
+        addtodb["reqID"] = formDict['reqID']
+        addtodb["migrantID"] = formDict['migrantID']
+        addtodb["donorID"] = formDict['donorID']
+
+        # Get datetime of donation posting
+        now = datetime.now()
+        currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
+        timeSubmitted = currentDT
+
+        addtodb["matchDate"] = timeSubmitted
+        print(addtodb)
+        item = Matches(**addtodb)
+        
+        try:
+            db.session.add(item)
+            db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Match added successfully!"
+                }
+            )
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while adding your match, please try again later"
+                }
+            ), 500
+
+# delete match by matchID
+@app.route("/deleteMatch/<matchID>", methods=["DELETE"])
+def deleteMatch(matchID):
+    match = Matches.query.filter_by(matchID=matchID).first()
+    try:
+        db.session.delete(match)
+        db.session.commit()
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Row deleted successfully!"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while deleting the data, please try again later"
+            }
+        ), 500
 
 # rank migrant workers according to reqHistory, get list of MWs who are prioritised
 @app.route("/getRankByReqHistory/<carouselID>")
