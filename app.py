@@ -1,3 +1,5 @@
+from cgi import print_directory
+from cv2 import Mat_DEPTH_MASK
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import load_only
@@ -121,12 +123,12 @@ class Matches(db.Model):
     donorID = db.Column(db.Integer, nullable=False)
     matchDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, matchID, reqID, migrantID, donorID, matchDate):
-        self.matchID = matchID
-        self.reqID = reqID
-        self.migrantID = migrantID
-        self.donorID = donorID
-        self.matchDate = matchDate
+    # def __init__(self, matchID, reqID, migrantID, donorID, matchDate):
+    #     self.matchID = matchID
+    #     self.reqID = reqID
+    #     self.migrantID = migrantID
+    #     self.donorID = donorID
+    #     self.matchDate = matchDate
 
     def json(self):
         return { "matchID": self.matchID, "reqID": self.reqID, "migrantID": self.migrantID, 
@@ -533,12 +535,10 @@ def getFormAnswers(formName):
         fieldNames[field.fieldID] = field.fieldName
     for field in tableFields:
         lastKey = list(fieldNames.keys())[-1]
-        print(field)
         if field == "itemID":
             fieldNames[lastKey + 1] = "itemName"
         else:
             fieldNames[lastKey + 1] = field
-        print(fieldNames)
     data = []
     if formName == "donation":
         submissionIDList = Donation.query.with_entities(Donation.donationID).distinct()
@@ -626,7 +626,7 @@ def getSpecificFormAnswers(formName, submissionID):
 
 # edit donated (donation) item OR wishlist in table
 @app.route("/updateFormAnswers/<formName>/<submissionID>", methods=["PUT"])
-def updateDonatedItem(formName, submissionID):
+def updateFormAnswers(formName, submissionID):
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
     formFields = FormBuilder.query.filter_by(formName=formName)
     if formName == "donation":
@@ -659,14 +659,21 @@ def updateDonatedItem(formName, submissionID):
         db.session.add(otherFormFields)
         db.session.commit()
         for d in data:
-            dataDict[d] = data[d]
+            if d not in ["donorID", "carouselID", "wishlistID", "migrantID", "itemStatus"]:
+                dataDict[d] = data[d]
         for ans in formAnswers:
+            fieldName = FormBuilder.query.filter_by(fieldID=ans.fieldID).first().fieldName
             if ans.fieldID != 3:
-                fieldID = ans.fieldID
-                print(fieldID, ans.fieldID)
-                print(dataDict)
-                ans.answer = dataDict[str(fieldID)]
+                fieldName = FormBuilder.query.filter_by(fieldID=ans.fieldID).first().fieldName
+                ans.answer = dataDict[fieldName]
+                dataDict.pop(fieldName)
                 db.session.add(ans)
+                db.session.commit()
+        for data in dataDict:
+            if data.isdigit() == False:
+                answer = {"submissionID": submissionID, "formName": formName, "fieldID": FormBuilder.query.filter_by(fieldName=data).first().fieldID, "answer": dataDict[data]}
+                answer = FormAnswers(**answer)
+                db.session.add(answer)
                 db.session.commit()
         return jsonify(
             {
@@ -680,41 +687,73 @@ def updateDonatedItem(formName, submissionID):
 # edit uploaded photo
 @app.route("/updatePhoto/<submissionID>", methods=['POST'])
 def updatePhoto(submissionID):
-        formData = request.form
-        formDict = formData.to_dict()
-        imgFile = request.files['file']
-        formField = FormBuilder.query.filter_by(formName="donation").filter_by(fieldName="Item Photo").first()
-        fieldID = formField.fieldID
-        formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
-        # save file
-        fileName = secure_filename(imgFile.filename.replace(" ", ""))
-        # print(formDict)
-        imgFile.save(os.path.join(uploads_dir, fileName))
-        # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
-        file = formDict['itemImg']
+    formData = request.form
+    formDict = formData.to_dict()
+    imgFile = request.files['file']
+    formField = FormBuilder.query.filter_by(formName="carousel").filter_by(fieldName="Item Photo").first()
+    fieldID = formField.fieldID
+    formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
+    # save file
+    fileName = secure_filename(imgFile.filename.replace(" ", ""))
+    # print(formDict)
+    imgFile.save(os.path.join(uploads_dir, fileName))
+    # os.open(uploads_dir+secure_filename(fileName), os.O_RDWR | os.O_CREAT, 0o666)
+    file = formDict['itemImg']
 
-        # delete old photo file
-        oldFile = formAnswer.answer
-        os.remove(os.path.join(uploads_dir, oldFile))
-        
-        try:
-            formAnswer.answer = file
-            db.session.add(formAnswer)
+    # delete old photo file
+    oldFile = formAnswer.answer
+    os.remove(os.path.join(uploads_dir, oldFile))
+    
+    try:
+        formAnswer.answer = file
+        db.session.add(formAnswer)
+        db.session.commit()
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Photo Successfully Updated"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while updating the item photo, please try again later"
+            }
+        ), 500
+
+# delete formAnswers + carousel/wishlist
+@app.route("/deleteRow/<formName>/<submissionID>", methods=["DELETE"])
+def deleteRow(formName, submissionID):
+    if formName == "carousel":
+        row = Carousel.query.filter_by(carouselID=submissionID).first()
+        oldFile = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=3).first().answer
+    elif formName == "wishlist":
+        row = Wishlist.query.filter_by(wishlistID=submissionID).first()
+    formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
+    try:
+        if formName == "carousel":
+            os.remove(os.path.join(uploads_dir, oldFile))
+        db.session.delete(row)
+        db.session.commit()
+        for ans in formAnswers:
+            db.session.delete(ans)
             db.session.commit()
-            return jsonify (
-                {
-                    "code": 200,
-                    "message": "Photo Successfully Updated"
-                }
-            )
-        except Exception as e:
-            print(e)
-            return jsonify(
-                {
-                    "code": 500,
-                    "message": "An error occurred while updating the item photo, please try again later"
-                }
-            ), 500
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Row deleted successfully!"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while deleting the data, please try again later"
+            }
+        ), 500
 
 
 # endregion
@@ -982,6 +1021,7 @@ def getRequestByID(reqID):
         }
     ), 404
 
+# update request by reqID
 @app.route("/updateRequest/<reqID>", methods=["PUT"])
 def updateRequest(reqID):
     requested = Request.query.filter_by(reqID=reqID).first()
@@ -1009,6 +1049,28 @@ def updateRequest(reqID):
                 "message": "Request successfully updated."
             }
         )
+
+# delete request by reqID
+@app.route("/deleteRequest/<reqID>", methods=["DELETE"])
+def deleteRequest(reqID):
+    request = Request.query.filter_by(reqID=reqID).first()
+    try:
+        db.session.delete(request)
+        db.session.commit()
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Row deleted successfully!"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while deleting the data, please try again later"
+            }
+        ), 500
 
 # endregion
 
@@ -1126,6 +1188,65 @@ def updateSuccessfulMatches(matchID):
                 "olddata": data
             }
         )
+
+# add new match
+@app.route("/addMatch", methods=['POST'])
+def addNewMatch():
+        formData = request.form
+        formDict = formData.to_dict()
+        addtodb = {}
+        addtodb["reqID"] = formDict['reqID']
+        addtodb["migrantID"] = formDict['migrantID']
+        addtodb["donorID"] = formDict['donorID']
+
+        # Get datetime of donation posting
+        now = datetime.now()
+        currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
+        timeSubmitted = currentDT
+
+        addtodb["matchDate"] = timeSubmitted
+        print(addtodb)
+        item = Matches(**addtodb)
+        
+        try:
+            db.session.add(item)
+            db.session.commit()
+            return jsonify (
+                {
+                    "code": 200,
+                    "message": "Match added successfully!"
+                }
+            )
+        except Exception as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "An error occurred while adding your match, please try again later"
+                }
+            ), 500
+
+# delete match by matchID
+@app.route("/deleteMatch/<matchID>", methods=["DELETE"])
+def deleteMatch(matchID):
+    match = Matches.query.filter_by(matchID=matchID).first()
+    try:
+        db.session.delete(match)
+        db.session.commit()
+        return jsonify (
+            {
+                "code": 200,
+                "message": "Row deleted successfully!"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return jsonify(
+            {
+                "code": 500,
+                "message": "An error occurred while deleting the data, please try again later"
+            }
+        ), 500
 
 # rank migrant workers according to reqHistory, get list of MWs who are prioritised
 @app.route("/getRankByReqHistory/<donationID>")
