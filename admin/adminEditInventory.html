@@ -5,13 +5,19 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-        <title>Inner Page - Medilab Bootstrap Template</title>
+        <title>IMatch | Edit Inventory</title>
         <meta content="" name="description">
         <meta content="" name="keywords">
 
         <!-- Favicons -->
-        <link href="../assets/img/favicon.png" rel="icon">
-        <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+        <link rel="icon"
+            href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
+            sizes="32x32" />
+        <link rel="icon"
+            href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
+            sizes="192x192" />
+        <link rel="apple-touch-icon"
+            href="../assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
 
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -83,6 +89,7 @@
                     <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
                     <li><a class="nav-link" href="adminViewDelivery.html">Delivery</a></li>
                     <li><a class="nav-link" href="adminViewAccounts.html">Accounts</a></li>
+                    <li><a class="nav-link" href="adminEditFaq.html">FAQ</a></li>
                     </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
                 </nav><!-- .navbar -->
@@ -97,6 +104,9 @@
         <div class="section-title">
             <h2>Add, Remove or Update Inventory</h2>
             <p>View and Edit items donated by donors and stored in the database</p>
+        </div>
+        <div class="text-center">
+            <a type="button" href="adminEditDonorForm.html" class="btn appointment-btn">Edit Donate Form</a>
         </div>
     </section>
     <section class="inner-page">
@@ -117,8 +127,8 @@
             <div style="display: none" id="edit-photo">
                 <div class="row">
                     <div class="col-6">
-                        <label for="carouselID">carouselID</label>
-                        <input class="form-control mb-2" type="text" placeholder="carouselID" id="carouselID">
+                        <label for="donationID">donationID</label>
+                        <input class="form-control mb-2" type="text" placeholder="donationID" id="donationID">
                     </div>
                     <div class="col-4">
                         <label for="itemPhoto">Upload Photo</label>
@@ -143,7 +153,7 @@
 
         function getDT() {
             $.ajax({
-                url: "http://127.0.0.1:5003/getFormAnswers/carousel",
+                url: "http://127.0.0.1:5003/getFormAnswers/donation",
                 success: function (data) {
                     columnNames = Object.values(data.columnHeaders);
                     for (var i in columnNames) {
@@ -180,7 +190,7 @@
 
         function fillCarouselDetails(val) {
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5003/getFormAnswers/carousel/" + val;
+                var serviceURL = "http://127.0.0.1:5003/getFormAnswers/donation/" + val;
                 try {
                     const response =
                     await fetch(
@@ -216,7 +226,7 @@
         function editInventory() {
             var inputFields = document.getElementById("edit-section").children;
             var data = {}
-            var carouselID = document.querySelector('[placeholder="carouselID"]').value;
+            var donationID = document.querySelector('[placeholder="donationID"]').value;
             for (var i in inputFields) {
                 input = inputFields[i];
                 inputChildrenCount = input.childElementCount;
@@ -236,7 +246,7 @@
             }
             var jsondata = JSON.stringify(data);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5003/updateFormAnswers/carousel/" + carouselID;
+                var serviceURL = "http://127.0.0.1:5003/updateFormAnswers/donation/" + donationID;
                 try {
                     const response =
                     await fetch(
@@ -270,14 +280,14 @@
         function editPhotoFile() {
             var data = new FormData();
             var editElements = document.getElementById("edit-photo").children;
-            var carouselID = document.getElementById("carouselID").value;
+            var donationID = document.getElementById("donationID").value;
             var file = document.getElementById("itemPhoto").files;
             var fileName = file[0].name;
             fileName = fileName.replace(/\s+/g, '');
             data.append(document.getElementById("itemPhoto").name, fileName);
             data.append("file", file[0]);
             $(async () => {
-                var serviceURL = "http://127.0.0.1:5003/updatePhoto/" + carouselID;
+                var serviceURL = "http://127.0.0.1:5003/updatePhoto/" + donationID;
                 try {
                     const response =
                     await fetch(

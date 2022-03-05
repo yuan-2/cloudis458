@@ -24,7 +24,7 @@ function editSpecificRow(form) {
     $("#edit-section").show();
     $("#carousel").hide();
     if (form == "Inventory") {
-        document.querySelector('[placeholder="carouselID"]').setAttribute("onchange", "fillCarouselDetails(this.value)");
+        document.querySelector('[placeholder="donationID"]').setAttribute("onchange", "fillCarouselDetails(this.value)");
         document.getElementById("edit-photo").style.display = "none";
     }
     else if (form == "Wishlist") {
@@ -56,7 +56,7 @@ function getEditDetails(fields) {
         if (field == "reqID") {
             fieldArr.unshift(fieldObj);
         }
-        else if (["carouselID", "wishlistID", "matchID"].includes(field)) {
+        else if (["donationID", "wishlistID", "matchID"].includes(field)) {
             fieldArr.unshift(fieldObj);
         }
         else if (field != "timeSubmitted") {
