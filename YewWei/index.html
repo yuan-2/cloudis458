@@ -373,7 +373,7 @@
     // Function to load donations
     async function loadCarousel() {
       try {
-        let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5004/getItems")
+        let response = await fetch("http://127.0.0.1:5004/getItems")
         let responseCode = await response.json()
         if (responseCode.code == 200) {
           return responseCode.data.items
@@ -388,7 +388,7 @@
     // Function to load wishlist items
     async function loadWishList() {
       try {
-        let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5004/getWL")
+        let response = await fetch("http://127.0.0.1:5004/getWL")
         let responseCode = await response.json()
         if (responseCode.code == 200) {
           return responseCode.data.items
@@ -399,7 +399,7 @@
     }
     // Async functions for Search Dropdown (Index Page)
     async function getDropDownCat() {
-      let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5004/getCat")
+      let response = await fetch("http://127.0.0.1:5004/getCat")
       let responseCode = await response.json()
 
       if (responseCode.code == 200) {
@@ -412,7 +412,7 @@
     async function populateSubCat(cat) {
       subCatList.innerHTML = ""
       cat = cat.value
-      let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5004/getSubCat/" + cat)
+      let response = await fetch("http://127.0.0.1:5004/getSubCat/" + cat)
       let responseCode = await response.json()
 
       if (responseCode.code == 200) {
@@ -431,7 +431,7 @@
 
     // If user is a MW, check if he has requested any items, then display item cards differently
     async function checkRequestedItems() {
-      let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5004/getMWRequested/" + user.username)
+      let response = await fetch("http://127.0.0.1:5004/getMWRequested/" + user.username)
       let data = await response.json()
       if (data.code == 200) {
         return data.requestedItemIds
@@ -456,7 +456,7 @@
     async function filter() {
       let subCatVal = subCatList.value
 
-      let response = await fetch("http://ec2-13-229-105-254.ap-southeast-1.compute.amazonaws.com:5004/getItemsBySubCat/" + subCatVal)
+      let response = await fetch("http://127.0.0.1:5004/getItemsBySubCat/" + subCatVal)
       let responseCode = await response.json()
 
       if (responseCode.code == 200) {
