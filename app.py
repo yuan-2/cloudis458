@@ -12,7 +12,7 @@ import bcrypt
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost:3306/imatch'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
@@ -186,14 +186,13 @@ def checkLogin():
     formDict = formData.to_dict()
     uName = formDict["username"]
     pw = formDict["password"]
-    
+
     user = User.query.filter_by(username=uName).first()
     if (user != None):
         if (bcrypt.checkpw(str(pw).encode('utf-8'), str(user.password).encode('utf-8'))):
-        
+
             print("Password checks out")
-    
-        
+
             return jsonify(
                 {
                     "code": 200,
@@ -203,12 +202,13 @@ def checkLogin():
                     }
                 }
             )
+    else:
         return jsonify(
-        {
-            "code": 404,
-            "message": "User not found, please register and try again."
-        }
-    ), 404
+            {
+                "code": 404,
+                "message": "User not found, please register and try again."
+            }
+        )
 # endregion
 
 # region FORMBUILDER
