@@ -1,5 +1,3 @@
-from cgi import print_directory
-from cv2 import Mat_DEPTH_MASK
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import load_only
