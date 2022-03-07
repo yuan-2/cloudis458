@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+        <title>Inner Page - Medilab Bootstrap Template</title>
+        <meta content="" name="description">
+        <meta content="" name="keywords">
+
+        <!-- Favicons -->
+        <link href="../assets/img/favicon.png" rel="icon">
+        <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+        <!-- Vendor CSS Files -->
+        <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+        <link href="../assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+        <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+        <link href="../assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+        <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+        <link href="../assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+        <!-- Template Main CSS File -->
+        <link href="adminStyle.css" rel="stylesheet">
+
+        <!-- datatables.net -->
+        <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+        <!-- jQuery & Popper.js -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>       
+
+        <!-- Custom Javascript -->
+        <script src="../assets/js/form.js" type="text/javascript"></script>
+        <script src="../assets/js/formprocessing.js" type="text/javascript"></script>
+        <script src="../assets/js/table.js"></script>
+
+        <!-- =======================================================
+        * Template Name: Medilab - v4.7.0
+        * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
+        * Author: BootstrapMade.com
+        * License: https://bootstrapmade.com/license/
+        ======================================================== -->
+</head>
+
+<body onload="checkLogin()">
+
+    <!-- ======= Top Bar ======= -->
+    <div id="topbar" class="d-flex align-items-center fixed-top">
+        <div class="container d-flex justify-content-between">
+            <div class="contact-info d-flex align-items-center">
+                <i class="bi bi-envelope"></i> <a
+                    href="mailto:tsrainingraincoats@gmail.com">itsrainingraincoats@gmail.com</a>
+            </div>
+            <div class="d-none d-lg-flex social-links align-items-center">
+                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i
+                        class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com/itsrainingraincoats/" class="instagram"><i
+                        class="bi bi-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i
+                        class="bi bi-linkedin"></i></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top">
+        <div class="container d-flex align-items-center">
+
+            <h1 class="logo me-auto"><a href="index.html">iMatch</a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+            <nav id="navbar" class="navbar order-last order-lg-0">
+                <ul>
+                    <li><a class="nav-link" href="adminHomepage.html">Home</a></li>
+                    <li><a class="nav-link" href="adminViewRequests.html">Requests</a></li>
+                    <li><a class="nav-link" href="adminViewSuccessfulMatches.html">Matches</a></li>
+                    <li><a class="nav-link" href="adminEditInventory.html">Inventory</a></li>
+                    <li><a class="nav-link" href="adminViewWishlist.html">Wishlist</a></li>
+                    <li><a class="nav-link" href="adminViewDelivery.html">Delivery</a></li>
+                    <li><a class="nav-link" href="adminViewAccounts.html">Accounts</a></li>
+                    <li><a class="nav-link" href="adminEditFaq.html">FAQ</a></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
+        </div>
+    </header><!-- End Header -->
+
+    <main id="main">
+        <section></section>
+        <section style="padding-bottom: 0px;">
+            <div class="section-title">
+                <h2>View Requests</h2>
+                <p>View all requests submitted by migrant workers</p>
+            </div>
+        </section>
+        <section class="inner-page">
+            <div class="container">
+                <table id="requests" class="table table-striped table-hover" style="width:100%">
+                </table>
+                <button type="button" id="edit-btn" href="#" class="mt-2 btn btn-outline-secondary" onclick="editSpecificRow('Request')" style="display: none">Edit Specific Row</button>
+                <button type="button" id="edit-btn3" href="#" class="mt-2 btn btn-outline-secondary" onclick="retrieveFormAdmin('request')" style="display: none">Add New Row</button>
+                <button type="button" id="edit-btn4" href="#" class="mt-2 btn btn-outline-secondary" onclick="deleteRow('request')" style="display: none">Delete Specific Row</button>
+                <br><br>
+                <hr>
+                <br>
+                <div id="edit-section" style="display: none"></div>
+            </div>
+        </section>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+        <script src="../assets/js/form.js"></script>
+
+        <script>
+            var columns = [];
+
+            function getDT() {
+                $.ajax({
+                    url: "http://127.0.0.1:5003/getRequests",
+                    success: function (data) {
+                        columnNames = Object.values(data.columnHeaders);
+                        // items = data.data.items;
+                        // console.log(data.data.items)
+                        // editFields = "";
+                        for (var i in columnNames) {
+                            columns.push({
+                                data: columnNames[i],
+                                title: columnNames[i]
+                            });
+                        }
+                        var table = $('#requests').DataTable({
+                            data: data.data,
+                            columns: columns,
+                            fixedHeader: true,
+                        });
+                        fields = data.data[0];
+                        fields["columnDetails"] = data.columnHeaders;
+                        getEditDetails(fields);
+                        $("#edit-btn").show();
+                        $("#edit-btn3").show();
+                        $("#edit-btn4").show();
+                        $("#request").hide();
+                    },
+                    error: function () {
+                        $("#edit-btn").hide();
+                        $("#edit-btn3").hide();
+                        $("#edit-btn4").hide();
+                        $("#request").hide();
+                        document.getElementById("edit-section").innerHTML = "There are currently no requests to be found."
+                        $("#edit-section").show();
+                    }
+
+                })
+            }
+
+            $(document).ready(function () {
+                getDT();
+            });
+
+            function fillRequestDetails(val) {
+                console.log(val);
+                $(async () => {
+                    var serviceURL = "http://127.0.0.1:5003/getRequests/" + val;
+                    try {
+                        const response =
+                            await fetch(
+                                serviceURL, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                });
+                        const result = await response.json();
+                        if (response.status == 200) {
+                            // success case
+                            for (var i in result.data) {
+                                if (["deliveryLocation", "donorID", "itemStatus", "requestQty", "migrantID", "carouselID"]
+                                    .includes(i)) {
+                                    for (id in result.columnHeaders) {
+                                        if (result.columnHeaders[id] == i) {
+                                            document.querySelector('[placeholder="' + i + '"]').value =
+                                                result.data[i];
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        if (response.status == 404) {
+                            alert('There is no such request ID in the database, please enter a valid ID.')
+                        }
+                    } catch (error) {
+                        // Errors when calling the service; such as network error, 
+                        // service offline, etc
+                        alert('There is a problem retrieving the data, please try again later.');
+                    } // error
+                });
+            }
+
+            function editRequest() {
+                var data = {};
+                var inputFields = document.getElementById("edit-section").children;
+                var reqID = document.querySelector('[placeholder="reqID"]').value;
+                for (var i in inputFields) {
+                    input = inputFields[i];
+                    inputChildrenCount = input.childElementCount;
+                    inputChildren = inputFields[i].children;
+                    if (inputChildrenCount > 0) {
+                        inputChildElement = inputChildren[1];
+                        inputLabelElement = inputChildren[0];
+                        // data[inputChildElement.id] = inputChildElement.value;
+                        if (inputChildElement.value == "") {
+                            alert("Please do not leave any blanks.");
+                            break;
+                        } else {
+                            data[inputLabelElement.innerHTML] = inputChildElement.value;
+                        }
+                    }
+                }
+                var jsondata = JSON.stringify(data);
+                $(async () => {
+                    var serviceURL = "http://127.0.0.1:5003/updateRequest/" + reqID;
+                    try {
+                        const response =
+                            await fetch(
+                                serviceURL, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: jsondata,
+                                });
+                        const result = await response.json();
+                        if (response.status == 200) {
+                            // success case
+                            alert('Successfully updated data in database. Please refresh to view changes.')
+                            window.location.reload();
+                        }
+                    } catch (error) {
+                        // Errors when calling the service; such as network error, 
+                        // service offline, etc
+                        alert('There is a problem updating the data, please try again later.');
+                    } // error
+                });
+            }
+          
+        </script>
+
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-3 col-md-6 footer-contact">
+                        <h3>ItsRainingRaincoats</h3>
+                        <p>
+                            For general enquiries <br>
+                            feel free to contact us at<br>
+                            <strong>Email:</strong> itsrainingraincoats@gmail.com<br>
+                        </p>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 footer-links">
+                        <h4>Our Services</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i> <a href="index.html">Home</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="donateGeneral.html">Donate to us</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="login.html">Login</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="register.html">Register</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 footer-links">
+                        <h4>Useful Links</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i> <a
+                                    href="https://www.itsrainingraincoats.com/">Homesite</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- <div class="col-lg-4 col-md-6 footer-newsletter">
+                        <h4>Join Our Newsletter</h4>
+                        <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
+                        <form action="" method="post">
+                            <input type="email" name="email"><input type="submit" value="Subscribe">
+                        </form>
+                    </div> -->
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container d-md-flex py-4">
+
+            <div class="me-md-auto text-center text-md-start">
+                <div class="copyright">
+                    &copy; Copyright <strong><span>IRR</span></strong>. All Rights Reserved
+                </div>
+                <div class="credits">
+                    <!-- All the links in the footer should remain intact. -->
+                    <!-- You can delete the links only if you purchased the pro version. -->
+                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/ -->
+                </div>
+            </div>
+            <div class="social-links text-center text-md-right pt-3 pt-md-0">
+                <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
+                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i
+                        class="bx bxl-facebook"></i></a>
+                <a href="https://www.instagram.com/itsrainingraincoats/?hl=en" class="instagram"><i
+                        class="bx bxl-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i
+                        class="bx bxl-linkedin"></i></a>
+            </div>
+        </div>
+    </footer><!-- End Footer -->
+
+
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="../assets/vendor/purecounter/purecounter.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="../assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="../assets/vendor/php-email-form/validate.js"></script>
+    <script src="login.js"></script>
+    <!-- Template Main JS File -->
+    <script src="../assets/js/main.js"></script>
+
+</body>
+
+</html>

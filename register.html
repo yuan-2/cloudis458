@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>IMatch - Registration</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link rel="icon"
+        href="assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-32x32.png"
+        sizes="32x32" />
+    <link rel="icon"
+        href="assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-192x192.png"
+        sizes="192x192" />
+    <link rel="apple-touch-icon"
+        href="assets/img/logo/cropped-ItsRainingRaincoats-Logo-A-2-180x180.png" />
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <!-- =======================================================
+  * Template Name: Medilab - v4.7.0
+  * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body onload="checkLogin()">
+
+    <!-- ======= Top Bar ======= -->
+    <div id="topbar" class="d-flex align-items-center fixed-top">
+        <div class="container d-flex justify-content-between">
+            <div class="contact-info d-flex align-items-center">
+                <i class="bi bi-envelope"></i> <a
+                    href="mailto:tsrainingraincoats@gmail.com">itsrainingraincoats@gmail.com</a>
+            </div>
+            <div class="d-none d-lg-flex social-links align-items-center">
+                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i
+                        class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com/itsrainingraincoats/" class="instagram"><i
+                        class="bi bi-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i
+                        class="bi bi-linkedin"></i></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======= Nav Bar ======= -->
+    <header id="header" class="fixed-top">
+        <div class="container d-flex align-items-center">
+
+            <h1 class="logo me-auto"><a href="index.html"></a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+            <nav id="navbar" class="navbar order-last order-lg-0">
+                <ul>
+                    <li><a class="nav-link scrollto" href="index.html">Home</a></li>
+                    <li><a class="nav-link scrollto active" href="donateGeneral.html">Donate</a></li>
+                    <li><a class="nav-link scrollto" href="requestWishList.html">Request</a></li>
+                    <li><a class="nav-link scrollto" href="faq.html">Help</a></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+
+            <a id="loginLogoutButton" onclick="loginLogout()" style="cursor: pointer;"
+                class="appointment-btn scrollto">Login</a>
+
+        </div>
+    </header><!-- End Header -->
+
+    <section id="hero" class="d-flex align-items-center"></section>
+
+    <main id="main">
+
+
+        <section>
+            <div class="container">
+                <div class="section-title">
+                    <h2>Migrant Worker Registration</h2>
+                </div>
+            </div>
+        </section>
+
+        <div style="max-width: 1000px; margin: auto;">
+            <div id="errorDiv" class="alert alert-warning d-none" role="alert">
+                <ul id="errorList"></ul>
+                <p class="text-center">Please ensure the above errors are resolved before submitting again.</p>
+            </div>
+            <form id="registerFormMW" class="row g-3" enctype="multipart/form-data">
+                <div class="col-md-6">
+                    <label for="userContact" class="form-label">Contact Number</label>
+                    <input type="text" placeholder="Enter your handphone number (e.g. 91325522)" class="form-control"
+                        id="userContact" name="userName" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="pw"
+                        placeholder="Enter a password between 6 to 8 characters long" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="confirm" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm" name="confirmPw"
+                        placeholder="Re-enter your password" required>
+                </div>
+
+                <div class="col-12" style='text-align: center; color: #E3A587;'>
+                    <button type="button" onclick="registerUser()" class="btn btn-outline-light"
+                        style="color:white; background-color: #E3A587;">Submit</button>
+                </div>
+            </form>
+            <br>
+        </div>
+
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-3 col-md-6 footer-contact">
+                        <h3>ItsRainingRaincoats</h3>
+                        <p>
+                            For general enquiries <br>
+                            feel free to contact us at<br>
+                            <strong>Email:</strong> itsrainingraincoats@gmail.com<br>
+                        </p>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 footer-links">
+                        <h4>Our Services</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i> <a href="index.html">Home</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="donateGeneral.html">Donate to us</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="login.html">Login</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="register.html">Register</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 footer-links">
+                        <h4>Useful Links</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i> <a
+                                    href="https://www.itsrainingraincoats.com/">Homesite</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- <div class="col-lg-4 col-md-6 footer-newsletter">
+                        <h4>Join Our Newsletter</h4>
+                        <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
+                        <form action="" method="post">
+                            <input type="email" name="email"><input type="submit" value="Subscribe">
+                        </form>
+                    </div> -->
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container d-md-flex py-4">
+
+            <div class="me-md-auto text-center text-md-start">
+                <div class="copyright">
+                    &copy; Copyright <strong><span>IRR</span></strong>. All Rights Reserved
+                </div>
+                <div class="credits">
+                    <!-- All the links in the footer should remain intact. -->
+                    <!-- You can delete the links only if you purchased the pro version. -->
+                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/ -->
+                </div>
+            </div>
+            <div class="social-links text-center text-md-right pt-3 pt-md-0">
+                <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
+                <a href="https://www.facebook.com/itsrainingraincoats/" class="facebook"><i
+                        class="bx bxl-facebook"></i></a>
+                <a href="https://www.instagram.com/itsrainingraincoats/?hl=en" class="instagram"><i
+                        class="bx bxl-instagram"></i></a>
+                <a href="https://www.linkedin.com/company/itsrainingraincoats/?originalSubdomain=sg" class="linkedin"><i
+                        class="bx bxl-linkedin"></i></a>
+            </div>
+        </div>
+    </footer><!-- End Footer -->
+
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/purecounter/purecounter.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        var user = ""
+
+        var itemCategoryOptions = document.getElementById('itemCategoryOptions')
+
+        var itemNameOptions = document.getElementById("itemNameOptions")
+
+        function checkLogin() {
+
+            if (sessionStorage.getItem("user") != null) {
+                user = JSON.parse(sessionStorage.getItem("user"))
+
+
+                document.getElementById("loginLogoutButton").innerText = "Logout"
+            }
+        }
+
+        const form = document.getElementById("registerFormMW")
+
+        function registerUser() {
+            var registerFormElements = document.forms[0].elements
+
+            let userName = ""
+            let pw1 = ""
+            let pw2 = ""
+            for (ele in registerFormElements) {
+                if (registerFormElements[ele].name == "pw") {
+                    pw1 = registerFormElements[ele].value
+                } else if (registerFormElements[ele].name == "confirmPw") {
+                    pw2 = registerFormElements[ele].value
+                } else if (registerFormElements[ele].name == "userName") {
+                    userName = registerFormElements[ele].value
+                }
+            }
+            var errorArr = [] // Used to store errors to be displayed
+
+            // Validate passwords
+            if (pw1.length != pw2.length) {
+                errorArr.push("Length of your password and your confirmation password are not the same")
+            } else if (pw1.length < 6 || pw2.length > 20) {
+                errorArr.push("Length of your password must be within 6 to 20 characters")
+            } else if (pw1 !== pw2) {
+                errorArr.push("The two passwords that you have entered do not match")
+            }
+
+            // Validate Username/Contact
+            if (userName.length > 8 || userName.length < 8) {
+                errorArr.push("The contact number you have entered has more or less than 8 digits")
+            } else if (parseInt(userName) == NaN) {
+                errorArr.push("Please make sure your contact number has no spaces, and only consist of numbers")
+            }
+
+            // Retrieve errorDiv to add/remove alert class
+            var errorDiv = document.getElementById('errorDiv')
+            var errorList = document.getElementById('errorList')
+
+            errorList.innerHTML = ""
+
+            if (errorArr.length > 0) {
+
+                errorDiv.classList.remove("d-none")
+                errorDiv.classList.add("d-block")
+
+                for (err of errorArr) {
+                    errorList.innerHTML += `
+                    <li>${err}</li>
+                    `
+                }
+
+            } else {
+                errorDiv.classList.remove("d-block")
+                errorDiv.classList.add("d-none")
+
+                var formData = new FormData();
+
+                for (ele in registerFormElements) {
+                    formData.append(registerFormElements[ele].name, registerFormElements[ele].value)
+                }
+
+                let res = addNewMW(formData, 'http://127.0.0.1:5003/registermw')
+            }
+
+        }
+
+        async function addNewMW(data, url) {
+
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: data // body data type must match "Content-Type" header
+            });
+
+            // console.log(response.status)
+
+            if (response.status >= 200 && response.status < 300) {
+                data = await response.json()
+                if (data.code == "200") {
+                    alert("User registered successfully!")
+                    window.location.href = "login.html"
+                } else {
+                    alert(data.message)
+                }
+            } else {
+                alert("The contact number you have entered has already been registered")
+            }
+        }
+
+        function loginLogout() {
+            if (document.getElementById("loginLogoutButton").innerText === "Login") {
+                window.location.href = "login.html"
+            } else {
+                sessionStorage.removeItem("userType")
+                window.location.reload()
+            }
+        }
+    </script>
+
+</body>
+
+</html>
