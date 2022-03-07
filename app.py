@@ -1288,7 +1288,7 @@ def getRankByReqHistory(donationID):
                 addressFieldID = FormBuilder.query.filter_by(fieldName="Address").first()
                 donorLoc = FormAnswers.query.filter_by(submissionID=donationID).filter_by(fieldID=addressFieldID).answer # 510121
                 # google maps api to calculate distance
-                apikey = "AIzaSyBQbgb9Au-6D6l6xzrZrYV7cUQNb1gIZ2I"
+                apikey = ""
                 geocodeAPI = "https://maps.googleapis.com/maps/api/geocode/json?address=" + donorLoc + "&key=" + apikey
                 req = request.get(geocodeAPI)
                 if req.status == "OK":
