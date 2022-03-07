@@ -1,5 +1,3 @@
-from cgi import print_directory
-from cv2 import Mat_DEPTH_MASK
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import load_only
@@ -10,7 +8,7 @@ from os import environ
 from sqlalchemy import ForeignKey
 from werkzeug.utils import secure_filename
 import bcrypt
-
+import random
 
 app = Flask(__name__)
 
@@ -1264,31 +1262,90 @@ def getRankByReqHistory(donationID):
         minValue = min(allKeys, default="EMPTY")
         priorityMW = reqHist[minValue]
         mwPoints = {}
+        
         # check whether item requires delivery
         deliveryFieldID = FormBuilder.query.filter_by(fieldName="Delivery Method").first()
         deliveryOption = FormAnswers.query.filter_by(submissionID=donationID).filter_by(fieldID=deliveryFieldID).first()
-        # if deliveryOption == "Self Pick-Up":
-            # find migrant worker(s) w shortest distance 
+        if deliveryOption == "Self Pickup":
+            for mw in priorityMW:
+                mwPoints[mw] = 0
+        else:
+            if deliveryMWOption == "Self Pickup":
+                for mw in priorityMW:
+                    deliveryMWOption = Request.query.filter_by(donationID=donationID).filter_by(migrantID=mw).first()
+                    mwPoints[mw] = 0
+            
+            # if donor did not choose self pick-up & no mw chose self pick-up, put all mw priority as 0
+            if len(mwPoints[0]) == 0:
+                for mw in priorityMW:
+                    deliveryMWOption = Request.query.filter_by(donationID=donationID).filter_by(migrantID=mw).first()
+                    mwPoints[mw] = 0
+                            
+            # find migrant worker(s) w shortest distance
+            mwDist = {}
+            for mw, points in mwPoints.items():
+                mwLoc = Request.query.filter_by(donationID=donationID).filter_by(migrantID=mw).first().deliveryLocation # 510425
+                addressFieldID = FormBuilder.query.filter_by(fieldName="Address").first()
+                donorLoc = FormAnswers.query.filter_by(submissionID=donationID).filter_by(fieldID=addressFieldID).answer # 510121
+                # google maps api to calculate distance
+                apikey = "AIzaSyBQbgb9Au-6D6l6xzrZrYV7cUQNb1gIZ2I"
+                geocodeAPI = "https://maps.googleapis.com/maps/api/geocode/json?address=" + donorLoc + "&key=" + apikey
+                req = request.get(geocodeAPI)
+                if req.status == "OK":
+                    # donorLat = req.results.address_components.geometry.location.lat # 1.366873
+                    # donorLon = req.results.address_components.geometry.location.lon # 103.954398
+                    donorPlace_id = req.results.address_components.place_id
+                    donorPlace_id = "ChIJK9KBZ6k92jERr1T6ldQ2nd4" 
+                geocodeAPI = "https://maps.googleapis.com/maps/api/geocode/json?address=" + mwLoc + "&key=" + apikey
+                req = request.get(geocodeAPI)
+                if req.status == "OK":
+                    # msLat = req.results.address_components.geometry.location.lat # 1.369631
+                    # mwLon = req.results.address_components.geometry.location.lon # 103.954737
+                    mwPlace_id = req.results.address_components.place_id
+                    mwPlace_id = "ChIJJQC1na492jERsng9ndkThiM"
+                distanceAPI = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=place_id:" + donorPlace_id + "&origins=place_id:" + mwPlace_id + "&key=" + apikey
+                req = request.get(distanceAPI)
+                distance = req.rows.elements.distance.value
+                mwDist[distance] = mw
+                if distance < 3000:
+                    points += 1
+                elif 3000 <= distance < 5000:
+                    points += 2
+                elif 5000 <= distance < 7000:
+                    points += 3
+                elif 7000 <= distance < 9000:
+                    points += 4
+                else:
+                    points += 5
+            shortestDist = min(list(mwDist.keys()))
+            nearestMW = mwDist[shortestDist]
+            mwPoints[nearestMW] -= 1
         
-        # else: 
         # check for the list of MWs, how long since each of them have gotten an item
         # i only wrote down the logic... the code below doesn't work yet HAHAHA
-        if minValue != 0:      
-            timeNow = datetime.now()
-            for mwNum in priorityMW:
-                mw = Matches.query.filter_by(migrantID=mwNum).first()
-                lastItemTime = mw.matchDate
-                days = timeNow - lastItemTime # convert difference into no. of days
-                if 0 <= days < 14:
-                    mwPoints[mwNum] = 0
-                elif 14 <= days < 28:
-                    mwPoints[mwNum] = 1
-                elif 28 <= days < 42:
-                    mwPoints[mwNum] = 2
-                elif 42 <= days < 56:
-                    mwPoints[mwNum] = 4
-                else:
-                    mwPoints[mwNum] = 6
+        timeNow = datetime.now()
+        for mwNum, points in mwPoints:
+            mw = Matches.query.filter_by(migrantID=mwNum).first()
+            lastItemTime = mw.matchDate
+            days = timeNow - lastItemTime # convert difference into no. of days
+            if 0 <= days < 14:
+                mwPoints[mwNum] += 6
+            elif 14 <= days < 28:
+                mwPoints[mwNum] += 4
+            elif 28 <= days < 42:
+                mwPoints[mwNum] += 2
+            elif 42 <= days < 56:
+                mwPoints[mwNum] += 1
+        minPoints = min(list(mwPoints.values()))
+        finalMWs = []
+        for mw, points in mwPoints.items():
+            if points == minPoints:
+                finalMWs.append(mw)
+        if len(finalMWs) == 1:
+            finalMW = finalMWs[0]
+        else:
+            randomInt = random.randint(1, len(finalMWs))
+            finalMW = finalMWs[randomInt]
             # if mw.lastItemTime in lastItem.keys():
             #     lastItem[mw.lastItemTime] += [mw.contactNo]
             # else:
@@ -1299,7 +1356,8 @@ def getRankByReqHistory(donationID):
         return jsonify(
             {
                 "code": 200,
-                "data": priorityMW
+                "data": priorityMW,
+                "finalMW": finalMW
             }
         )
     return jsonify(
