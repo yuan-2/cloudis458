@@ -412,7 +412,7 @@ def getItem(itemID):
     ), 404
 #endregion
 
-# region FORMANSWERS + CAROUSEL/WISHLIST
+# region FORMANSWERS + DONATION/WISHLIST
 # get all form answers by donation/wishlist submission
 def getFormAnswersBySubmission(submissionID):
     answerlist = FormAnswers.query.filter_by(submissionID=submissionID).all()
@@ -659,7 +659,7 @@ def updateFormAnswers(formName, submissionID):
         db.session.add(otherFormFields)
         db.session.commit()
         for d in data:
-            if d not in ["donorID", "carouselID", "wishlistID", "migrantID", "itemStatus"]:
+            if d not in ["donorID", "donationID", "wishlistID", "migrantID", "itemStatus"]:
                 dataDict[d] = data[d]
         for ans in formAnswers:
             fieldName = FormBuilder.query.filter_by(fieldID=ans.fieldID).first().fieldName
@@ -690,7 +690,7 @@ def updatePhoto(submissionID):
     formData = request.form
     formDict = formData.to_dict()
     imgFile = request.files['file']
-    formField = FormBuilder.query.filter_by(formName="carousel").filter_by(fieldName="Item Photo").first()
+    formField = FormBuilder.query.filter_by(formName="donation").filter_by(fieldName="Item Photo").first()
     fieldID = formField.fieldID
     formAnswer = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=fieldID).first()
     # save file
@@ -723,23 +723,23 @@ def updatePhoto(submissionID):
             }
         ), 500
 
-# delete formAnswers + carousel/wishlist
+# delete formAnswers + donation/wishlist
 @app.route("/deleteRow/<formName>/<submissionID>", methods=["DELETE"])
 def deleteRow(formName, submissionID):
-    if formName == "carousel":
-        row = Carousel.query.filter_by(carouselID=submissionID).first()
+    if formName == "donation":
+        row = Donation.query.filter_by(donationID=submissionID).first()
         oldFile = FormAnswers.query.filter_by(submissionID=submissionID).filter_by(fieldID=3).first().answer
     elif formName == "wishlist":
         row = Wishlist.query.filter_by(wishlistID=submissionID).first()
     formAnswers = FormAnswers.query.filter_by(submissionID=submissionID)
     try:
-        if formName == "carousel":
-            os.remove(os.path.join(uploads_dir, oldFile))
         db.session.delete(row)
         db.session.commit()
         for ans in formAnswers:
             db.session.delete(ans)
             db.session.commit()
+        if formName == "donation":
+            os.remove(os.path.join(uploads_dir, oldFile))
         return jsonify (
             {
                 "code": 200,
@@ -758,7 +758,7 @@ def deleteRow(formName, submissionID):
 
 # endregion
 
-# region CAROUSEL
+# region DONATION
 # get all donation items
 @app.route("/donation")
 def getAllDonationItems():
