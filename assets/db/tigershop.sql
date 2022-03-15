@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
   `username` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
   PRIMARY KEY (`username`)
 ) ;
 
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 DROP TABLE IF EXISTS `purchase`;
 CREATE TABLE IF NOT EXISTS `purchase` (
   `purchaseID` varchar(30) NOT NULL,
-  `username` int NOT NULL,
+  `username` varchar(100) NOT NULL,
   `itemID` int NOT NULL,
   PRIMARY KEY (`purchaseID`),
   FOREIGN KEY (`username`) references user (`username`)
