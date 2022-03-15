@@ -117,152 +117,66 @@ def checkLogin():
         )
 # endregion
 
-# region CAROUSEL
-# get all donation items
-@app.route("/donation")
-def getAllDonationItems():
-    donationList = Donation.query.all()
-    if len(donationList):
-        itemList = []
-        for donationItem in donationList:
-            item = donationItem.json()
-            formAnswers = getFormAnswersBySubmission(item["donationID"])
-            itemDetails = getItem(item["itemID"]).get_json()["data"]
-            itemDetails.pop("itemID")   # remove duplicate itemID
-
-            itemList.append(dict(**item, **formAnswers, **itemDetails))
-        return jsonify(
-            {
-                "code": 200,
-                "data": {
-                    "items": itemList
-                }
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "There are no donations at the moment."
-        }
-    ), 404
-
-# get specified donation item
-@app.route("/donation/<string:donationID>")
-def getDonationItem(donationID):
-    donationItem = Donation.query.filter_by(donationID=donationID).first()
-    if donationItem:
-        formAnswers = getFormAnswersBySubmission(donationItem.donationID)
-        itemDetails = getItem(donationItem.itemID).get_json()["data"]
-        itemDetails.pop("itemID")   # remove duplicate itemID
-
-        return jsonify(
-            {
-                "code": 200,
-                "data": dict(**donationItem.json(), **formAnswers, **itemDetails)
-            }
-        )
-    return jsonify(
-        {
-            "code": 404,
-            "message": "Donation does not exist."
-        }
-    ), 404
-
-# API for search function
-@app.route("/getItemsByCat/<string:cat>")
-def getItemsByCategory(cat):
-    catList = CategoryItem.query.filter_by(category=cat).all()
-    catItemList = []
-    for category in catList:
-        itemList = Donation.query.filter_by(itemID=category.itemID).all()
-        if (len(itemList)):
-            categorydict = category.json()
-            categorydict.pop("itemID")
-            catList = [dict(**item.json(),**categorydict) for item in itemList]
-            catItemList.extend(catList)
+# region ITEMS
+# get all items
+@app.route("/items")
+def getAllItems():
+    itemList = Item.query.all()
     if len(itemList):
         return jsonify(
             {
                 "code": 200,
                 "data": {
-                    "itemsByCat": catItemList
+                    "items": [item.json() for item in itemList]
                 }
             }
         )
     return jsonify(
         {
             "code": 404,
-            "message": "There are no items listed under this category."
+            "message": "There are no items at the moment."
         }
     ), 404
 
-@app.route("/getItemsBySubCat/<subcat>")
-def filterItems(subcat):
-    subcatList = CategoryItem.query.filter_by(subCat=subcat).all()
-    subcatItemList = []
-    for category in subcatList:
-        itemList = Donation.query.filter_by(itemID=category.itemID).all()
-        if (len(itemList)):
-            categorydict = category.json()
-            categorydict.pop("itemID")
-            subcatDetailsList = []
-            for item in itemList:
-                formAns = getFormAnswersBySubmission(item.donationID)
-                subcatDetailsList.append(dict(**item.json(),**categorydict, **formAns))
-            subcatItemList.extend(subcatDetailsList)
-    if (len(subcatItemList)):
+# get specific item
+@app.route("/item/<int:itemID>")
+def getItem(itemID):
+    item = Item.query.filter_by(itemID=itemID).first()
+    if item:
         return jsonify(
             {
                 "code": 200,
-                "data": {
-                    "items": subcatItemList
-                }
+                "data": item.json()
             }
         )
     return jsonify(
         {
             "code": 404,
-            "message": "There are no items donated under this Sub-category"
+            "message": "Item does not exist."
         }
     ), 404
     
 # endregion
 
-# region REQUEST
-@app.route("/request/<string:contactNo>")
-def getMwRequest(contactNo):
-    itemReqList = Donation.query\
-        .join(Request, Request.donationID==Donation.donationID)\
-            .filter(Request.donationID==Donation.donationID)\
-                .filter(Request.migrantID==contactNo)\
-                    .distinct()
-
-    itemIdArr = [id.json()['donationID'] for id in itemReqList]
-    
+# region PURCHASE
+@app.route("/purchase/<int:purchaseID>")
+def getPurchase(purchaseID):
+    purchase = Purchase.query.filter_by(purchaseID=purchaseID).first()    
     return jsonify(
         {
             "code": 200,
-            "requestedItemIds": itemIdArr
+            "data": purchase.json()
         }
     )
 
-@app.route("/request", methods=['POST'])
-def addNewRequest():
+@app.route("/purchase", methods=['POST'])
+def addPurchase():
         formData = request.form
         formDict = formData.to_dict()
         addtodb = {}
-        addtodb["donationID"] = formDict['id']
-        addtodb["deliveryLocation"] = formDict['destination']
-        addtodb["migrantID"] = formDict['contact']
-
-        # Get datetime of donation posting
-        now = datetime.now()
-        currentDT = now.strftime("%Y-%m-%d %H:%M:%S")
-        timeSubmitted = currentDT
-
-        addtodb["timeSubmitted"] = timeSubmitted
-
-        item = Request(**addtodb)
+        addtodb["username"] = formDict['username']
+        addtodb["itemID"] = formDict['itemID']
+        item = Purchase(**addtodb)
         
         try:
             db.session.add(item)
@@ -270,7 +184,7 @@ def addNewRequest():
             return jsonify (
                 {
                     "code": 200,
-                    "message": "Request registered successfully!"
+                    "message": "Purchased successfully!"
                 }
             )
         except Exception as e:
@@ -278,128 +192,45 @@ def addNewRequest():
             return jsonify(
                 {
                     "code": 500,
-                    "message": "An error occurred while registering your request, please try again later"
+                    "message": "An error occurred while purchasing, please try again later"
                 }
             ), 500
 
-# get all requests submitted by migrant workers
-@app.route("/getRequests")
-def getAllRequests():
-    requestList = Request.query.all()
-    data = []
-    for request in requestList:
-        row = {}
-        donationID = request.donationID
-        donationItem = Donation.query.filter_by(donationID=donationID).first()
-        itemID = donationItem.itemID
-        itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
-        row["itemName"] = itemName
-        row.update(donationItem.json())
-        row.update(request.json())
-        row.pop('itemID')
-        row.pop('donationID')
-        data.append(row)
-    columns = list(data[0].keys())
-    if len(requestList):
+# get all purchases submitted by user
+@app.route("/purchases/<string:username>")
+def getAllPurchases(username):
+    userPurchases = Purchase.query.filter_by(username=username)
+    if len(userPurchases) > 0:
         return jsonify(
             {
                 "code": 200,
-                "columnHeaders": columns,
-                "data": data
+                "data": [purchase.json() for purchase in userPurchases]
             }
         )
     return jsonify(
         {
             "code": 404,
-            "message": "There are no requests at the moment."
+            "message": "There are no purchases at the moment."
         }
     ), 404
 
-# get specific request by reqID
-@app.route("/getRequests/<reqID>")
-def getRequestByID(reqID):
-    request = Request.query.filter_by(reqID=reqID).first()
-    donationID = request.donationID
-    donationItem = Donation.query.filter_by(donationID=donationID).first()
-    itemID = donationItem.itemID
-    itemName = CategoryItem.query.filter_by(itemID=itemID).first().itemName
-    data = {}
-    data["itemName"] = itemName
-    data.update(request.json())
-    data.update(donationItem.json())
-    data.pop("itemID")
-    data.pop("donationID")
-    fieldNames = {}
-    columns = sorted(list(data.keys()))
-    for i in range(len(columns)):
-        fieldNames[i] = columns[i]
-    if request:
+# get specific purchase by purchaseID
+@app.route("/getPurchases/<int:purchaseID>")
+def getPurchaseByID(purchaseID):
+    purchase = Purchase.query.filter_by(purchaseID=purchaseID).first()
+    if purchase:
         return jsonify(
             {
                 "code": 200,
-                "columnHeaders": fieldNames,
-                "data": data
-                # "columnHeaders": NewRequest.metadata.tables["request"].columns.keys(),
-                # "data": request
+                "data": purchase.json()
             }
         )
     return jsonify(
         {
             "code": 404,
-            "message": "Request cannot be found for this ID."
+            "message": "Invalid purchase ID."
         }
     ), 404
-
-# update request by reqID
-@app.route("/updateRequest/<reqID>", methods=["PUT"])
-def updateRequest(reqID):
-    requested = Request.query.filter_by(reqID=reqID).first()
-    donation = Donation.query.filter_by(donationID=requested.donationID).first()
-    data = request.get_json()
-    if (requested is None):
-        return jsonify( 
-            {
-                "code": 404,
-                "message": "This reqID is not found in the database."
-            }
-        )
-    else:
-        requested.deliveryLocation = data['deliveryLocation']
-        # requested.requestQty = data['requestQty']
-        requested.migrantID = data['migrantID']
-        db.session.add(requested)
-        db.session.commit()
-        donation.itemStatus = data['itemStatus']
-        db.session.add(donation)
-        db.session.commit()
-        return jsonify(
-            {
-                "code": 200,
-                "message": "Request successfully updated."
-            }
-        )
-
-# delete request by reqID
-@app.route("/deleteRequest/<reqID>", methods=["DELETE"])
-def deleteRequest(reqID):
-    request = Request.query.filter_by(reqID=reqID).first()
-    try:
-        db.session.delete(request)
-        db.session.commit()
-        return jsonify (
-            {
-                "code": 200,
-                "message": "Row deleted successfully!"
-            }
-        )
-    except Exception as e:
-        print(e)
-        return jsonify(
-            {
-                "code": 500,
-                "message": "An error occurred while deleting the data, please try again later"
-            }
-        ), 500
 
 # endregion
 
